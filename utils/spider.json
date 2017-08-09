@@ -1,0 +1,10 @@
+{
+  "indexUrl":"http://www.uukanshu.com/b/31802/",
+  "indexReg":"<li><a href=\"/b/31802/(.*?)\" .*?>(.*?)</a></li>",
+  "contentTestUrl":"http://www.uukanshu.com/b/31802/79572.html",
+  "contentReg":"<h1 id=\"timu\">(.*?)</h1>.*?<div id=\"contentbox\">(.*?)<div .*?>.*?</div>(.*?)</div>",
+  "useContentTitle":true,
+  "contentOffset":765,
+  "reverseIndexOrder":true,
+  "outFile":"story2.txt"
+}

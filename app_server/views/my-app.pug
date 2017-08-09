@@ -1,0 +1,13 @@
+.navbar.navbar-default.navbar-fixed-top.mynav
+  h2.text-center Roof Sentry System
+.container
+  .panel.panel-default
+    .panel-heading
+      span #{title}
+      a.btn.btn-primary.btn-xs.fr(onclick="addLocation()") AddLocation
+    .panel-body
+      locations
+.navbar.navbar-default.navbar-fixed-bottom.mynav
+  .container
+    .fr
+      now(format="yyyy-MM-dd hh:mm:ss",startOn=startTimeDesc)

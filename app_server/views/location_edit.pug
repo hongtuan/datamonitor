@@ -1,0 +1,60 @@
+//- add customer page
+extends layout_subpage
+block append refRes
+  script(src='/lib/jquery-validate/jquery.validate.min.js')
+  script(src='/myjs/location_edit.js')
+  script(type="text/javascript").
+    var locData = !{locData};
+    $().ready(function() {
+      //control form's submit.
+      $("#cef").submit(checkForm);
+      if(!$.isEmptyObject(locData)) {
+        //console.log('edit loacation.');
+        $.each(locData,function(k,v){
+          //console.log(k+'='+v);
+          if(k=='alertpolices'){
+            v = JSON.stringify(JSON.parse(v),null,2);
+          }
+          $('#'+k).val(v);
+        });
+        //$('#cef').appendChild();
+        $('<input>').attr('type','hidden').attr('name','id').attr('value',locData._id).appendTo('#cef');
+      }else{
+        console.log('add loacation here.');
+        var alertpolicesDefault = {Temperature:{min:50,max:120},DeltaHumidity:{min:-7,max:10}};
+        $("#alertpolices").val(JSON.stringify(alertpolicesDefault,null,2));
+      }
+    });
+block content
+  .container
+    form#cef.form-horizontal(role='form' method='post')
+      .form-group
+        .col-xs-3.text-right
+          label.control-label(for='name') Name:
+        .col-xs-9
+          input#name.form-control(type='text' name='name' placeholder='Enter Name' minlength='2' required)
+      .form-group
+        .col-xs-3.text-right
+          label.control-label(for='dataurl') DataUrl:
+        .col-xs-9
+          input#dataurl.form-control(type='text' name='dataurl' value='http://xsentry.co/api/v1/sentry/C47F51001099/snapshots' placeholder='Enter DataUrl' required)
+      .form-group
+        .col-xs-3.text-right
+          label.control-label(for='tzoffset') TZoffset:
+        .col-xs-9
+          input#tzoffset.form-control(type='text' name='tzoffset' value='-180' required placeholder='Enter monitperiod(seconds)')
+      .form-group
+        .col-xs-3.text-right
+          label.control-label(for='monitperiod') Monitperiod:
+        .col-xs-9
+          input#monitperiod.form-control(type='text' name='monitperiod' value='60' required placeholder='Enter monitperiod(seconds)')
+      .form-group
+        .col-xs-3.text-right
+          label.control-label(for='alertpolices') Alertpolices:
+        .col-xs-9
+          textarea#alertpolices(rows='6' cols='50' name='alertpolices' placeholder='Enter alertpolices')
+      .form-group
+        .col-xs-offset-3.col-xs-9
+          a.btn.btn-primary.btn-xs(onclick="saveLocation()") save
+          span.sbb80
+          a.btn.btn-primary.btn-xs(onclick="closeFrameWin()") cancel

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Map rotation</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        width: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      #map-canvas {
+         -ms-transform: rotate(40deg); /* IE 9 */
+        -webkit-transform: rotate(40deg); /* Safari */
+        transform: rotate(40deg); /* Standard syntax */
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXZwCraYGZB_15hN6Ml1UmYAKDLHTBik&libraries=drawing"></script>
+    <script>
+    function getCircleOptions(center,circleColor,draggable){
+    	return {
+        strokeColor: circleColor,
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: circleColor,
+        fillOpacity: .85,
+        center: center,
+        radius: 1.0,
+        draggable:draggable||false,
+        zIndex: 2
+      };
+    }
+
+  //for deploy use
+  function drawCircle(center,circleColor,draggable,map){
+  	var circle = new google.maps.Circle(
+  	  getCircleOptions(center,circleColor,draggable));
+    //circle.setInitColor(circleColor);
+    //circle.setInitCenter(center);
+    circle.setMap(map);
+  	return circle;
+  }
+
+function initialize() {
+  var coords = new google.maps.LatLng(39.141519,-76.801555);
+  var mapOptions = {
+    zoom: 18,
+    center: coords,
+    mapTypeId: 'satellite'
+  }
+  
+  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+  var c1 = drawCircle(coords,'blue',true,map);
+  c1.addListener('click',function(e){
+    //e.stop();
+    alert('Hello!you clicked me!');
+  });
+  console.log('initialize over.');
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
+</html>

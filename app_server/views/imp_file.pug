@@ -1,0 +1,34 @@
+extends layout_subpage
+block append refRes
+  style.
+    .lform{padding-top:5px;}
+    .lbtxt{padding-top:10px;text-align:right;}
+    .ilipt{padding-top:5px;}
+    .btrow {padding-top:10px;}
+  script.
+    var parentWin;
+    var crtWinIndex;
+    var crtPid = "{pid}";
+    function doImportData(){
+      //alert($("#forma").prop('action'));
+      $("#forma").submit();
+    }
+    
+    function doClose(){
+      parent.layer.close(crtWinIndex);
+    }
+
+block content
+  rows
+    form#forma.form-horizontal.lform(role="form" action= impUrl enctype="multipart/form-data" method="post")
+      input(type="hidden" name="lid" value= lid)
+      input(type="hidden" name="bid" value= bid)
+      form-group
+        label.col-xs-2.control-label.lbtxt(for="data") Data:
+        .col-xs-10.ilipt
+          input.form-control(type="file" name="impfile")
+      form-group.lbtxt
+        .col-xs-offset-3.col-xs-3.btrow
+          a.btn.btn-primary.btn-xs(onclick="doImportData()") Save
+        .col-xs-4.btrow
+          a.btn.btn-primary.btn-xs(onclick="doClose()") Cancel

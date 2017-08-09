@@ -1,0 +1,64 @@
+body {
+  font: 12px Arial;
+}
+
+path {
+  stroke: steelblue;
+  stroke-width: 2;
+  fill: none;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: white;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  fill: white;
+}
+
+.legend,.legend-time,.dvtext,.dctext,.tips-text {
+  fill: white;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+.loader {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  z-index: 99;
+  display: none;
+}
+
+.loader p {
+  margin-top: 180px;
+}
+
+.dot {
+  fill: #000;
+}
+
+.dcrectxx {
+  cursor: pointer;
+  z-index: 10;
+}
+
+.clkrect{
+  cursor: pointer;
+  fill: #00008B;
+  opacity: 0;
+}
+.tips{pointer-events: none;opacity: 0.9;fill: #00008B;}
+.tips-text {font-size: 2em;}

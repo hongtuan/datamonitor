@@ -1,0 +1,191 @@
+extends layout_subpage
+block append refRes
+  style.
+    .mynav{margin:2px 20px 0px 20px;}
+    #headingArea,#mainArea,#footerArea{background-color:#00008B;color:white;}
+    #timeRangeText{width:370px;font-size:18px;background-color:#00008B;}
+    #d3container{min-width:300px;min-height:500px;width:100%";}
+    
+  link(rel="stylesheet" type="text/css" href="/lib/d3/d3ext/charts.css")
+  link(rel="stylesheet" type="text/css" href="/lib/daterangepicker/daterangepicker.css")
+  script(src='/lib/moment/min/moment.min.js')
+  script(src="/lib/daterangepicker/daterangepicker.js")
+  script(src='/myjs/timeselect.js')
+  //script(src='/lib/d3/d3_v3.3.3.min.js')
+  script(src='/lib/d3/d3.js')
+  script(src='/lib/requirejs/require.min.js')
+  script(src='/lib/d3/d3ext/charts.js')
+
+  script.
+    var parentWin;
+    var crtWinIndex;
+
+    function doClose(){
+      parent.layer.close(crtWinIndex);
+    }
+
+    function switchChart(cbObj){
+      var chartId = cbObj.name;
+      var visible = cbObj.checked;
+      setChartVisible(chartId,visible);
+    }
+    
+    function switchDataTable(cbObj){
+      var dtObj = $("#dataTableDiv");
+      if(cbObj.checked){
+        dtObj.removeClass('hidden');
+      }else{
+        dtObj.addClass('hidden');
+      }
+    }
+    
+    var dataTimeRange;
+    function updateTimeRangeText(){
+      var timeRangeCtrl = $("#timeRangeText");
+      var fmt = 'MM/DD/YYYY h:mm a';
+      timeRangeCtrl.val(moment(dataTimeRange.from).format(fmt) + ' - ' + moment(dataTimeRange.to).format(fmt));
+    }
+    function refreshCharts(){
+      removeAllCharts();
+      //console.log('in refreshCharts:\n',JSON.stringify(dataTimeRange,null,2));
+      var url = '/api/nd/getavgnd/!{lid}/!{nid}';
+      //console.log('url=',url);
+      $.get(url,dataTimeRange,function(data,status){
+        if(data){
+          var dtCtrls = $(":checkbox.dataType");
+          var chartsConfig = [];
+
+          for(var i = 0; i < dtCtrls.length; i++){
+            var cbObj = dtCtrls[i];
+            var dataName = cbObj.id;
+            var lc = {id:dataName,name:cbObj.title,visible:cbObj.checked};
+            var dataA = [];
+            data.dataList.forEach(function(nd){
+              var di = {DateTime:nd.dataTime,Value:nd.dataObj[dataName]};
+              if(nd.dataObj['isSham']){
+                di['isSham'] = true;
+              }
+              dataA.push(di);
+            });
+            lc['data'] = dataA;
+            chartsConfig.push(lc);
+          }
+          //drawCharts here:
+          drawCharts('d3container',chartsConfig);
+          
+          //fill data to datatable.
+          var table = $('#dataTable').DataTable();
+          table.clear();
+          var i = 1;
+          data.dataList.forEach(function(nd){
+            table.row.add([i++,iso2LocaleDate(nd.dataTime),json2Str(nd.dataObj)]);
+          });
+          table.draw();
+        }else{
+          var table = $('#dataTable').DataTable();
+          table.clear().draw();
+        }
+        //close load win here.
+        //parent.layer.close(lwi);
+      });
+    }
+    
+    function toNodeData(){
+      window.location = `/dm/vnd/!{lid}/!{nid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
+      //parent.layer.title('NodeAvgData', crtWinIndex);
+    }
+    
+    function toAllData(){
+      window.location = `/dm/ad/!{lid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
+      parent.layer.title('AllNodesData', crtWinIndex);
+    }
+    
+    function setDlgTitle(){
+      //console.log('setDlgTitle here.');
+      if(parentWin){
+        var ni = parentWin.getNodeByPid('!{nid}');//in fact is pid
+        if(ni){
+          var title = `NODE&nbsp;${ni.ptag}&nbsp;&nbsp;[${ni.nid.substr(8)}]-AvgData`;
+          parent.layer.title(title, crtWinIndex);
+        }
+      }
+    }
+
+    function refresh(){
+      dataTimeRange.to = moment().toISOString();
+      //end = moment();
+      refreshCharts();
+      updateTimeRangeText();
+    }
+
+    $().ready(function() {
+      var navHeight = $("#headingArea").outerHeight();
+      $("#mainArea").css("padding-top",navHeight+5+"px");
+      //config datatable here:
+      $('#dataTable').DataTable({
+        searching: false,
+        ordering:  true,
+        "scrollY":        "80px",
+        "scrollCollapse": true,
+        "paging":         false
+      });
+
+      setDlgTitle();
+      dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
+      if(dataTimeRange.from == ''){
+        dataTimeRange = timeRangeSelector.getDefaultRange();
+      }
+      refreshCharts();
+      updateTimeRangeText();
+    });
+
+block content
+  .navbar.navbar-default.navbar-fixed-top
+    #headingArea.phfp.mynav
+      table
+        tr
+          td.tdtfr DataType:
+          td
+            each _dap in dap
+              span.sbb5
+              input.dataType(type="checkbox" onclick="switchChart(this)" checked= _dap.dh!=1 id= _dap.name name= _dap.name title= _dap.desc)
+              span= _dap.name
+            span.sbb5
+            input(type="checkbox" onclick="switchDataTable(this)" id="sdt" name="sdt" title="Switch DataTable")
+            span DataTable
+            
+        tr
+          td.tdtfr TimeRange:
+          td
+            input#timeRangeText(type="text" value="" readOnly)
+            span.sbb5
+            a.btn.btn-primary.btn-xs.text-center(onclick="toNodeData()" title="Jump to Node data") Node Data
+            span.sbb5
+            a.btn.btn-primary.btn-xs.text-center(onclick="toAllData()" title="Jump to All data") All Data
+            span.sbb5
+            a.btn.btn-primary.btn-xs.text-center(onclick="refresh()" title="Refresh this view") Refresh
+            script.
+              timeRangeSelector.config({endWithCurTime:'no',startHour:5,startMinute:30}).show('timeRangeText',function(selectedTimeRange){
+                dataTimeRange = selectedTimeRange;
+                refreshCharts();
+              },function(){
+                parent.layer.msg('timeRange invalid.');
+              });
+             
+  .container-fluid
+    .panel.panel-default
+      #mainArea.panel-body
+        #d3container
+        div.loader
+          p Please waiting...
+        #dataTableDiv.hidden
+          table#dataTable.table.table-bordered
+            thead
+              tr.btn-primary
+                th num
+                th dataTime
+                th dataValues
+
+      #footerArea.panel-footer
+        .col-xs-offset-5
+          a.btn.btn-primary.btn-xs.text-center(onclick="doClose()") Close

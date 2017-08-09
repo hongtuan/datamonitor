@@ -1,0 +1,16 @@
+<div class="page-top clearfix" baScrollPosition maxHeight="50" (scrollChange)="scrolledChanged($event)"
+     [ngClass]="{scrolled: isScrolled}">
+  <a routerLink="/pages/location" class="al-logo clearfix"><span>Home</span></a>
+  <a href (click)="toggleMenu()" class="collapse-menu-link ion-navicon"></a>
+
+  <div class="systitle">
+    <h2>Roof Sentry System</h2>
+  </div>
+
+  <div class="user-profile clearfix">
+    <div *ngIf="isLogin">
+      <span>{{userName}}</span>
+      <button class="btn btn-primary" (click)="logOut()">logout</button>
+    </div>
+  </div>
+</div>

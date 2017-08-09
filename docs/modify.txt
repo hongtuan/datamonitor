@@ -1,0 +1,23 @@
+
+-- 去掉了页脚代码。
+/adminframe/src/app/pages/pages.component.ts
+<footer class="al-footer clearfix">
+      <div class="al-footer-right" translate>{{'general.created_with'}} <i class="ion-heart"></i></div>
+      <div class="al-footer-main clearfix">
+        <div class="al-copy">&copy; <a href="http://akveo.com" translate>{{'general.akveo'}}</a> 2016</div>
+        <ul class="al-share clearfix">
+          <li><i class="socicon socicon-facebook"></i></li>
+          <li><i class="socicon socicon-twitter"></i></li>
+          <li><i class="socicon socicon-google"></i></li>
+          <li><i class="socicon socicon-github"></i></li>
+        </ul>
+      </div>
+    </footer>
+    <ba-back-top position="200"></ba-back-top>
+
+--修改页头，修改系统标题，去掉搜索，和警告、信息提示。
+/adminframe/src/app/theme/components/baPageTop/baPageTop.html
+/adminframe/src/app/theme/components/baPageTop/baPageTop.scss --添加了样式systitle
+
+--简化登录界面
+/adminframe/src/app/pages/login/login.html

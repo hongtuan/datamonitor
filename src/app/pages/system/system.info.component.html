@@ -1,0 +1,20 @@
+<div class="panel-body">
+  <div id="locListPanel">
+    <table class="table table-bordered">
+      <thead>
+        <tr class="btn-primary">
+          <th width="60">Name</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let si of systemInfo">
+          <td>{{si.name}}</td>
+          <td>{{si.value}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+

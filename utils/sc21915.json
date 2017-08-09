@@ -1,0 +1,13 @@
+{
+  "storyName":"史上第一混乱",
+  "storyNum":21915,
+  "encode":"gbk",
+  "baseUrl":"http://www.uukanshu.com/b",
+  "indexUrl":"{baseUrl}/{storyNum}/",
+  "indexReg":"<li><a href=\"/b/{storyNum}/(.*?)\" .*?>(.*?)</a></li>",
+  "contentTestUrl":"{baseUrl}/{storyNum}/97425.html",
+  "contentReg":"<h1 id=\"timu\">(.*?)</h1>.*?<div id=\"contentbox\">.*?<div.*?>.*?</div>(.*?)<div.*?>.*?</div>(.*?)</div>",
+  "useContentTitle":true,
+  "contentOffset":0,
+  "reverseIndexOrder":true
+}

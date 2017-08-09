@@ -1,0 +1,13 @@
+{
+  "storyName":"神级透视眼",
+  "storyNum":41450,
+  "encode":"gbk",
+  "baseUrl":"http://www.uukanshu.com/b",
+  "indexUrl":"{baseUrl}/{storyNum}/",
+  "indexReg":"<li><a href=\"/b/{storyNum}/(.*?)\" .*?>(.*?)</a></li>",
+  "contentTestUrl":"{baseUrl}/{storyNum}/41329.html",
+  "contentReg":"<h1 id=\"timu\">(.*?)</h1>.*?<div id=\"contentbox\">.*?<div.*?>.*?</div>(.*?)<div.*?>.*?</div>(.*?)</div>",
+  "useContentTitle":true,
+  "contentOffset":0,
+  "reverseIndexOrder":true
+}

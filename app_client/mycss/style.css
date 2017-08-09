@@ -1,0 +1,126 @@
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+.pd0 {
+  padding: 0
+}
+
+.mg0 {
+  margin: 0
+}
+
+.tbhead {
+  height: 40px;
+}
+
+.fr {
+  float: right
+}
+
+.fc {
+  float: center
+}
+
+.mynav {
+  color: #fff;
+  background-color: #337ab7
+}
+a {
+  color: #00B7FF;
+}
+
+.tblabel {
+  display: inline-block;
+  width: 60px;
+  text-align:right;
+  margin-right: 3px
+}
+.uif{
+  display: inline-block;
+  width:50px;
+}
+.dut{
+  width:40px; 
+}
+
+.controls {
+  margin-top: 10px;
+  border: 1px solid transparent;
+  border-radius: 2px 0 0 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  height: 32px;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+#pac-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 300px;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
+
+.pac-container {
+  font-family: Roboto;
+}
+
+#type-selector {
+  color: #fff;
+  background-color: #4d90fe;
+  padding: 5px 11px 0px 11px;
+}
+
+#type-selector label {
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#target {
+  width: 345px;
+}
+
+.sbb5{
+  display: inline-block;
+  width:5px;
+}
+
+.sbb10{
+  display: inline-block;
+  width:10px;
+}
+
+.sbb20{
+  display: inline-block;
+  width:20px;
+}
+
+.sbb50{
+  display: inline-block;
+  width:50px;
+}
+
+.sbb80{
+  display: inline-block;
+  width:50px;
+}
+
+.rows{
+  padding: 3px;
+}
+
+.tdtfr{
+  float: right;
+  padding-right: 5px;
+}

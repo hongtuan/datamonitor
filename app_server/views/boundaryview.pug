@@ -1,0 +1,142 @@
+extends layout_subpage
+block append refRes
+  style.
+    body {padding-left:5px;padding-top:5px;padding-right:3px;padding-bottom:0;}
+    #scount,#dlv,#alov{display:none}
+    //-@grid-gutter-width:         0px;
+    .row.no-pad {
+      margin-left:2px;
+      margin-right:2px;
+    }
+    .row.no-pad > [class*='col-'] {
+      padding-left:2px;
+      padding-right:2px;
+    }
+    .numtd{width:28px;padding-left:5px;}
+    .numipt{width:50px;}
+  script.
+    //location infomation object,for reuse in this page.
+    var locInfo = !{locInfo};
+    var biaObj = null;
+    //var myStr = 'This is an {0} for {0} purposes: {1}';
+    //alert(myStr.format('example', 'end'));
+    function resizeMap(){
+      //$("#map").width($(window).width()-60);//240
+      $("#map").height($(window).height()-16);
+      //console.log('resizeMap over.');
+    }
+    var dataPolicy = {};
+    function checkData(cbObj){
+      //console.log(cbObj.id,cbObj.checked);
+      var isChecked = cbObj.checked;
+      var dpName = cbObj.id;
+      var dpDesc = cbObj.title;
+
+      if(isChecked){
+        dataPolicy = {
+          name:dpName,
+          desc:dpDesc,
+          range:{min:$("#"+dpName+"min").val(),max:$("#"+dpName+"max").val()}
+        };
+      }
+      //console.log(JSON.stringify(dataPolicy));
+      //then,use dataPolicy to check data.
+      checkDataItem(dataPolicy);
+    }
+    
+    function showTips(){
+      //parent.layer.
+      layer.tips('look', "#btTips");
+      console.log('showTips called.');
+    }
+    
+    function goDeploy(){
+      //console.log('goDeploy');
+      //window.title = `Deploy Nodes In ${locInfo.name}`;
+      parent.layer.title(`Deploy Nodes In ${locInfo.name}`, crtWinIndex);
+      window.location = '/locations/' + locInfo._id + '/editbound';
+    }
+    
+    //$(document).ready(resizeMap);
+    $().ready(function(){
+      resizeMap();
+      configSwitch('showBound',switchBound);
+      configSwitch('monitorOn',monitorCtrl);
+      configSwitch('showTag',switchTag);
+      //rotateMap(40);
+      //auto start monitor.
+      //if(locInfo.contentbrief.bc > 0 || locInfo.contentbrief.inc > 0)
+        //$("#monitorOn").click();
+      $("#bmMonitor").removeClass('disabled');
+      var userInfo = getUserInfo();
+      //console.log(JSON.stringify(userInfo));
+      if(userInfo.role == 'view'){
+        $("#gdEnt").hide();
+        //console.log('gdEnt hide over.');
+      }
+    });
+    $(window).resize(resizeMap);
+  script(src="/lib/layer/layer.js")
+  script(src='/lib/google/richmarker.js')
+  script(src='/myjs/map-utils.js')
+  script(src='/myjs/boundaryview.js')
+  script(async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyACXZwCraYGZB_15hN6Ml1UmYAKDLHTBik&libraries=geometry&callback=initMap')
+
+block content
+  .container-fluid
+    .row.no-pad
+      #mtbar.col-xs-5.col-lg-2(style={"max-width":"155px"})
+        table.mytable
+          tr
+            td
+              .btn-group
+                button#bmMonitor.btn.btn-primary.btn-xs.dropdown-toggle.disabled(data-toggle="dropdown") View
+                  span.caret
+                ul.dropdown-menu(role="menu")
+                  li
+                    a(href="#" onclick="refresh()") Refresh
+                  li.divider(role="presentation")
+                  li
+                    a(href="#" onclick="viewDataTime()") DataTime
+                  li
+                    a(href="#" onclick="viewDashboard()") Dashboard
+                  li
+                    a(href="#" onclick="viewAllData()") AllNodesData
+                  //li
+                  //  a(href="#") Alerts
+            td
+              input#delayTime(type="text" style={width:"28px"} value="30" title="Delay how many minutes as delay node.")
+              span.sbb5
+              a#gdEnt.btn.btn-primary.btn-xs(onclick="goDeploy()") Deploy
+          tr
+            td
+              span Monitor:
+            td
+              input(type='checkbox' id='monitorOn' name='monitorOn')
+          tr
+            td(align='right')
+              span Edge:
+            td
+              input(type='checkbox' id='showBound' name='showBound' checked)
+          tr
+            td(align='right')
+              span Tag:
+            td
+              input(type='checkbox' id='showTag' name='showTag' checked)
+        table.mytable
+          tr
+            th Data
+            th.numtd Min
+            th.numtd Max
+          each dp in dataPolicy
+            tr
+              td(title=dp.desc)
+                input(name='dpr' id=dp.name type='radio' title=dp.desc  onclick='checkData(this)')
+                span= dp.name
+              td.numtd
+                input.numipt(id=dp.name+'min' type='number' value=dp.range.min step=dp.range.step?dp.range.step:1)
+              td.numtd
+                input.numipt(id=dp.name+'max' type='number' value=dp.range.max step=dp.range.step?dp.range.step:1)
+        //-input#btTips(type='button' onclick='showTips()' value='tip')
+      #mapcol.col-xs-7.col-lg-10
+        #map

@@ -1,0 +1,33 @@
+<!-- user list -->
+<div class="panel-body">
+  <button class="btn btn-primary" (click)="openAddDlg()">Create New User</button>
+  <span>Current Users List.</span>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr class="tbhead btn-primary">
+          <th>Email</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>CreatedOn</th>
+          <th>ExpiredOn</th>
+          <th>Operate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td class="clkt" title="click to edit." (click)="openEditDlg(user)">{{user.email}}</td>
+          <td>{{user.name}}</td>
+          <td>{{user.role}}</td>
+          <td>{{user.createdOn | date:'yMdjm'}}</td>
+          <td>{{user.expiredOn | date:'yMdjm'}}</td>
+          <td>
+            <button class="btn btn-primary" (click)="deleteUser(user._id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+

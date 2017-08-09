@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    block refRes
+      link(rel='stylesheet', href='/mycss/style.css')
+      link(rel='stylesheet', href='/lib/bootstrap/dist/css/bootstrap.min.css')
+      script(src='/lib/jquery/dist/jquery.min.js')
+      script(src='/lib/bootstrap/dist/js/bootstrap.min.js')
+      script(src='/myjs/utils.js')
+  body
+    .wrapper
+      block content
+

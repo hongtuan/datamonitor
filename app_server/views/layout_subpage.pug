@@ -1,0 +1,56 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    block refRes
+      link(rel='stylesheet', href='/mycss/style.css')
+      link(rel='stylesheet', href='/lib/bootstrap/dist/css/bootstrap.min.css')
+      link(rel='stylesheet', href='/lib/bootstrap-switch/dist/css/bootstrap-switch.css')
+      link(rel='stylesheet', href='/lib/datatables/css/dataTables.bootstrap.min.css')
+      link(rel='stylesheet', href='/lib/smartmenu/css/smartMenu.css')
+      style.
+        body {padding-left:5px;padding-top:5px;padding-right:5px;padding-bottom:10px;}
+        .phfp{padding:5px 8px 5px 8px}
+        .pbp{padding:0px 8px 5px 8px}
+        .nodetag{
+          background: green;
+          border: 1px solid white;
+          padding: 0;
+          color:white;
+        }
+        .edgetag{
+          background: green;
+          border: 1px solid white;
+          padding: 0;
+          font-size:2em;
+          color:white;
+        }
+        .newnid{
+          background: blue;
+          border: 2px solid yellow;
+          padding: 3px;
+          color:white;
+        }
+        .cclk{cursor:pointer}
+        .nopt{padding-top:0;}
+        .heavy {
+          opacity: 1;
+          background: white;
+        }
+        .mt-5{margin-top:-5px;}
+        .mt15{margin-top:15px;}
+        .tbzi{position: absolute;z-index:20;}
+      script(src='/lib/jquery/dist/jquery.min.js')
+      script(src='/lib/bootstrap/dist/js/bootstrap.min.js')
+      script(src='/lib/bootstrap-switch/dist/js/bootstrap-switch.js')
+      script(src='/lib/datatables/js/jquery.dataTables.min.js')
+      script(src='/lib/datatables/js/dataTables.bootstrap.min.js')
+      script(src='/lib/smartmenu/js/jquery-smartMenu.js')
+      //-script(src='/lib/float-panel/float-panel.js')
+      //-script(src='/lib/moment/min/monment.min.js')
+      script(src='/myjs/utils.js')
+  body
+    .wrapper
+      block content

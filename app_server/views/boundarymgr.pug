@@ -1,0 +1,117 @@
+extends layout_subpage
+block append refRes
+  script.
+    //location infomation object,for reuse in this page.
+    var locInfo = !{locInfo};
+    //console.log('locInfo='+JSON.stringify(locInfo));
+    //console.log('locInf.lcpos='+locInfo.lcpos);
+    var biaObj = null;
+    function resizeMap(){
+      //$("#map").width($(window).width()-30);
+      //console.log($(window).height());
+      $("#map").height($(window).height()-70);
+      google.maps.event.trigger(map, 'resize');
+    }
+
+    function testRotate(){
+      console.log('testRotate here.');
+      var rDeg = $("#rotate").val();
+      rotateMap(rDeg);
+      rotateTag(40);
+      /*
+      var rotate = $("#map").css("transform");
+      console.log('rotate=',rotate);
+      $("#map").css("transform","rotate("+$("#rotate").val()+"deg)");
+      $(".nodetag").css("transform","rotate(-"+$("#rotate").val()+"deg)");//*/
+    }
+    
+    function rotateBack(){
+      //$("#map").css("transform","rotate(-"+$("#rotate").val()+"deg)");
+      $("#map").css("transform","none");
+      $(".nodetag").css("transform","none");
+    }
+    
+    function goMonitor(){
+      //console.log('goDeploy');
+      //window.title = `Deploy Nodes In ${locInfo.name}`;
+      //crtWin.setTitle(`Monitoring ${locInfo.name}`);
+      window.location = '/locations/' + locInfo._id + '/viewbound';
+      parent.layer.title(`Monitoring ${locInfo.name}`, crtWinIndex);
+    }
+    
+    //$(document).ready(resizeMap);
+    var taskId = null;
+    $().ready(function(){
+      resizeMap();
+      configSwitch('showBound',switchBound);
+      configSwitch('inspectOn',swithInspect);
+      configSwitch('showTag',switchTag);
+      
+      //console.log('on ready called.');
+    });
+    $(window).resize(resizeMap);
+  script(src='/lib/google/richmarker.js')
+  script(src='/myjs/map-utils.js')
+  script(src='/myjs/map-edit.js')
+  //-script(src='/myjs/txtoverlay.js')
+  script(src='/myjs/boundarymgr.js')
+  script(async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyACXZwCraYGZB_15hN6Ml1UmYAKDLHTBik&libraries=geometry,places,drawing&callback=initMap')
+  //script(async defer src='https://ditu.google.cn/maps/api/js?language=zh-CN&key=AIzaSyACXZwCraYGZB_15hN6Ml1UmYAKDLHTBik&libraries=geometry,places,drawing&callback=initMap')
+
+block content
+  .container-fluid
+    .rows
+      a.btn.btn-primary.btn-xs(onclick="goMonitor()") Monitor
+      span.sbb5
+      span#menutest offset:
+      span.uif
+        input.dut(type='text' id='edgeOffset' name='edgeOffset' value='20.0' onchange='updateRoofConfig()')
+      span span:
+      span.uif
+        input.dut(type='text' id='sensorSpan' name='sensorSpan' value='40.0' onchange='updateRoofConfig()')
+      span.uif
+        input(type='radio' id='du' name='du' value='ft' checked onclick='switchUnit()')
+        span ft
+        input(type='radio' id='du' name='du' value='m' onclick='switchUnit()')
+        span m
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="inputCenter()") InputCenter
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="doDeploy()") Deploy
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="doSave()") Save
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="doDelete()") Del
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="addNode()") AddNode
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="expFreeNode()") Export
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="impLocation()") Import
+      span.sbb5
+      a.btn.btn-primary.btn-xs(onclick="showHelp()") Help
+      span.sbb5
+      span Edge:
+      input(type='checkbox' id='showBound' name='showBound' checked)
+      span.sbb5
+      span Tag:
+      input(type='checkbox' id='showTag' name='showTag' checked)
+      span.sbb5
+      span Inspect:
+      input(type='checkbox' id='inspectOn' name='inspectOn')
+      span.sbb5
+      span every:
+      input#iDelay(name='iDelay' value='10' style={width:'30px'})
+      span seconds
+      
+      //-span.sbb5
+      //-a.btn.btn-primary.btn-xs(onclick="testRotate()") Rotate
+      //-span.sbb5
+      //-input#rotate(name='rotate' type="number" step="5" value='40' style={width:'50px'})
+      //-span.sbb5
+      //-a.btn.btn-primary.btn-xs(onclick="rotateBack()") RotateBack
+    .rows
+      input(id='pac-input' class='controls' type='text' placeholder='Search Box')
+      #map
+        //-textarea(rows='6' cols='80') #{sd}
+  

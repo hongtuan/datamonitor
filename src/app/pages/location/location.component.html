@@ -1,0 +1,57 @@
+<div class="panel-body">
+  <button *ngIf="!isMonitor" class="btn btn-primary" (click)="openAddDlg()">Create New Location</button>
+  <button *ngIf="!isMonitor" class="btn btn-primary" (click)="exportLocations()">Export Locations</button>
+  <button *ngIf="!isMonitor" class="btn btn-primary" id="btRefresh" (click)="refreshList()">refreshList</button>
+  <span>Current Locations List.</span>
+  <div id="locListPanel">
+    <table class="table table-bordered">
+      <thead>
+        <tr class="btn-primary">
+          <th *ngIf="!isMonitor" width="30"><input name="lsca" type="checkbox" title="selectAll" (click)="selectAll($event)" /></th>
+          <th width="40">Status</th>
+          <th max-width="100">Name</th>
+          <th *ngIf="!isMonitor" width="30">Syn</th>
+          <th *ngIf="!isMonitor" width="40">Operate</th>
+          <th>Address</th>
+          <th>ContactInfo</th>
+          <th>EMails</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let location of locations">
+          <td *ngIf="!isMonitor" class="clkt" title="Click to select" (click)="selectLocation(location._id,$event)"><input name="lsc" class="lsc" type="checkbox" value="{{location._id}}" /></td>
+          <td>
+            <img class="licon" src="{{latestDataOnImg(location.latestDataOn)}}" title="LatestDataOn:{{showLatestDataOn(location.latestDataOn)}}" />
+          </td>
+          <td class="clkt" title="Click to monitor location" (click)="monitoringLocation(location)">{{location.name}}</td>
+          <td *ngIf="!isMonitor" class="clkt">
+            <a (click)="dataSynMgr(location)">
+              <img *ngIf="location.isAutoSyn" class="licon" src="/assets/myimgs/plugined.png" title="dataSyn on" />
+              <img *ngIf="!location.isAutoSyn" class="licon" src="/assets/myimgs/unplugin.png" title="dataSyn off" />
+            </a>
+          </td>
+          <td *ngIf="!isMonitor">
+            <div class="btn-group" ngbDropdown>
+              <button type="button" class="btn btn-primary" ngbDropdownToggle>
+                <img class="licon" src="/assets/myimgs/setup.png" />
+              </button>
+              <ul class="dropdown-menu clkt">
+                <li class="dropdown-item" (click)="inspectNode(location)">Inspect</li>
+                <li class="dropdown-item" (click)="goParseData(location)">ParseData</li>
+                <li class="dropdown-divider"></li>
+                <li class="dropdown-item" (click)="deployLocation(location)">Deploy</li>
+                <li class="dropdown-item" (click)="openEditDlg(location)">Modify</li>
+                <li class="dropdown-item" (click)="deleteLocation(location._id)">Delete</li>
+              </ul>
+            </div>
+          </td>
+          <td>{{location.address}}</td>
+          <td>{{location.contactInfo}}</td>
+          <td>{{location.emails}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+

@@ -1,0 +1,132 @@
+extends layout_subpage
+block append refRes
+  script.
+    var parentWin;
+    var crtWinIndex;
+    function doClose(){
+      parent.layer.close(crtWinIndex);
+    }
+    var dataObj;
+    function setDataObj(_dataObj){
+      dataObj = _dataObj;
+      //console.log('dataObj='+JSON.stringify(dataObj,null,2));
+    }
+    
+    var taskId = null;
+    var dyTable = null;
+    
+    function doInspectTask(){
+      //get data from server.
+      $.post('/api/nd/'+dataObj._id+'/eint',dataObj,function(data,status){
+        //console.log('rows.length='+table.rows.length);
+        if(data){
+          var table = document.getElementById("dataTable");
+          var row = table.insertRow(1);
+          var cell1 = row.insertCell(0);
+          var cell2 = row.insertCell(1);
+          var cell3 = row.insertCell(2);
+          
+          cell1.innerHTML = table.rows.length-1;
+          cell2.innerHTML = iso2LocaleTime(data.swipLog.createdOn);
+          cell3.innerHTML = data.swipLog.logContent;
+          var outInfo = `${iso2LocaleTime(data.swipLog.createdOn)}\n${data.swipLog.logContent}\n`;
+          if(data.snc == 0){
+            outInfo += 'lastestNodeData:\n';
+            outInfo += `${data.lnd.ptag}[${data.lnd.nid.substr(8)}]@\n${data.lnd.dtime}\n${data.lnd.data}`;
+          }
+          //show inspect res:
+          $("#ires").val(outInfo+'\n'+$("#ires").val());
+        }
+      },'json').fail(function(data,status){
+        console.log(data);
+        console.log(status);
+      });
+    }
+    
+    function showLogContent(lc){
+      console.log('lc=',lc);
+      $("#ires").val(lc);
+      $("#cntB").hide();
+      $("#cntA").show();
+    }
+    
+    function switchListAndText(link){
+      var text = link.innerText;
+      //console.log(text);
+      if(text.endsWith('List')){
+        $("#cntA").hide();
+        $("#cntB").show();
+        link.innerText = 'ToText';
+      }else{
+        $("#cntA").show();
+        $("#cntB").hide();
+        link.innerText = 'ToList';
+      }
+    }
+    
+    $().ready(function() {
+      dyTable = $('#dataTable').DataTable({
+        searching: false,
+        ordering:  false,
+        "scrollY":        "280px",
+        "scrollCollapse": true,
+        "paging":         false,
+        "order": [[ 0, "desc" ]]
+      });
+      
+      configSwitch('inspectSwitch',function(switchOn){
+        //console.log('switchOn='+switchOn);
+        //var table = $("#dataTable");
+        if(switchOn){
+          //console.log('$("#iDelay").val()'+$("#iDelay").val());
+          //table.style.display='none'; 
+          $("#cntB").hide();
+          $("#cntA").show();
+          setTimeout(doInspectTask,500);
+          taskId = setInterval(doInspectTask,$("#iDelay").val()*1000);
+          console.log('Auto task started.');
+        }else{
+          //table.style.display='';
+          $("#cntA").hide();
+          $("#cntB").show();
+          if(taskId) clearInterval(taskId);
+          console.log('Auto task stoped.');
+        }
+      });
+      $("#inspectSwitch").click();
+      //console.log('onReady called.');
+    });
+  script(src='/myjs/map-utils.js')
+block content
+  .container
+    .panel.panel-default
+      .panel-heading.phfp
+        span Inspect:
+        input#inspectSwitch(type="checkbox" name="inspectSwitch")
+        span.sbb5
+        span Every
+        span.sbb5
+        input#iDelay(name='iDelay' value='10' style={width:'30px'})
+        span.sbb5
+        spand seconds
+        span.sbb5
+        a.btn.btn-primary.btn-xs(onclick="switchListAndText(this)") toList
+        //-a.btn.btn-primary.btn-xs.fr(onclick="addLocation()") AddLocation
+      .panel-body.pbp(style={height:"410px"})
+        div#cntA(style={display:'none',"padding-top":"5px",align:"center"})
+          textarea#ires(rows=9,cols=20,style={'font-size':'2em',color:'#F00'})
+        div#cntB
+          table#dataTable.table.table-striped.table-bordered
+            thead
+              tr.btn-primary
+                each ch in ['num','logTime','logContent']
+                  th= ch
+            tbody
+              each log,index in logList
+                tr
+                  td= logList.length-index
+                  td= log.createdOn.toLocaleTimeString('en-US')
+                  td.cclk(onclick="showLogContent(this.innerHTML)")= log.logContent
+      .panel-footer.phfp
+        .col-xs-offset-5
+          a.btn.btn-primary.btn-xs(onclick="doClose()") Close

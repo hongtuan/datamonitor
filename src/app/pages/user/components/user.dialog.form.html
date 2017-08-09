@@ -1,0 +1,59 @@
+<div md-dialog-title fxLayout="row" fxLayoutAlign="space-between center" class="dlgheader">
+  <span>{{dlgTitle}}</span>
+  <button md-dialog-close md-icon-button tabindex="-1"><md-icon>close</md-icon></button>
+</div>
+<form #locForm="ngForm">
+  <div md-dialog-content class="dlgbody">
+    <table class="full-width" cellspacing="0">
+      <tr>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="EMail" name="emails" [(ngModel)]="user.email" tabindex="1" required/>
+          </md-input-container>          
+        </td>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="Name" name="name" [(ngModel)]="user.name" tabindex="2" required />
+          </md-input-container>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="Password" name="password" [(ngModel)]="user.password" tabindex="3" required/>
+          </md-input-container>
+        </td>
+        <td>
+          <md-input-container>
+            <input mdInput [mdDatepicker]="picker" placeholder="ExpiredOn" name="expiredOn" [(ngModel)]="user.expiredOn" required>
+            <button mdSuffix [mdDatepickerToggle]="picker"></button>
+          </md-input-container>
+          <md-datepicker #picker></md-datepicker>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <h2 class="example-h2">Role</h2>
+          <md-radio-group class="example-radio-group" name="role" [(ngModel)]="user.role" required>
+            <md-radio-button class="example-radio-button" *ngFor="let role of roles"
+              [value]="role.value" [disabled]="isDisabled()">{{role.display}}</md-radio-button>
+          </md-radio-group>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <h2 class="example-h2">Auth-Location</h2>
+          <div fxLayout="column" class="ml20" (dblclick)="openListSelectDlg('600,420')">
+            <div *ngIf="authedLocs.length==0">DoubleClick to Select Locations.</div>
+            <div *ngFor="let al of authedLocs">{{al.name}}</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div md-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="20px" class="dlgfooter">
+    <button type="button" md-raised-button color="primary"
+      tabindex="7"  (click)="onSubmit()" [disabled]="!locForm.valid">Save</button>
+    <button md-button md-dialog-close  tabindex="8">Cancel</button>
+  </div>
+</form>

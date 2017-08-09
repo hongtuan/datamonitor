@@ -1,0 +1,44 @@
+//-customer list page
+extends layout
+block append refRes
+  style.
+    body {padding-top:70px; padding-bottom: 30px;}
+    .pd0{padding:0}
+    .mg0{margin:0}
+    .tbhead{height:40px;}
+    .fr{float:right}
+    .mynav{color:#fff;background-color:#337ab7}
+  script(src='/lib/layer/layer.js')
+  script(src='/myjs/locations_list.js')
+
+block content
+  .navbar.navbar-default.navbar-fixed-top.mynav
+    h2.text-center Roof Sentry System
+  .container
+    .panel.panel-default
+      .panel-heading
+        span #{title}
+        a.btn.btn-primary.btn-xs.fr(onclick="addLocation()") AddLocation
+      .panel-body
+        .table-responsive
+          table.table.table-bordered.table-striped 
+            thead
+              tr.tbhead.btn-primary
+                each ch in ['Name','Dataurl','TZoffset','MonitPeriod','Operate']
+                  th= ch
+            tbody
+              each row in rows
+                tr
+                  td
+                    a(href="javascript:;" onclick="modifyLocation('"+row._id+"')")= row.name
+                  td= row.dataurl
+                  td= row.tzoffset
+                  td= row.monitperiod
+                  td
+                    ul.list-inline.mg0
+                      each fun,text in {Deploy:'deployLocation',Monitor:'monitoringLocation',Delete:'deleteLocation'}
+                        li
+                          a.btn.btn-primary.btn-xs(onclick=fun+"('"+row._id+"')")= text
+  nav.navbar.navbar-default.navbar-fixed-bottom.mynav
+    .container
+      span(style={float:'right'}) Server Started@ #{startTimeDesc}

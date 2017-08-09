@@ -1,0 +1,52 @@
+extends layout_subpage
+block append refRes
+  script(src='/myjs/map-utils.js')
+  style.
+    .lform{padding-top:5px;}
+    .lbtxt{padding-top:5px;}
+    .btrow {padding-top:10px;}
+  script.
+    //location infomation object,for reuse in this page.
+    var parentWin;
+    var crtWinIndex;
+    var locInfo = {_id:"#{lid}"};
+    function doSaveCenter(){
+      //alert('doSaveCenter');
+      var ci = $("#centerinfo").val();
+      if(ci!=''){
+        locInfo.ctpos = ci;
+        updateLocCenter(function(){
+          //close dlg first.
+          parent.layer.msg('Reopen map will go to new center.');
+          doClose();
+        });
+      }
+    }
+    
+    function doClose(){
+      //console.log('window.name='+window.name);
+      var index = parent.layer.getFrameIndex(window.name);
+      //console.log('index='+index);
+      parent.layer.close(index);
+    }
+    
+    $().ready(function() {
+      if(parentWin){
+        //console.log('parentWin=',parentWin.locInfo.ctpos);
+        $("#centerinfo").val(parentWin.locInfo.ctpos);
+      }
+      //console.log('input center on ready.');
+    });
+
+block content
+  rows
+    form.form-horizontal.lform(role="form")
+      form-group
+        label.col-xs-2.control-label.lbtxt(for="centerinfo") Center:
+        .col-xs-10
+          input.form-control.ilipt(type="text" id="centerinfo" name="centerinfo" placeholder='39.140638,-76.802087')
+        br
+      .col-xs-offset-3.col-xs-4.btrow
+        a.btn.btn-primary.btn-xs(onclick="doSaveCenter()") Save
+      .col-xs-5.btrow
+        a.btn.btn-primary.btn-xs(onclick="doClose()") Cancel

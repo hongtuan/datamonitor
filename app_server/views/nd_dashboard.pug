@@ -1,0 +1,100 @@
+extends layout_subpage
+block append refRes
+  style.
+    .lform{padding-top:5px;}
+    .lbtxt{padding-top:10px;text-align:right;}
+    .ilipt{padding-top:5px;}
+    .btrow {padding-top:10px;}
+  link(rel='stylesheet', href='/mycss/dashboard.css')
+  script(src='/lib/d3/d3_v3.3.3.min.js')
+  script(src='/myjs/dv/dashboard.js')
+  
+  script.
+    var parentWin;
+    var crtWinIndex;
+    function testFun(){
+      //console.log('testFun!',parentWin.nodesData.length);
+      console.log('testFun!',crtWinIndex,parentWin.nodesData.length);
+    }
+
+    function doClose(){
+      parent.layer.close(crtWinIndex);
+    }
+    var freqData=[
+      {name:'SS',freq:{low:4786, mid:1319, high:249}},
+      {name:'SC',freq:{low:1101, mid:412, high:674}},
+      {name:'AH',freq:{low:932, mid:2149, high:418}},
+      {name:'RH',freq:{low:832, mid:1152, high:1862}},
+      {name:'DH',freq:{low:4481, mid:3304, high:948}},
+      {name:'TP',freq:{low:1619, mid:167, high:1063}},
+      {name:'FS',freq:{low:1819, mid:247, high:1203}},
+      {name:'FC',freq:{low:4498, mid:3852, high:942}},
+      {name:'FD',freq:{low:797, mid:1849, high:1534}}
+    ];
+    //here calc roofData
+    function buildRoofData(locationData,cb){
+      console.log('calc here.');
+      //build dataPolicy and roofData frame
+      var dataPolicy = {};
+      var roofData = {};
+      for(var i in locationData.dataPolicy){
+        var dp = locationData.dataPolicy[i];
+        dataPolicy[dp.name] = dp;
+        roofData[dp.name] = {
+          name:dp.name,
+          desc:dp.desc,
+          freq:{low:0, mid:0, high:0},
+          freqDetail:{low:[],mid:[],high:[]}
+        };
+      }
+      //user nidNodeMap to fill roofData
+      var nidNodeMap = locationData.NNM;
+      for(var nid in nidNodeMap){
+        var node = nidNodeMap[nid];
+        var nodeData = node.latestData;
+        nodeData.forEach(function(nd){
+          for(var dn in nd){
+            var r = dataPolicy[dn].range;
+            var dv = +nd[dn];
+            var rdi = roofData[dn];
+            if(dv<r.min){
+              rdi.freq.low+=1; 
+              rdi.freqDetail.low.push(node.ptag);
+            }
+            if(r.min<=dv && dv<=r.max){
+              rdi.freq.mid+=1;
+              rdi.freqDetail.mid.push(node.ptag);
+            }
+            if(dv>r.max){
+              rdi.freq.high+=1;
+              rdi.freqDetail.high.push(node.ptag);
+            }
+          }
+        });
+      }
+      //cvt roofData to freqData.
+      var roofFreqData = [];
+      for(var pro in roofData){
+        roofFreqData.push(roofData[pro]);
+      }
+      //console.log(JSON.stringify(roofFreqData,null,2));
+      if(cb) cb(roofFreqData);
+    }
+
+    $().ready(function(){
+      //var locationData = parentWin.locationData;
+      buildRoofData(parentWin.locationData,function(roofData){
+        dashboard('#dashboard',roofData,
+          {hGDimW:300,hGDiH:300,pieDim:{w:300, h: 300}});
+      });
+      
+    });
+
+block content
+  .container-fluid
+    .panel.panel-default
+      .panel-heading.phfp
+        span Data Dashboard
+      .panel-body.pbp(style={width:"720px",height:"570px"})
+        #dashboard
+

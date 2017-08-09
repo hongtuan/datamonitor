@@ -1,0 +1,87 @@
+extends layout_subpage
+block append refRes
+  style.
+    .lform{padding-top:5px;}
+    .lbtxt{padding-top:10px;text-align:right;}
+    .ilipt{padding-top:5px;}
+    .btrow {padding-top:10px;}
+  script.
+    var parentWin;
+    var crtWinIndex;
+    var crtPid = "{pid}";
+    function doSavePoint(){
+      var pointData = $("#forma").serializeObject();
+      //console.log(JSON.stringify(pointData,null,2));
+      var inputCheckRes = parentWin.isPointInputOk(pointData);
+      if(inputCheckRes.length == 0){
+        //console.log('sendData='+JSON.stringify(pointData,null,2));
+        $.post('/api/locations/upi',pointData,function(response,status){
+          parent.layer.msg(response);
+          parentWin.location.reload();
+          /*
+          //console.log('nodeid='+$("#nodeid").val());
+          var toStatus = $("#nodeid").val()!=''?'normal':'empty';
+          //console.log('toStatus='+toStatus);
+          parentWin.refreshNode("!{pid}",toStatus,pointData.nodedi);
+          parentWin.changeNodeTagText('!{pid}',$("#ptag").val());//*/
+          doClose();
+        });
+      }else{
+        parent.layer.msg('Point info is not invalid:\n'+inputCheckRes);
+      }
+    }
+    
+    function doDeletePoint(){
+      //console.log('doDeletePoint...');
+      parent.layer.confirm('Are you sure to delete this Node?', {
+        icon: 3,
+        title: 'Delete Confirm'
+      }, (index) => {
+          parent.layer.close(index);
+          var pointData = $("#forma").serializeObject();
+          pointData['status'] = '0';
+          $.post('/api/locations/upi',pointData,function(response,status){
+            //parentWin.removeNode("!{pid}");
+            parent.layer.msg('Node delete over.');
+            parentWin.location.reload();
+            doClose();
+          });
+      });
+    }
+
+    function doClose(){
+      //console.log('window.name='+window.name);
+      //var index = parent.layer.getFrameIndex(window.name);
+      //console.log('in subpage index='+index);
+      parent.layer.close(crtWinIndex);
+    }
+
+block content
+  rows
+    form#forma.form-horizontal.lform(role="form")
+      input(type="hidden" name="lid" value= lid)
+      input(type="hidden" name="bid" value= bid)
+      input(type="hidden" name="pid" value= pid)
+      form-group
+        label.col-xs-3.control-label.lbtxt(for="ptag") Tag:
+        .col-xs-9.ilipt
+          input.form-control(type="text" id="ptag" name="ptag" value= point.ptag)
+      form-group
+        label.col-xs-3.control-label.lbtxt(for="nodeid") Nodeid:
+        .col-xs-9.ilipt
+          input.form-control(type="text" id="nodeid" name="nodeid" value= point.nodeid placeholder='658792102abc99')
+      form-group
+        label.col-xs-3.control-label.lbtxt(for="newnote") NewNote:
+        .col-xs-9.ilipt
+          input.form-control(type="text" id="newnote" name="newnote" placeholder='change xxx to yyy')
+      form-group
+        label.col-xs-3.control-label.lbtxt(for="notes") OldNotes:
+        .col-xs-9.ilipt
+          textarea.form-control(type="text" rows="5" cols="10" id="notes" name="notes" readOnly)= point.notes
+      form-group.lbtxt
+        .col-xs-offset-2.col-xs-3.btrow
+          a.btn.btn-primary.btn-xs(onclick="doSavePoint()") Save
+        .col-xs-2.btrow
+          a.btn.btn-primary.btn-xs(onclick="doDeletePoint()") Delete
+        .col-xs-2.btrow
+          a.btn.btn-primary.btn-xs(onclick="doClose()") Cancel

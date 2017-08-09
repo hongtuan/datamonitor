@@ -1,0 +1,67 @@
+extends layout_subpage
+block append refRes
+  script.
+    var parentWin;
+    var crtWinIndex;
+    function doClose(){
+      parent.layer.close(crtWinIndex);
+    }
+    var dataObj;
+    function setDataObj(_dataObj){
+      dataObj = _dataObj;
+      //console.log('dataObj='+JSON.stringify(dataObj,null,2));
+    }
+    
+    $().ready(function() {
+      configSwitch('dataSynSwitch',function(state){
+        console.log('state='+state);
+        $.post('/api/nd/'+dataObj._id+'/sdtc/'+(state?'on':'off'),
+          dataObj,
+          function(data,status){
+            //console.log(data);
+            $("#taskState").text(data=='running'?'running every['+dataObj.synperiod+']seconds':'stop.');
+            //call parent window's method to refresh.
+            parent.document.getElementById("btRefresh").click();
+          },
+          'json'
+        ).fail(function(data,status){
+            console.log(data,status);
+          }
+        );
+      });
+      
+      $('#dataTable').DataTable({
+        searching: false,
+        ordering:  true,
+        "scrollY":        "250px",
+        "scrollCollapse": true,
+        "paging":         false
+      });
+      //console.log('onReady called.');
+    });
+  script(src='/myjs/map-utils.js')
+block content
+  .container-fluid
+    .panel.panel-default
+      .panel-heading.phfp
+        span DataSyn:
+        input(type="checkbox" name="dataSynSwitch" checked= isTaskRunning)
+        span  Data Syn Task now is 
+        span#taskState= isTaskRunning?'running':'stop' 
+        span  logList:
+        //-a.btn.btn-primary.btn-xs.fr(onclick="addLocation()") AddLocation
+      .panel-body.pbp
+        table#dataTable.table.table-striped.table-bordered
+          thead
+            tr.btn-primary
+              each ch in ['num','logTime','logContent']
+                th= ch
+          tbody
+            each log,index in dataSyncLogList
+              tr
+                td= index+1
+                td= log.createdOn.toLocaleString()
+                td= log.logContent
+      .panel-footer.phfp
+        .col-xs-offset-5
+          a.btn.btn-primary.btn-xs(onclick="doClose()") Close

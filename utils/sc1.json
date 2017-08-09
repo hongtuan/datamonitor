@@ -1,0 +1,11 @@
+{
+  "storyName":"全能订制App",
+  "encode":"gbk",
+  "indexUrl":"http://www.uukanshu.com/b/31832/",
+  "indexReg":"<li><a href=\"/b/31832/(.*?)\" .*?>(.*?)</a></li>",
+  "contentTestUrl":"http://www.uukanshu.com/b/31832/54583.html",
+  "contentReg":"<h1 id=\"timu\">(.*?)</h1>.*?<div id=\"contentbox\">(.*?)<div .*?>.*?</div>(.*?)</div>",
+  "useContentTitle":true,
+  "contentOffset":0,
+  "reverseIndexOrder":true
+}

@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  form(method="post" action="/pu")
+    input(name="p1")
+    input(name="p2")
+    button(type="submit" name="sbt") send
+  

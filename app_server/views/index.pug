@@ -1,0 +1,25 @@
+extends layout
+block append refRes
+  base(href="/")
+  style.
+    body {padding-top:70px; padding-bottom: 30px;}
+    .pd0{padding:0}
+    .mg0{margin:0}
+    .tbhead{height:40px;}
+    .fr{float:right}
+    .mynav{color:#fff;background-color:#337ab7}
+  //-<!-- 1. Load libraries -->
+  //-<!-- Polyfill(s) for older browsers -->
+  script(src='node_modules/core-js/client/shim.min.js')
+  script(src='node_modules/zone.js/dist/zone.js')
+  script(src='node_modules/reflect-metadata/Reflect.js')
+  script(src='node_modules/systemjs/dist/system.src.js')
+  script(src='/lib/layer/layer.js')
+  //-<!-- 2. Configure SystemJS -->
+  script(src='systemjs/systemjs.config.js')
+  script.
+    System.import('app').catch(function(err){ console.error(err); });
+  //-script(src='node_modules/ng-lightning/ng-lightning.bundle.js')
+  //-<!-- 3. Display the application -->
+block content
+  my-app Loadingxxx...

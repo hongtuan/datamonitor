@@ -1,0 +1,11 @@
+{
+  "storyName":"绝世风流小农民",
+  "encode":"gbk",
+  "indexUrl":"http://www.uukanshu.com/b/8621/",
+  "indexReg":"<li><a href=\"/b/8621/(.*?)\" .*?>(.*?)</a></li>",
+  "contentTestUrl":"http://www.uukanshu.com/b/8621/7235.html",
+  "contentReg":"<h1 id=\"timu\">(.*?)</h1>.*?<div id=\"contentbox\">(.*?)<div .*?>.*?</div>(.*?)</div>",
+  "useContentTitle":true,
+  "contentOffset":0,
+  "reverseIndexOrder":true
+}

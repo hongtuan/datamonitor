@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=10" />
+  <title>Log Chart</title>
+  <link rel="stylesheet" type="text/css" href="/lib/d3/d3ext/charts.css"> 
+  <script src="/lib/jquery/dist/jquery.min.js"></script>
+  <script src="/lib/d3/d3_v3.3.3.min.js"></script>
+  <script src="/lib/requirejs/require.min.js"></script>
+
+  <script src="/lib/d3/d3ext/charts.js"></script>
+  <script type="text/javascript">
+    //Cool
+    $(function() {
+      //console.log('Ok');
+    });
+    
+    $().ready(function() {
+      drawLines(null,[
+        {id:'SC',name:'Super Cap Voltage',data:imps1},
+        {id:'AH',name:'Ambient Humidity',data:imps2},
+        {id:'RH',name:'Roof Humidity',data:CTR},
+        {id:'DH',name:'Delta Humidity',data:rpmData}
+      ]);
+    });
+  </script>
+  
+</head>
+
+<body>
+  <script src="./sample_data.js"></script>
+  <div id="container" style="min-width:300px;width:100%">
+    <div class="loader">
+      <p>Working...</p>
+    </div>
+  </div>
+</body>
+
+</html>

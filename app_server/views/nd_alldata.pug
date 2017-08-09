@@ -1,0 +1,157 @@
+extends layout_subpage
+block append refRes
+  style.
+    .lform{padding-top:5px;}
+    .lbtxt{padding-top:10px;text-align:right;}
+    .ilipt{padding-top:5px;}
+    .btrow {padding-top:10px;}
+    .mynav{margin:2px 20px 0px 20px;}
+    #headingArea,#mainArea,#footerArea{background-color:#00008B;color:white;}
+    #timeRangeText{width:370px;font-size:18px;background-color:#00008B;}
+    #d3container{min-width:300px;min-height:460px;width:100%";}
+  //-link(rel='stylesheet', href='/mycss/dashboard.css')
+  link(rel="stylesheet" type="text/css" href="/lib/d3/d3ext/charts.css")
+  link(rel="stylesheet" type="text/css" href="/lib/daterangepicker/daterangepicker.css")
+  script(src='/lib/moment/min/moment.min.js')
+  script(src="/lib/daterangepicker/daterangepicker.js")
+  script(src='/myjs/timeselect.js')
+  //script(src='/lib/d3/d3_v3.3.3.min.js')
+  script(src='/lib/d3/d3.js')
+  //-script(src='/myjs/dv/mapboard.js')
+  script(src='/lib/requirejs/require.min.js')
+  script(src='/lib/d3/d3ext/charts.js')
+  
+  script.
+    var parentWin;
+    var crtWinIndex;
+
+    function getCenter(){
+      if(parentWin){
+        var tmpA = parentWin.locInfo.ctpos.split(',');
+        return [+tmpA[1],+tmpA[0]];
+      }
+      return [-81.35975428389361,41.12872149287895];
+    }
+
+    function doClose(){
+      parent.layer.close(crtWinIndex);
+    }
+
+    var dataTimeRange;
+    var dataType,dataTypeDesc;
+    function updateTimeRangeText(){
+      var timeRangeCtrl = $("#timeRangeText");
+      var fmt = 'MM/DD/YYYY h:mm a';
+      timeRangeCtrl.val(moment(dataTimeRange.from).format(fmt) + ' - ' + moment(dataTimeRange.to).format(fmt));
+    }
+
+    function showDataType(dt){
+      var rdObj = $('#'+dt);
+      rdObj.attr("checked",true);
+      dataType = rdObj.attr('id');
+      dataTypeDesc = rdObj.attr('title');
+      refreshCharts();
+      //console.log(dataType,dataTypeDesc);
+    }
+    
+    function switchChart(cbObj){
+      var chartId = cbObj.name;
+      var visible = cbObj.checked;
+      setChartVisible(chartId,visible);
+    }
+    
+    function refresh(){
+      dataTimeRange.to = moment().toISOString();
+      //end = moment();
+      refreshCharts();
+      updateTimeRangeText();
+    }
+
+    function refreshCharts(){
+      var url = '/api/nd/getnsd/!{lid}';
+      //console.log(url);
+      //var lwi = parent.layer.load();
+      $.get(url,dataTimeRange,function(data,status){
+        //console.log(JSON.stringify(data,null,2));
+        removeAllCharts();
+        var chartsConfig = [];
+        var nodesCtrl = $(":checkbox.installedNode");
+        for(var i = 0; i < nodesCtrl.length; i++){
+          var nc = nodesCtrl[i];
+          var nodeDataArray = data[nc.id];
+          var cc = {id:nc.name,name:dataTypeDesc,
+            visible:nc.checked,lid:'!{lid}',pid:nc.id,showAvg:true};
+          var dataA = [];
+          nodeDataArray.forEach(function(nd){
+            var di = {DateTime:nd.dataTime,Value:nd.dataObj[dataType||'SS']};
+            if(nd.dataObj['isSham']){
+              di['isSham'] = true;
+            }
+            dataA.push(di);
+            //dataA.push({DateTime:nd.dataTime,Value:nd.dataObj[dataType||'SS']});
+          });
+          cc['data'] = dataA;
+          chartsConfig.push(cc);
+        }
+        //draw charts
+        drawCharts('d3container',chartsConfig);
+        //parent.layer.close(lwi);
+      });
+    }
+    //var start = moment().hour(7).minute(0);
+    //var end = moment();
+    $().ready(function(){
+      //console.log('height',$("#headingArea").outerHeight());
+      var navHeight = $("#headingArea").outerHeight();
+      $("#mainArea").css("padding-top",navHeight+5+"px");
+      //var locationData = parentWin.locationData;
+      dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
+      //console.log(JSON.stringify(dataTimeRange,null,2));
+      if(dataTimeRange.from == ""){
+        dataTimeRange = timeRangeSelector.getDefaultRange();
+      }
+      showDataType('RH');
+      updateTimeRangeText();
+    });
+
+block content
+  .navbar.navbar-default.navbar-fixed-top
+    #headingArea.phfp.mynav
+      table
+        tr
+          td.tdtfr DataType:
+          td
+            each _dap in dap
+              span.sbb5
+              input(type="radio" id= _dap.name name="dataType" onclick="showDataType(this.id)"  title= _dap.desc)
+              span= _dap.name
+        tr
+          td.tdtfr Nodes:
+          td 
+            each node,pid in pidNodeMap
+              input.installedNode(type="checkbox" onclick="switchChart(this)" id= pid name= node.ptag title= node.nid checked)
+              span= node.ptag
+              span.sbb5
+        tr
+          td.tdtfr TimeRange:
+          td
+            input#timeRangeText(type="text" value="" readOnly)
+            span.sbb5
+            a.btn.btn-primary.btn-xs.text-center(onclick="refresh()" title="Refresh this view") Refresh
+            script.
+              timeRangeSelector.show('timeRangeText',function(selectedTimeRange){
+                dataTimeRange = selectedTimeRange;
+                refreshCharts();
+              },function(){
+                parent.layer.msg('timeRange invalid.');
+              });
+
+  .container-fluid
+    .panel.panel-default
+      #mainArea.panel-body
+        #d3container
+        div.loader
+          p Please waiting...
+      #footerArea.panel-footer
+        .col-xs-offset-5
+          a.btn.btn-primary.btn-xs.text-center(onclick="doClose()") Close

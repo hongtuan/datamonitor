@@ -1,0 +1,31 @@
+<div class="widgets">
+  <div class="row">
+    <div class="col-md-12">
+      <span>Parse<b>[{{name}}]</b>'s RAW data</span>
+      <input type="text" style="width:116px" [(ngModel)] = "datasrc" />
+      <input type="text" style="width:36px" [(ngModel)] = "snapcount" />
+      <button class="btn btn-primary" (click)="getRawData()">Refresh</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <ba-card title="AnalysisResult" baCardClass="with-scroll">
+        <textarea class="full-width" rows="14"  id="analysisResult" name="analysisResult">{{analysisResult}}</textarea>
+      </ba-card>
+      <ba-card title="No Data Nodes" baCardClass="with-scroll">
+        <textarea class="full-width" rows="8" id="noDataInfo" name="noDataInfo">{{noDataInfo}}</textarea>
+      </ba-card>      
+    </div>
+    <div class="col-md-6">
+      <ba-card title="Raw Data:{{rawDataDesc}}" baCardClass="with-scroll">
+        <textarea class="full-width" rows="5" id="rawdata" name="rawdata">{{rawDataStr}}</textarea>
+      </ba-card>
+      <ba-card title="Parserd Data:{{parserDataDesc}}" baCardClass="with-scroll">
+        <textarea class="full-width" rows="5" id="parserdata" name="parserdata">{{parserData}}</textarea>
+      </ba-card>
+      <ba-card title="SimplifiedNodesData" baCardClass="with-scroll">
+        <textarea class="full-width" rows="5" id="simplifiedNodesData" name="simplifiedNodesData">{{simplifiedNodesData}}</textarea>
+      </ba-card>
+    </div>
+  </div>
+</div>

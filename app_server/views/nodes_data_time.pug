@@ -1,0 +1,100 @@
+extends layout_subpage
+block append refRes
+  style.
+    .lform{padding-top:5px;}
+    .lbtxt{padding-top:10px;text-align:right;}
+    .ilipt{padding-top:5px;}
+    .btrow {padding-top:10px;}
+    .textContainer{padding-top:20px;padding-left:5px;}
+  script(src='/lib/d3/d3_v3.3.3.min.js')
+  script(src='/myjs/dv/donut3D.js')
+  script.
+    var parentWin;
+    var crtWinIndex;
+    function testFun(){
+      //console.log('testFun!',parentWin.nodesData.length);
+      console.log('testFun!',crtWinIndex,parentWin.nodesData.length);
+    }
+
+    function doClose(){
+      parent.layer.close(crtWinIndex);
+    }
+    /*
+    var salesData=[
+    	{label:"Basic", color:"#3366CC"},
+    	{label:"Plus", color:"#DC3912"},
+    	{label:"Lite", color:"#FF9900"},
+    	{label:"Elite", color:"#109618"},
+    	{label:"Delux", color:"#990099"}
+    ];//*/
+    
+    var delayRangeTplt=[
+    	{label:"Timely", color:"green",range:[0,30]},
+    	{label:"Delay0.5H", color:"#ed8290",range:[31,60]},
+    	{label:"Delay1H~2H", color:"#ef6275",range:[61,120]},
+    	{label:"Delay3H~8H", color:"#ef5166",range:[121,480]},
+    	{label:"Delay9H~24H", color:"#ea2e47",range:[481,1440]},
+    	{label:"Delay1D~2D", color:"#f40502",range:[1441,2880]},
+    	{label:"Delay3D~4D", color:"#7c1c23",range:[2881,5760]},
+    	{label:"Delay5D~7D", color:"#bc0511",range:[5761,10080]},
+    	{label:"Delay1W~2W", color:"#f50202",range:[10081,141120]},
+    	{label:"Delay3W~4W", color:"#f70202",range:[141121,282240]},
+    	{label:"Delay5W~", color:"#f90202",range:[282241,Infinity]},
+    	{label:"NoData", color:"blue",range:[-2,-1]}
+    ];
+
+    function randomData(){
+    	return delayRangeTplt.map(function(d){
+    		return {label:d.label, value:1000*Math.random(), color:d.color};});
+    }
+    
+    function parseRoofData(){
+      var delayRangeData = delayRangeTplt.map(function(d){
+        return {label:d.label, color:d.color,range:d.range,value:0,nodeList:[]};
+      });
+      
+      var nidNodeMap = parentWin.locationData.NNM;
+      var nowTime = new Date().getTime();
+      var delayMinutes = 0;
+      for(var nid in nidNodeMap){
+        var node = nidNodeMap[nid];
+        var nodeDatatime = node.latestDatatime;
+        delayMinutes = nodeDatatime!=null?Math.ceil(
+          (nowTime - new Date(nodeDatatime).getTime())/1000/60
+        ):-1;
+        //console.log('delayMinutes=',delayMinutes);
+        var delayRange = delayRangeData.filter(function(dr){
+          return dr.range[0]<=delayMinutes && delayMinutes<=dr.range[1];
+        });
+        if(delayRange != undefined && delayRange.length>0){
+          var dr = delayRange[0];
+          dr.value += 1;
+          //dr.nodeList.push(`${node.ptag}@${node.pos}`);
+          dr.nodeList.push(`${node.ptag}`);
+        }
+      }
+      //console.log(JSON.stringify(delayRangeData,null,2));
+      return delayRangeData;
+    }
+
+    $().ready(function(){
+      //roofData();
+      var svg = d3.select("#d3svg").append("svg").attr("width",500).attr("height",480);
+      svg.append("g").attr("id","salesDonut");
+      var dt = d3.select("#dataDetail").append("div").attr("class", "textContainer").append("text");
+      //var dt = svg.append("text");
+      dt.text("dataDetail here:");
+      var roofDataDelayInfo = parseRoofData();
+      //console.log('roofDataDelayInfo',JSON.stringify(roofDataDelayInfo,null,2));
+      Donut3D.draw("salesDonut", roofDataDelayInfo, 250, 220, 230, 200, 30, 0.3);
+    });
+
+block content
+  .container-fluid
+    .panel.panel-default
+      .panel-heading.phfp
+        span Data Delay View
+      .panel-body.pbp(style={width:"640px",height:"480px"})
+        #d3svg.col-xs-9
+        #dataDetail.col-xs-3
+        //-#d3svg2

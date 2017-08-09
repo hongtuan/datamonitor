@@ -1,0 +1,69 @@
+<div md-dialog-title fxLayout="row" fxLayoutAlign="space-between center" class="dlgheader">
+  <span>{{dlgTitle}}</span>
+  <button md-dialog-close md-icon-button tabindex="-1"><md-icon>close</md-icon></button>
+</div>
+<form #locForm="ngForm" (ngSubmit)="onSubmit()">
+  <div md-dialog-content class="dlgbody">
+    <table class="full-width" cellspacing="0">
+      <tr>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="Name" name="name" [(ngModel)]="location.name" tabindex="1" required />
+          </md-input-container>
+        </td>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="Address" name="address" [(ngModel)]="location.address" tabindex="2" />
+          </md-input-container>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="ContactInfo" name="contactInfo" [(ngModel)]="location.contactInfo" tabindex="3" />
+          </md-input-container>
+        </td>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="EMails" name="emails" [(ngModel)]="location.emails" tabindex="4" />
+          </md-input-container>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="DataSrc" name="datasrc" [(ngModel)]="location.datasrc"  tabindex="5" required />
+          </md-input-container>
+        </td>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="SnapCount" name="snapcount" [(ngModel)]="location.snapcount"  tabindex="6" required>
+          </md-input-container>
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <md-input-container class="full-width">
+              <input mdInput placeholder="SynPeriod" name="synperiod" [(ngModel)]="location.synperiod"  tabindex="7" required />
+          </md-input-container>
+        </td>
+        <td>
+          <md-input-container class="full-width">
+            <input mdInput placeholder="MonitPeriod" name="monitperiod" [(ngModel)]="location.monitperiod" tabindex="8" required />
+          </md-input-container>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <md-input-container class="full-width">
+            <textarea mdInput placeholder="AlertPolicy" rows="5" name="alertPolicy" [(ngModel)]="alertPolicyStr" tabindex="9" required></textarea>
+          </md-input-container>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div md-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="20px" class="dlgfooter">
+    <button type="submit" md-raised-button color="primary"  tabindex="10" [disabled]="!locForm.valid">Save</button>
+    <button md-button md-dialog-close  tabindex="11">Cancel</button>
+  </div>
+</form>

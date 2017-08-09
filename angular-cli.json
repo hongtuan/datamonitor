@@ -1,0 +1,75 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "datamonitor"
+  },
+  "apps": [
+    {
+      "root": "src",
+      "outDir": "client",
+      "assets": [
+        { "glob": "**/*", "input": "./assets/layer/skin", "output": "./skin/" },
+        "assets",
+        "favicon.ico"
+      ],
+      "index": "index.html",
+      "main": "main.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "app",
+      "styles": [
+        "../node_modules/bootstrap/scss/bootstrap.scss",
+        "../node_modules/ng2-slim-loading-bar/style.css",
+        "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+        "../node_modules/dragula/dist/dragula.css",
+        "assets/lib/smartmenu/css/smartMenu.css",
+        "app/theme/theme.scss",
+        "styles.scss"
+      ],
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.js",
+        "../node_modules/tether/dist/js/tether.js",
+        "../node_modules/bootstrap/dist/js/bootstrap.js",
+        
+        "../node_modules/moment/min/moment.min.js",
+        "assets/lib/smartmenu/js/jquery-smartMenu.js",
+        "assets/layer/layer.js",
+        "assets/myjs/lh.js",
+        "assets/myjs/data_utils.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    }
+  ],
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "project": "src/tsconfig.app.json"
+    },
+    {
+      "project": "src/tsconfig.spec.json"
+    },
+    {
+      "project": "e2e/tsconfig.e2e.json"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
+  "defaults": {
+    "styleExt": "scss",
+    "component": {
+    }
+  }
+}
