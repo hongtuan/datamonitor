@@ -9,17 +9,18 @@
  *
  */
 
-var nodemailer = require('nodemailer')
-var smtpTransport = require('nodemailer-smtp-transport');
-var config = require('./config')
+var nodemailer = require('nodemailer');
+var mailAccount = {
+  //service: 'QQ',
+  host: 'smtp.qq.com',
+  secureConnection: true, //use SSL
+  auth: {
+    user: '3239048@qq.com',
+    pass: 'xsmswyjselewcaab'
+  }
+};
 
-smtpTransport = nodemailer.createTransport(smtpTransport({
-    service: config.email.service,
-    auth: {
-        user: config.email.user,
-        pass: config.email.pass
-    }
-}));
+var smtpTransport = nodemailer.createTransport(mailAccount);
 
 /**
  * @param {String} recipient 收件人
@@ -27,22 +28,19 @@ smtpTransport = nodemailer.createTransport(smtpTransport({
  * @param {String} html 发送的html内容
  */
 var sendMail = function (recipient, subject, html) {
+  smtpTransport.sendMail({
+    from: mailAccount.auth.user,
+    to: recipient,
+    subject: subject,
+    html: html
+  }, function (error, response) {
+    console.log('send mail test over.');
+    if (error) {
+      console.log(error);
+      return;
+    }
+    console.log('发送成功')
+  });
+};
 
-    smtpTransport.sendMail({
-
-        from: config.email.user,
-        to: recipient,
-        subject: subject,
-        html: html
-
-    }, function (error, response) {
-        if (error) {
-            console.log(error);
-        }
-        console.log('发送成功')
-    });
-}
-sendMail('hongtuang3@gmail.com','testMail','<h1>hello</h1>');
-console.log('send mail over.');
-
-//module.exports = sendMail;
+sendMail('hongtuang3@gmail.com','testMail4','<h2>hello2中文</h2>');

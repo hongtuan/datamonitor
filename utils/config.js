@@ -8,11 +8,23 @@ exports.emailSettings = {
   }
 };//*/
 
+//*
 module.exports = {
-    //mail config.
-    email: {
-        service: 'QQ',
-        user: '3239048@qq.com',
-        pass: '960801tht',
-    }
-}
+  //mail config.
+  email: {
+    service: 'QQ',
+    user: '3239048@qq.com',
+    pass: 'xsmswyjselewcaab',
+  }
+}//*/
+
+/*
+module.exports = {
+  //mail config.
+  email: {
+    service: 'sina',
+    user: 'tht@sina.com',
+    pass: 'thinkpad114',
+  }
+}//*/
+
