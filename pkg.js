@@ -59,6 +59,7 @@ setTimeout(function() {
   archive.file('package4server.json',{name:'package.json'});
   
   archive.file('utils/util.js',{name:'utils/util.js'});
+  archive.file('utils/mailsender.js',{name:'utils/mailsender.js'});
   archive.file('utils/datasyntask.js',{name:'utils/datasyntask.js'});
 
   archive.directory('client/');
