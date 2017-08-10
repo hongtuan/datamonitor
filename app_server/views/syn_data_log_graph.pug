@@ -1,0 +1,122 @@
+extends layout_subpage
+block append refRes
+  style.
+
+  script(src='/lib/moment/min/moment.min.js')
+  script(src='/lib/echarts/echarts.min.js')
+  script.
+    var parentWin;
+    var crtWinIndex;
+
+    var dataObj;
+    function setDataObj(_dataObj){
+      dataObj = _dataObj;
+    }
+
+    var myChart;
+    var chartOption;
+    function drawChartPanel(){
+      myChart = echarts.init(document.getElementById('main'));
+      // 指定图表的配置项和数据
+      chartOption = {
+        title: {
+          text: 'DataCount'
+        },
+        tooltip: {},
+        legend: {
+          data:['dataCount']
+        },
+        xAxis: {
+          data: []
+        },
+        yAxis: {},
+        series: [{
+          name: 'dataCount',
+          type: 'bar',
+          data: []
+        }]
+      };
+      myChart.setOption(chartOption);
+    }
+    
+    var dataX,dataY;
+    var totalItems,totalPages;
+    var pageSize=36,currentPage = 1;
+    var pagedX,pagedY;
+    function showPage(offset){
+      currentPage+=offset;
+      if(currentPage<=0) currentPage = totalPages - 1;
+      if(currentPage>=totalPages) currentPage = 1;
+      var startIndex = (currentPage - 1) * pageSize;
+      var endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
+      pagedX = dataX.slice(startIndex, endIndex + 1);
+      pagedY = dataY.slice(startIndex, endIndex + 1);
+      //fill data
+      myChart.setOption({
+        xAxis: {
+          data: pagedX
+        },
+        series: [{
+          // fill by name
+          name: 'dataCount',
+          data: pagedY
+        }]
+      });
+    }
+
+    function loadData(){
+      var url = '/api/nd/getsdl/!{lid}/300';
+      //console.log('url=',url);
+      $.get(url,null,function(data,status){
+        //console.log(JSON.stringify(data,null,2),status);
+        if(data){
+          //console.log(data);
+          dataX = [],dataY = [];
+          data.logData.forEach(function(nd){
+            dataX.push(moment(nd.dataTime).format('MMM DD h:mm A'));
+            dataY.push(nd.updateCount);
+          });
+
+          totalItems = dataX.length;
+          totalPages = Math.ceil(totalItems / pageSize);
+          showPage(0);
+        }
+      });
+    }
+
+    function goLast(){
+      showPage(-1);
+    }
+
+    function goNext(){
+      showPage(1);
+    }
+    
+    function toTable(){
+      window.location = `/dm/!{lid}/sdmgr`;
+    }
+    
+    function setDlgTitle(){
+      //console.log('setDlgTitle here.');
+      if(dataObj){
+        var title = `${dataObj.name}'s DataSynCount in Graph.`;
+        parent.layer.title(title, crtWinIndex);
+      }
+    }
+
+    $().ready(function() {
+      drawChartPanel();
+      loadData();
+      setDlgTitle(); 
+    });
+
+block content
+  .container-fluid
+    .panel.panel-default
+      .panel-body
+        #topPanel
+          a.btn.btn-primary.btn-xs.text-left(onclick="toTable()()") toTable
+        #main(style="width: 580px;height:320px;")
+        #pagerPanel
+          a.btn.btn-primary.btn-xs.text-left(onclick="goLast()") Last
+          a.btn.btn-primary.btn-xs.fr(onclick="goNext()") Next
