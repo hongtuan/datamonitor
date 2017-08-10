@@ -5,7 +5,7 @@ block append refRes
     #headingArea,#mainArea,#footerArea{background-color:#00008B;color:white;}
     #timeRangeText{width:370px;font-size:18px;background-color:#00008B;}
     #d3container{min-width:300px;min-height:500px;width:100%";}
-    
+
   link(rel="stylesheet" type="text/css" href="/lib/d3/d3ext/charts.css")
   link(rel="stylesheet" type="text/css" href="/lib/daterangepicker/daterangepicker.css")
   script(src='/lib/moment/min/moment.min.js')
@@ -29,7 +29,7 @@ block append refRes
       var visible = cbObj.checked;
       setChartVisible(chartId,visible);
     }
-    
+
     function switchDataTable(cbObj){
       var dtObj = $("#dataTableDiv");
       if(cbObj.checked){
@@ -38,7 +38,7 @@ block append refRes
         dtObj.addClass('hidden');
       }
     }
-    
+
     var dataTimeRange;
     function updateTimeRangeText(){
       var timeRangeCtrl = $("#timeRangeText");
@@ -58,7 +58,7 @@ block append refRes
           for(var i = 0; i < dtCtrls.length; i++){
             var cbObj = dtCtrls[i];
             var dataName = cbObj.id;
-            var lc = {id:dataName,name:cbObj.title,visible:cbObj.checked};
+            var lc = {id:dataName,name:cbObj.title,visible:cbObj.checked,showAvg:true};
             var dataA = [];
             data.dataList.forEach(function(nd){
               var di = {DateTime:nd.dataTime,Value:nd.dataObj[dataName]};
@@ -72,7 +72,7 @@ block append refRes
           }
           //drawCharts here:
           drawCharts('d3container',chartsConfig);
-          
+
           //fill data to datatable.
           var table = $('#dataTable').DataTable();
           table.clear();
@@ -89,17 +89,17 @@ block append refRes
         //parent.layer.close(lwi);
       });
     }
-    
+
     function toNodeData(){
       window.location = `/dm/vnd/!{lid}/!{nid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
       //parent.layer.title('NodeAvgData', crtWinIndex);
     }
-    
+
     function toAllData(){
       window.location = `/dm/ad/!{lid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
       parent.layer.title('AllNodesData', crtWinIndex);
     }
-    
+
     function setDlgTitle(){
       //console.log('setDlgTitle here.');
       if(parentWin){
@@ -112,7 +112,7 @@ block append refRes
     }
 
     function refresh(){
-      dataTimeRange.to = moment().toISOString();
+      //dataTimeRange.to = moment().toISOString();
       //end = moment();
       refreshCharts();
       updateTimeRangeText();
@@ -131,7 +131,7 @@ block append refRes
       });
 
       setDlgTitle();
-      dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
+      dataTimeRange = {from:'',to:''};
       if(dataTimeRange.from == ''){
         dataTimeRange = timeRangeSelector.getDefaultRange();
       }
@@ -153,7 +153,7 @@ block content
             span.sbb5
             input(type="checkbox" onclick="switchDataTable(this)" id="sdt" name="sdt" title="Switch DataTable")
             span DataTable
-            
+
         tr
           td.tdtfr TimeRange:
           td
@@ -165,13 +165,13 @@ block content
             span.sbb5
             a.btn.btn-primary.btn-xs.text-center(onclick="refresh()" title="Refresh this view") Refresh
             script.
-              timeRangeSelector.config({endWithCurTime:'no',startHour:5,startMinute:30}).show('timeRangeText',function(selectedTimeRange){
+              timeRangeSelector.config({endWithCurTime:'no',rangType:'RT2',startHour:10,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
                 dataTimeRange = selectedTimeRange;
                 refreshCharts();
               },function(){
                 parent.layer.msg('timeRange invalid.');
               });
-             
+
   .container-fluid
     .panel.panel-default
       #mainArea.panel-body

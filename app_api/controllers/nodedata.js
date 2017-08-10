@@ -84,7 +84,7 @@ function doInterpolation(data,emptyData,dataTimeRange){
       dataObj:emptyData
     });
   }
-  
+
   if(dist > 30){
     iData.push({
       dataTime:moment(startDataTime).subtract(15,'minutes'),
@@ -101,7 +101,7 @@ function doInterpolation(data,emptyData,dataTimeRange){
       dB = data[i+1];
       dtA = moment(dA.dataTime);
       dtB = moment(dB.dataTime);
-      
+
       dist = dtB.diff(dtA,'minutes');
       if(dist >= 30){//add a data close to dtA;
         iData.push({
@@ -109,7 +109,7 @@ function doInterpolation(data,emptyData,dataTimeRange){
           dataObj:emptyData
         });
       }
-      
+
       if(dist > 45){//add a data close to dtB
         iData.push({
           dataTime:dtB.subtract(15,'minutes'),
@@ -128,14 +128,14 @@ function doInterpolation(data,emptyData,dataTimeRange){
       dataObj:emptyData
     });
   }
-  
+
   if(dist > 15){
     iData.push({
       dataTime:dataTimeRange.to,
       dataObj:emptyData
     });
   }
-  
+
   return iData;
 }
 
@@ -266,7 +266,7 @@ module.exports.executeInspectNodeTask = function(req, res) {
           });
         });
       }else{//just give an echo,need not record the log.
-        //out put lastestNodeData here 
+        //out put lastestNodeData here
         var node = nidNodeMap[lastestNodeData.nid];
         //console.log('lastestNodeData='+JSON.stringify(node,null,2));
         var cvtLastestNodeData  = cvtNodeData(lastestNodeData,node?node.ptag:'Mac');
@@ -393,13 +393,13 @@ module.exports.getNodeAvgData = function(req, res) {
         console.log(err);
         res.status(406).json(err);
       }
-      
+
       var dateRange = getDatesInRange(from,to);
       //console.log(dateRange);
       var avgData = {};
       for(let ds of dateRange){
-        var start = moment(ds).hour(5).minute(30);
-        var end = moment(ds).hour(22).minute(00);
+        var start = moment(ds).hour(10).minute(0);
+        var end = moment(ds).hour(17).minute(30);
         var navd = [];
         for(let d of dataList){
           var md = moment(d.dataTime);
@@ -425,7 +425,7 @@ module.exports.getNodeAvgData = function(req, res) {
             avgDataValue[dn]+= d[dn];
           }
         }
-        
+
         for(var dn in avgDataValue){
           var avgValue = avgDataValue[dn]/navd.length;
           avgDataValue[dn] = +avgValue.toFixed(2);
@@ -449,12 +449,12 @@ module.exports.getSynDataLog = function(req, res) {
   var lid = req.params.lid;
   var lc = req.params.lc;
   if (lid) {
-    //res.render('syn_data_log_graph', {lid:lid});    
+    //res.render('syn_data_log_graph', {lid:lid});
     llDao.getLocLogList(lid,llDao.logType.dataSync,lc||300,function(err,dataSyncLogList){
       var logData = [];
       for(let slog of dataSyncLogList){
         var logContent = slog.logContent;
-        var udc = logContent.substr(logContent.lastIndexOf(':')+1);        
+        var udc = logContent.substr(logContent.lastIndexOf(':')+1);
         logData.push({dataTime:slog.createdOn,updateCount:+udc});
       }
       //console.log(logData);

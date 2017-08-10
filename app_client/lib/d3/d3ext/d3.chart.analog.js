@@ -26,7 +26,7 @@
             .attr("r", function(d) {return 2; });
           //});
         }
-        
+
         function drawDataCountBar(){
           //calc the dataCount
           var dc = 0;//,sumv = 0;
@@ -42,12 +42,12 @@
             //var avgv = Math.floor(sumv/dc);
             //create a g object for rect.
             var dcg = g.append("g").attr("class","dcrect").attr("x", 0);
-            
+
             var xRectWidthScale = d3.scaleLinear()
               .domain([0, Math.max(400,dc*1.1)])
               //.domain([0, 10000])
               .range([0, 400]);
-  
+
             var rectWidth = xRectWidthScale(dc);
             //draw a rect for dataCount.
             var dcRect = dcg.append("rect")
@@ -88,8 +88,8 @@
             }
           }
         }
-        
-        
+
+
         //add on 6/5/2017 by Tim
         function drawAverageValue(){
           //calc the dataCount
@@ -97,10 +97,10 @@
           var dc = 0,sumv = 0;
           var minX = '',maxX = '';
           if(d.data.length>=2){
-            minX = d.data[1].DateTime;
-            maxX = d.data[d.data.length-2].DateTime;
+            minX = d.data[0].DateTime;
+            maxX = d.data[d.data.length-1].DateTime;
           }
-          
+
           _.chain(d.data).filter(function(di){
               //console.log(JSON.stringify(di));
               return di.isSham == undefined;
@@ -123,7 +123,7 @@
               .attr("y2",avglh)
               .attr("stroke",color(d.order))
               .attr("stroke-width",1);
-            
+
             var tips = g.append('g').attr('class', 'tips');
             tips.append('rect')
               .attr('class', 'tips-border')
@@ -141,7 +141,7 @@
             //wording1.text();
             //d3.select('.tips')
             tips.attr('transform', 'translate(' + 10 + ',' + Math.floor(avglh) + ')');
-          }          
+          }
         }
 
         var chartConfig = this.__chart__;
@@ -189,7 +189,7 @@
             .call(yAxis);//*/
         }
 
-        //add path for each y-Value dimension 
+        //add path for each y-Value dimension
         _.each(d.yVal, function(c, i) {
           //setup line function
           //var valueline = d3.svg.line()
@@ -218,13 +218,13 @@
           }
           else {
             //*
-            g.append("path") //add path 
+            g.append("path") //add path
               .attr('class', 'path ' + c)
               .attr("d", valueline(d.data))
               .attr("clip-path", "url(#clip)")
               //.style('stroke', color(d.id + i));//*/
               .style('stroke', color(d.order));//*/
-            
+
             //add dot for each data.
             drawDots();
             drawDataCountBar();
@@ -251,7 +251,7 @@
         };
       });
     }
-    // The x-accessor for the path generator; xScale 
+    // The x-accessor for the path generator; xScale
     function X(d) {
       return xScale(xValue(d));
     }
