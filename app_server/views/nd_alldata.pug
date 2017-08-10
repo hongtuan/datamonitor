@@ -127,11 +127,13 @@ block content
               span= _dap.name
         tr
           td.tdtfr Nodes:
-          td 
-            each node,pid in pidNodeMap
-              input.installedNode(type="checkbox" onclick="switchChart(this)" id= pid name= node.ptag title= node.nid checked)
+          td
+            each node,index in installedNodes
+              input.installedNode(type="checkbox" onclick="switchChart(this)" id= node.pid name= node.ptag title= node.pid checked)
               span= node.ptag
               span.sbb5
+              if node.newline
+                br
         tr
           td.tdtfr TimeRange:
           td

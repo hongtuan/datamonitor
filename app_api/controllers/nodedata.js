@@ -444,3 +444,21 @@ module.exports.getNodeAvgData = function(req, res) {
     });
   });
 };
+
+module.exports.getSynDataLog = function(req, res) {
+  var lid = req.params.lid;
+  var lc = req.params.lc;
+  if (lid) {
+    //res.render('syn_data_log_graph', {lid:lid});    
+    llDao.getLocLogList(lid,llDao.logType.dataSync,lc||300,function(err,dataSyncLogList){
+      var logData = [];
+      for(let slog of dataSyncLogList){
+        var logContent = slog.logContent;
+        var udc = logContent.substr(logContent.lastIndexOf(':')+1);        
+        logData.push({dataTime:slog.createdOn,updateCount:+udc});
+      }
+      //console.log(logData);
+      res.status(200).json({logData:logData});
+    });
+  }
+};

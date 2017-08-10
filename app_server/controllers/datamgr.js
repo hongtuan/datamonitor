@@ -34,6 +34,17 @@ module.exports.synDataMgr = function(req, res) {
   }
 };
 
+module.exports.synDataLogGraph = function(req, res) {
+  //console.log('In controllers:req.params.lid='+req.params.lid);
+  var lid = req.params.lid;
+  if (lid) {
+    res.render('syn_data_log_graph', {lid:lid});
+    
+    //llDao.getLocLogList(lid,llDao.logType.dataSync,300,function(err,dataSyncLogList){
+    //});
+  }
+};
+
 module.exports.inspectNode = function(req, res) {
   //console.log('In controllers:req.params.lid='+req.params.lid);
   var lid = req.params.lid;
@@ -68,14 +79,33 @@ module.exports.showAllData = function(req, res) {
       res.status(406).json(err);
       return;
     }
-    var installedNodes = {};
+    //var insta
+    var installedNodes = [];
     for(var pid in nodesInfo.pidNodeMap){
       var node = nodesInfo.pidNodeMap[pid];
       if(node.nid && node.nid.length > 0){
-        installedNodes[pid] = node;
+        installedNodes.push({ptag:node.ptag,pid:pid});//[pid] = node;
       }
     }
-    res.render('nd_alldata', {lid:lid,query:req.query,dap:nodesInfo.dap,pidNodeMap:installedNodes});
+    //sort installedNodes by ptag
+    installedNodes.sort(function (a, b) {
+      if (a.ptag > b.ptag) {
+        return 1;
+      }
+      if (a.ptag < b.ptag) {
+        return -1;
+      }
+      // a 必须等于 b
+      return 0;
+    });
+    //add newline here.
+    for(var i=0;i<installedNodes.length-1;i++){
+      var node = installedNodes[i],nextNode = installedNodes[i+1];
+      if(node.ptag.charAt(0)!=nextNode.ptag.charAt(0)){
+        node['newline'] = true;
+      }
+    }
+    res.render('nd_alldata', {lid:lid,query:req.query,dap:nodesInfo.dap,installedNodes:installedNodes});
   });
 };
 

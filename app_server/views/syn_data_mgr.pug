@@ -9,8 +9,21 @@ block append refRes
     var dataObj;
     function setDataObj(_dataObj){
       dataObj = _dataObj;
-      //console.log('dataObj='+JSON.stringify(dataObj,null,2));
     }
+    
+    function setDlgTitle(){
+      //console.log('setDlgTitle here.');
+      if(dataObj){
+        var title = `${dataObj.name}'s DataSyn Task Management.`;
+        parent.layer.title(title, crtWinIndex);
+      }
+    }
+    
+    function toGraph(){
+      window.location = `/dm/!{lid}/sdlg`;
+      //parent.layer.title('synDataCountInGraph', crtWinIndex);
+    }
+    var isTaskRunning = !{isTaskRunning};
     
     $().ready(function() {
       configSwitch('dataSynSwitch',function(state){
@@ -37,7 +50,9 @@ block append refRes
         "scrollCollapse": true,
         "paging":         false
       });
-      //console.log('onReady called.');
+      setDlgTitle();
+      if(isTaskRunning)
+        $("#taskState").text('running every['+dataObj.synperiod+']seconds');
     });
   script(src='/myjs/map-utils.js')
 block content
@@ -48,8 +63,7 @@ block content
         input(type="checkbox" name="dataSynSwitch" checked= isTaskRunning)
         span  Data Syn Task now is 
         span#taskState= isTaskRunning?'running':'stop' 
-        span  logList:
-        //-a.btn.btn-primary.btn-xs.fr(onclick="addLocation()") AddLocation
+        a.btn.btn-primary.btn-xs.fr(onclick="toGraph()") toGraph
       .panel-body.pbp
         table#dataTable.table.table-striped.table-bordered
           thead

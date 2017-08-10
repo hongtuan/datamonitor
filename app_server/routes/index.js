@@ -45,6 +45,7 @@ router.get('/locations/:lid/ibdp/:bid', ctrlBoundaries.impBoundaryDataPage);
 
 router.get('/dm/:lid/in', ctrlDataMgr.inspectNode);//ok
 router.get('/dm/:lid/sdmgr', ctrlDataMgr.synDataMgr);//ok
+router.get('/dm/:lid/sdlg', ctrlDataMgr.synDataLogGraph);//ok
 
 router.get('/dm/vnd/:lid/:nid',ctrlDataMgr.showNodeData);//ok
 router.get('/dm/sdt/:lid',ctrlDataMgr.showDataTime);//ok

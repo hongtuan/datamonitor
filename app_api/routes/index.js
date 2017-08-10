@@ -57,6 +57,7 @@ router.delete('/users/:uid', ctrlAuth.deleteUser);
 router.get('/nd/getnd/:lid/:nid',ctrlNodeData.getNodeData);
 router.get('/nd/getavgnd/:lid/:nid',ctrlNodeData.getNodeAvgData);
 router.get('/nd/getnsd/:lid',ctrlNodeData.getNodesData);
+router.get('/nd/getsdl/:lid/:lc',ctrlNodeData.getSynDataLog);//add @2017-08-09
 
 router.post('/nd/:lid/sdtc/:sts', ctrlNodeData.synDataTaskCtrl);//ok
 router.post('/nd/:lid/eint', ctrlNodeData.executeInspectNodeTask);//ok
