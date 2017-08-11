@@ -43,7 +43,9 @@ block append refRes
     function updateTimeRangeText(){
       var timeRangeCtrl = $("#timeRangeText");
       var fmt = 'MM/DD/YYYY h:mm a';
-      timeRangeCtrl.val(moment(dataTimeRange.from).format(fmt) + ' - ' + moment(dataTimeRange.to).format(fmt));
+      var text = `${moment(dataTimeRange.from).format(fmt)} - ${moment(dataTimeRange.to).format(fmt)}`;
+      //console.log(text);
+      timeRangeCtrl.val(text);
     }
     function refreshCharts(){
       removeAllCharts();
@@ -115,7 +117,7 @@ block append refRes
       //dataTimeRange.to = moment().toISOString();
       //end = moment();
       refreshCharts();
-      updateTimeRangeText();
+      //updateTimeRangeText();
     }
 
     $().ready(function() {
@@ -131,12 +133,14 @@ block append refRes
       });
 
       setDlgTitle();
-      dataTimeRange = {from:'',to:''};
+      dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
+      //dataTimeRange = {from:'',to:''};
       if(dataTimeRange.from == ''){
         dataTimeRange = timeRangeSelector.getDefaultRange();
+      }else{
+        updateTimeRangeText();
       }
       refreshCharts();
-      updateTimeRangeText();
     });
 
 block content
@@ -165,7 +169,7 @@ block content
             span.sbb5
             a.btn.btn-primary.btn-xs.text-center(onclick="refresh()" title="Refresh this view") Refresh
             script.
-              timeRangeSelector.config({endWithCurTime:'no',rangType:'RT2',startHour:10,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
+              timeRangeSelector.config({rangeType:'RT2',startHour:6,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
                 dataTimeRange = selectedTimeRange;
                 refreshCharts();
               },function(){

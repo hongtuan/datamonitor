@@ -3,25 +3,20 @@
   var fmt = 'MM/DD/YYYY h:mm a';
 
   var timeRangeCtrl;
-  var startHour = 5,startMinute = 30;
-  var endHour = 22,endMinute = 0;
+  var startHour = 6,startMinute = 0;
+  var endHour = 17,endMinute = 30;
   var endWithCurTime = true;
-  var rangType = 'RT1';
+  var rangeType = 'RT1';
+
+  var selectedRange = null;
 
   var start = moment().hour(startHour).minute(startMinute);
-  var end = moment();
+  var end = moment().hour(endHour).minute(endMinute);
 
   function setStartEnd(){
     start = moment().hour(startHour).minute(startMinute);
-    end = moment();
-    if(!endWithCurTime) {
-      end = moment().hour(endHour).minute(endMinute);
-    }
-  }
-
-  function echoTimeRange() {
-    setStartEnd();
-    timeRangeCtrl.val(start.format(fmt) + ' - ' + end.format(fmt));
+    //end = moment().hour(endHour).minute(endMinute);
+    end = endWithCurTime?moment():moment().hour(endHour).minute(endMinute);
   }
 
   function isTimeRangeOk(picker){
@@ -31,7 +26,7 @@
   function buildRanges(){
     //end = moment();
     setStartEnd();
-    switch(rangType){
+    switch(rangeType){
       case 'RT1':
       return {
         'Today': [start, end],
@@ -60,7 +55,7 @@
   }
 
   timeRangeSelector.config = function(opt){
-    console.log('do config here.');
+    //console.log('do config here.');
     if(opt.endWithCurTime == 'no') endWithCurTime = false;
 
     if(opt.hasOwnProperty('startHour')) startHour = opt.startHour;
@@ -69,15 +64,15 @@
     if(opt.hasOwnProperty('endHour')) endHour = opt.endHour;
     if(opt.hasOwnProperty('endMinute')) endMinute = opt.endMinute;
 
-    if(opt.hasOwnProperty('rangType')) rangType = opt.rangType;
-    //console.log('endWithCurTime:',endWithCurTime,'startHour:',startHour);
+    if(opt.hasOwnProperty('rangeType')) rangeType = opt.rangeType;
+    //console.log('endWithCurTime:',endWithCurTime,'startHour:',startHour,'endHour',endHour);
     return this;
   };
 
   timeRangeSelector.getDefaultRange = function(){
     //console.log('getDefaultRange');
     setStartEnd();
-    return {from:start.subtract(2, 'days').toISOString(),to:end.toISOString()};
+    return {from:start.toISOString(),to:end.toISOString()};
   };
 
   timeRangeSelector.show = function(timeRangeTextID,cb,fail) {
@@ -91,34 +86,51 @@
       timePicker: true,
       timePickerIncrement: 30,
       ranges: buildRanges(),
+      autoUpdateInput:false,
       locale: {
         format: fmt
       }
-    }, echoTimeRange);
+    }, function(start, end, label) {
+      //endWithCurTime = label == 'Today';
+      endWithCurTime = !label.endsWith('Days');
+      var text = `${start.format(fmt)} - ${endWithCurTime?end.format(fmt):end.hour(endHour).minute(endMinute).format(fmt)}`;
+      timeRangeCtrl.val(text);
+  });//echoTimeRange
 
     //daterangepicker event.
     timeRangeCtrl.on('show.daterangepicker', (ev, picker)=>{
       //console.log('show.daterangepicker');
+      //*
       if(moment().diff(end,'minutes') >=1){
-        console.log('need update range.');
+        //console.log('need update range.');
         picker.ranges = buildRanges();
-        console.log('update range over.');
-      }
+        //console.log('update range over.');
+      }//*/
     });
 
     timeRangeCtrl.on('apply.daterangepicker', (ev, picker)=>{
       if(isTimeRangeOk(picker)){
-        var dataTimeRange = {
+        //console.log('endWithCurTime:',endWithCurTime);
+        //console.log('picker.startDate:',JSON.stringify(picker.startDate,null,2));
+        //console.log('picker.endDate:',JSON.stringify(picker.endDate,null,2));
+        if(!endWithCurTime){
+          picker.endDate = picker.endDate.hour(endHour).minute(endMinute);
+        }
+        //console.log('after set,picker.endDate:',JSON.stringify(picker.endDate,null,2));
+        selectedRange = {
           from:picker.startDate.toISOString(),
           to:picker.endDate.toISOString()
         };
-        if(cb) cb(dataTimeRange);
+        //console.log('selectedRange:',JSON.stringify(selectedRange,null,2));
+        if(cb) cb(selectedRange);
       }else{
         console.log('timeRange invalid.');
         if(fail) fail();
         //parent.layer.msg('timeRange invalid.');
       }
     });
+    //default show Today.
+    timeRangeCtrl.val(`${start.format(fmt)} - ${end.format(fmt)}`);
   };
 
   this.timeRangeSelector = timeRangeSelector;

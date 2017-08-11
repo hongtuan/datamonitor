@@ -20,7 +20,7 @@ block append refRes
   //-script(src='/myjs/dv/mapboard.js')
   script(src='/lib/requirejs/require.min.js')
   script(src='/lib/d3/d3ext/charts.js')
-  
+
   script.
     var parentWin;
     var crtWinIndex;
@@ -42,7 +42,10 @@ block append refRes
     function updateTimeRangeText(){
       var timeRangeCtrl = $("#timeRangeText");
       var fmt = 'MM/DD/YYYY h:mm a';
-      timeRangeCtrl.val(moment(dataTimeRange.from).format(fmt) + ' - ' + moment(dataTimeRange.to).format(fmt));
+      var text = `${moment(dataTimeRange.from).format(fmt)} - ${moment(dataTimeRange.to).format(fmt)}`;
+      //console.log(text);
+      timeRangeCtrl.val(text);
+      //timeRangeCtrl.val(moment(dataTimeRange.from).format(fmt) + ' - ' + moment(dataTimeRange.to).format(fmt));
     }
 
     function showDataType(dt){
@@ -53,18 +56,18 @@ block append refRes
       refreshCharts();
       //console.log(dataType,dataTypeDesc);
     }
-    
+
     function switchChart(cbObj){
       var chartId = cbObj.name;
       var visible = cbObj.checked;
       setChartVisible(chartId,visible);
     }
-    
+
     function refresh(){
-      dataTimeRange.to = moment().toISOString();
+      //dataTimeRange.to = moment().toISOString();
       //end = moment();
       refreshCharts();
-      updateTimeRangeText();
+      //updateTimeRangeText();
     }
 
     function refreshCharts(){
@@ -107,11 +110,12 @@ block append refRes
       //var locationData = parentWin.locationData;
       dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
       //console.log(JSON.stringify(dataTimeRange,null,2));
-      if(dataTimeRange.from == ""){
+      if(dataTimeRange.from == ''){
         dataTimeRange = timeRangeSelector.getDefaultRange();
+      }else{
+        updateTimeRangeText();
       }
       showDataType('RH');
-      updateTimeRangeText();
     });
 
 block content

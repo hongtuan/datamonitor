@@ -24,6 +24,10 @@ function getInitData(dap){
 }
 
 function getDatesInRange(from,to,fmt='YYYY-MM-DD'){
+  //var fromDate = from.substr(0,from.indexOf('T'));
+  //var toDate = to.substr(0,to.indexOf('T'));
+  //console.log('fromDate,toDate',fromDate,toDate);
+  //var start = moment(fromDate),end = moment(toDate);
   var start = moment(from),end = moment(to);
   var dc = end.diff(start,'days');
   var dateRange = [start.format(fmt)];
@@ -189,6 +193,9 @@ module.exports.getNodeData = function(req, res) {
     var nid = req.params.nid;
     var from = req.query.from;
     var to = req.query.to;
+    //var fmt = 'MM/DD/YYYY hh:mm a';
+    //console.log('getNodeData:from',moment(from).format(fmt));
+    //console.log('getNodeData:to',moment(to).format(fmt));
     var timeRange = null;
     if(from && to){
       timeRange = {from:from,to:to};
@@ -198,8 +205,10 @@ module.exports.getNodeData = function(req, res) {
         console.log(err);
         res.status(406).json(err);
       }
+      //console.log('getNodeData:dataList',dataList.length,JSON.stringify(dataList,null,2));
       var emptyData = getEmptyData(dataAlertPolicy);
       var iDataList = doInterpolation(dataList,emptyData,timeRange);
+      //console.log('getNodeData:iDataList',iDataList.length,JSON.stringify(iDataList,null,2));
       res.status(200).json({dap:dataAlertPolicy,dataList:iDataList});
     });
   });
@@ -372,6 +381,74 @@ module.exports.getNodesData = function(req, res) {
   });
 };
 
+function calcAvgData(dataList,from,to,dataAlertPolicy){
+  //console.log(JSON.stringify(dataList,null,2));
+  //console.log(from,to);
+  var mfrom = moment(from);
+  var startHour = mfrom.hour(),startMinute = mfrom.minute();
+
+  var mto = moment(to);
+  var endHour = mto.hour(),endMinute = mto.minute();
+
+  var dateRange = getDatesInRange(from, to);
+
+  var avgData = {};
+  for(let ds of dateRange) {
+    var start = moment(ds).hour(startHour).minute(startMinute);
+    var end = moment(ds).hour(endHour).minute(endMinute);
+    //console.log('start,end:',start.format('YYYY-MM-DD hh:mm:ss'),end.format('YYYY-MM-DD hh:mm:ss'));
+    var navd = [];
+    for(let d of dataList) {
+      var md = moment(d.dataTime);
+      //console.log('md=',md.format('YYYY-MM-DD h:mm:ss'));
+      if(md.isBetween(start, end, null, '[]')) {
+        navd.push(d.dataObj);
+        //console.log('is between!',md,md.format('YYYY-MM-DD hh:mm:ss'));
+      }else{
+        //console.log('not between!',md,md.format('YYYY-MM-DD hh:mm:ss'));
+      }
+    }
+    avgData[ds] = navd;
+    //console.log(JSON.stringify(navd,null,2));
+  }
+
+  //console.log(JSON.stringify(avgData,null,2));
+
+  //calc the avage:
+  //var emptyData = getInitData(dataAlertPolicy);
+  for(var ds in avgData) {
+    var navd = avgData[ds];
+    var avgDataValue = getInitData(dataAlertPolicy);
+    if(navd.length == 0) {
+      avgData[ds] = avgDataValue;
+      continue;
+    }
+
+    for(let d of navd) {
+      for(var dn in d) {
+        avgDataValue[dn] += d[dn];
+      }
+    }
+
+    for(var dn in avgDataValue) {
+      var avgValue = avgDataValue[dn] / navd.length;
+      avgDataValue[dn] = +avgValue.toFixed(2);
+      if(dn == 'DC') {
+        avgDataValue[dn] = navd.length;
+      }
+    }
+    avgData[ds] = avgDataValue;
+  }
+  var avgDataList = [];
+  for(var ds in avgData) {
+    avgDataList.push({
+      dataTime: ds,
+      dataObj: avgData[ds]
+    });
+  }
+  return avgDataList;
+}
+
 module.exports.getNodeAvgData = function(req, res) {
   var lid = req.params.lid;
   locDao.getDataAlertPolicy(lid,function(err,dataAlertPolicy){
@@ -383,6 +460,9 @@ module.exports.getNodeAvgData = function(req, res) {
     var nid = req.params.nid;
     var from = req.query.from;
     var to = req.query.to;
+    //var fmt = 'MM/DD/YYYY hh:mm a';
+    //console.log('getNodeAvgData:from',moment(from).format(fmt));
+    //console.log('getNodeAvgData:to',moment(to).format(fmt));
     var timeRange = null;
     if(from && to){
       timeRange = {from:from,to:to};
@@ -393,54 +473,11 @@ module.exports.getNodeAvgData = function(req, res) {
         console.log(err);
         res.status(406).json(err);
       }
-
-      var dateRange = getDatesInRange(from,to);
-      //console.log(dateRange);
-      var avgData = {};
-      for(let ds of dateRange){
-        var start = moment(ds).hour(10).minute(0);
-        var end = moment(ds).hour(17).minute(30);
-        var navd = [];
-        for(let d of dataList){
-          var md = moment(d.dataTime);
-          if(md.isBetween(start,end,null,'[]')){
-            navd.push(d.dataObj);
-          }
-        }
-        avgData[ds] = navd;
-      }
-
-      //calc the avage:
-      //var emptyData = getInitData(dataAlertPolicy);
-      for(var ds in avgData){
-        var navd = avgData[ds];
-        var avgDataValue = getInitData(dataAlertPolicy);
-        if(navd.length == 0){
-          avgData[ds] = avgDataValue;
-          continue;
-        }
-
-        for(let d of navd){
-          for(var dn in d){
-            avgDataValue[dn]+= d[dn];
-          }
-        }
-
-        for(var dn in avgDataValue){
-          var avgValue = avgDataValue[dn]/navd.length;
-          avgDataValue[dn] = +avgValue.toFixed(2);
-          if(dn == 'DC'){
-            avgDataValue[dn] = navd.length;
-          }
-        }
-        avgData[ds] = avgDataValue;
-      }
-      var iDataList = [];
-      for(var ds in avgData){
-        iDataList.push({dataTime:ds, dataObj:avgData[ds]});
-      }
-      //console.log(JSON.stringify(iDataList,null,2));
-      res.status(200).json({dap:dataAlertPolicy,dataList:iDataList});
+      //console.log('getNodeAvgData:dataList',dataList.length,JSON.stringify(dataList,null,2));
+      var avgDataList = calcAvgData(dataList,from,to,dataAlertPolicy);
+      //console.log('getNodeAvgData:avgDataList',avgDataList.length,JSON.stringify(avgDataList,null,2));
+      //console.log(JSON.stringify(avgDataList,null,2));
+      res.status(200).json({dap:dataAlertPolicy,dataList:avgDataList});
     });
   });
 };
