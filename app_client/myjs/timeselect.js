@@ -30,7 +30,7 @@
       case 'RT1':
       return {
         'Today': [start, end],
-        'Yesterday': [moment().subtract(1, 'days').hour(startHour).minute(startMinute), end],
+        'Yesterday': [moment().subtract(1, 'days').hour(startHour).minute(startMinute), moment().subtract(1, 'days').hour(endHour).minute(endMinute)],
         'Last 3 Days': [moment().subtract(2, 'days').hour(startHour).minute(startMinute), end],
         'Last 7 Days': [moment().subtract(6, 'days').hour(startHour).minute(startMinute), end],
         'Last 15 Days': [moment().subtract(14, 'days').hour(startHour).minute(startMinute), end],
@@ -92,7 +92,7 @@
       }
     }, function(start, end, label) {
       //endWithCurTime = label == 'Today';
-      endWithCurTime = !label.endsWith('Days');
+      endWithCurTime = !(label.endsWith('Days')||label=='Yesterday');
       var text = `${start.format(fmt)} - ${endWithCurTime?end.format(fmt):end.hour(endHour).minute(endMinute).format(fmt)}`;
       timeRangeCtrl.val(text);
   });//echoTimeRange
