@@ -32,8 +32,9 @@ function drawCharts(ctID,chartConfig){
         visible:cc.visible,
         showAvg:false
       };
-      if(cc.lid) graph['lid'] = cc.lid;
-      if(cc.pid) graph['pid'] = cc.pid;
+      //if(cc.lid) graph['lid'] = cc.lid;
+      //if(cc.pid) graph['pid'] = cc.pid;
+      if(cc.linkto) graph['linkto'] = cc.linkto;
       if(cc.showAvg) graph['showAvg'] = cc.showAvg;
 
       d3Chart.addGraph(graph);

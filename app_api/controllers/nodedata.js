@@ -396,16 +396,14 @@ function calcAvgData(dataList,from,to,dataAlertPolicy){
   for(let ds of dateRange) {
     var start = moment(ds).hour(startHour).minute(startMinute);
     var end = moment(ds).hour(endHour).minute(endMinute);
-    //console.log('start,end:',start.format('YYYY-MM-DD hh:mm:ss'),end.format('YYYY-MM-DD hh:mm:ss'));
+    //console.log('start,end:',start.format('YYYY-MM-DD hh:mm:ss a'),end.format('YYYY-MM-DD hh:mm:ss a'));
     var navd = [];
     for(let d of dataList) {
       var md = moment(d.dataTime);
       //console.log('md=',md.format('YYYY-MM-DD h:mm:ss'));
       if(md.isBetween(start, end, null, '[]')) {
         navd.push(d.dataObj);
-        //console.log('is between!',md,md.format('YYYY-MM-DD hh:mm:ss'));
-      }else{
-        //console.log('not between!',md,md.format('YYYY-MM-DD hh:mm:ss'));
+        //console.log('is between!',md,md.format('YYYY-MM-DD hh:mm:ss a'));
       }
     }
     avgData[ds] = navd;
@@ -481,6 +479,48 @@ module.exports.getNodeAvgData = function(req, res) {
     });
   });
 };
+
+module.exports.getNodesDataAvg = function(req, res) {
+  var lid = req.params.lid;
+  var from = req.query.from;
+  var to = req.query.to;
+  var timeRange = null;
+  if(from && to){
+    timeRange = {from:from,to:to};
+  }
+
+  locDao.getNodesInfoInLocation(lid,function(err,nodesInfo){
+    if(err){
+      console.log(err);
+      res.status(404).json(err);
+      return;
+    }
+    var alertPolicy = nodesInfo.dap;
+    var pidNodeMap = nodesInfo.pidNodeMap;
+
+    ndDao.getNodesData(lid,timeRange,function(err,pidDataMap){
+      if(err){
+        console.log(err);
+        res.status(404).json(err);
+        return;
+      }
+      var nodesData = {};
+      var emptyData = getEmptyData(alertPolicy);
+      for(var pid in pidNodeMap){
+        var node = pidNodeMap[pid];
+        //only get installed nodes.
+        if(node.nid && node.nid.length > 0){
+          var data = pidDataMap[pid];
+          var avgDataList = calcAvgData(data,from,to,alertPolicy);
+          nodesData[pid] = avgDataList;
+          //nodesData[pid] = doInterpolation(data,emptyData,timeRange);
+        }
+      }
+      res.status(200).json(nodesData);
+    });
+  });
+};
+
 
 module.exports.getSynDataLog = function(req, res) {
   var lid = req.params.lid;

@@ -9,15 +9,12 @@ block append refRes
     #headingArea,#mainArea,#footerArea{background-color:#00008B;color:white;}
     #timeRangeText{width:370px;font-size:18px;background-color:#00008B;}
     #d3container{min-width:300px;min-height:460px;width:100%";}
-  //-link(rel='stylesheet', href='/mycss/dashboard.css')
   link(rel="stylesheet" type="text/css" href="/lib/d3/d3ext/charts.css")
   link(rel="stylesheet" type="text/css" href="/lib/daterangepicker/daterangepicker.css")
   script(src='/lib/moment/min/moment.min.js')
   script(src="/lib/daterangepicker/daterangepicker.js")
   script(src='/myjs/timeselect.js')
-  //script(src='/lib/d3/d3_v3.3.3.min.js')
   script(src='/lib/d3/d3.js')
-  //-script(src='/myjs/dv/mapboard.js')
   script(src='/lib/requirejs/require.min.js')
   script(src='/lib/d3/d3ext/charts.js')
 
@@ -41,7 +38,7 @@ block append refRes
       //console.log('setDlgTitle here.');
       var locInfo = parentWin.getLocInfo();
       if(locInfo){
-        var title = `${locInfo.name}'s AllNodesData in Graph.`;
+        var title = `${locInfo.name}'s AllNodesAvgData in Graph.`;
         parent.layer.title(title, crtWinIndex);
       }
     }
@@ -78,10 +75,9 @@ block append refRes
       refreshCharts();
       //updateTimeRangeText();
     }
-
     var lid = '!{lid}';
     function refreshCharts(){
-      var url = '/api/nd/getnsd/!{lid}';
+      var url = '/api/nd/getnsdavg/!{lid}';
       //console.log(url);
       //var lwi = parent.layer.load();
       $.get(url,dataTimeRange,function(data,status){
@@ -93,7 +89,7 @@ block append refRes
           var nc = nodesCtrl[i];
           var nodeDataArray = data[nc.id];
           var cc = {id:nc.name,name:dataTypeDesc,
-            visible:nc.checked,linkto:`/dm/vnd/${lid}/${nc.id}?from=${dataTimeRange.from}&to=${dataTimeRange.to}`,showAvg:true};
+            visible:nc.checked,linkto:`/dm/nad/${lid}/${nc.id}?from=${dataTimeRange.from}&to=${dataTimeRange.to}`,showAvg:true};
           var dataA = [];
           nodeDataArray.forEach(function(nd){
             var di = {DateTime:nd.dataTime,Value:nd.dataObj[dataType||'SS']};
@@ -112,10 +108,11 @@ block append refRes
       });
     }
 
-    function toAvg(){
-      window.location = `/dm/adavg/!{lid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
-      parent.layer.title('AllNodes-AvgData', crtWinIndex);
+    function toAllData(){
+      window.location = `/dm/ad/!{lid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
+      parent.layer.title('AllNodesData', crtWinIndex);
     }
+
     //var start = moment().hour(7).minute(0);
     //var end = moment();
     $().ready(function(){
@@ -159,11 +156,11 @@ block content
           td
             input#timeRangeText(type="text" value="" readOnly)
             span.sbb5
-            a.btn.btn-primary.btn-xs.text-center(onclick="toAvg()" title="jump to Avg Data") AvgData
+            a.btn.btn-primary.btn-xs.text-center(onclick="toAllData()" title="jump to All Data") AllData
             span.sbb5
             a.btn.btn-primary.btn-xs.text-center(onclick="refresh()" title="Refresh this view") Refresh
             script.
-              timeRangeSelector.config({startHour:8,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
+              timeRangeSelector.config({rangeType:'RT2',startHour:8,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
                 dataTimeRange = selectedTimeRange;
                 refreshCharts();
               },function(){

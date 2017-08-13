@@ -22,21 +22,21 @@ function initMap() {
   });
   //map.setTilt(45);
   //map.setRotateControl(true);
-  
+
   gmgSph = google.maps.geometry.spherical;
   //gmgPoly = google.maps.geometry.poly;
-  
+
   //draw a center mark here
   ctMarker = new google.maps.Marker({
     position: mapCenter,
     map: map,
     title: 'Location center,you can update by search.'
   });
-  
+
   configMapNode();
   setupRichMarker();
   //rotateMap(40);
-  
+
   loadLocationData(function(){
     parent.layer.close(lwi);
     /*
@@ -77,14 +77,14 @@ function doMonitorTask(cb){
     data.BDL.forEach(function(boundaryData){
       nodesData = nodesData.concat(boundaryData.nodeList);
     });
-    
+
     boundaryNidTagMap = data.BNTM;
     //nidNodeMap = data.NNM;
 
     analysisNodesData();
     showAlertNodes();
     buildAlertLogs();
-    
+
     recordLoadLog('Refresh '+(++loadTimes)+' times.');
     $("#bmMonitor").removeClass('disabled');
     if(cb) cb();
@@ -102,7 +102,7 @@ function startMonitorTask(){
     console.log('Empty location,need not monitor.');
     recordLoadLog('Empty location,need not monitor.');
     $("#monitorOn").click();
-    return; 
+    return;
   }
   setTimeout(doMonitorTask,2000);//
   recordLoadLog('Monitoring start now.');
@@ -138,7 +138,7 @@ function putNodeOnPosition(ni){
     	showNodeData(ni);
     	//addPointMeun("#t"+ni.pid);
     });
-    
+
     node.addListener('mouseover',function(e){
     	//showNodeData(ni);
     	//addPointMeun("#t"+ni.pid);
@@ -216,7 +216,7 @@ function analysisNodesData(){
   var maxTime = new Date(maxLatestDataTime).getTime();
   for(var i in nodesData){
     var nd = nodesData[i];
-    
+
     if(nd.nid && nd.nid.length == 0){//jump over empty nodes.
       //console.log(nd.ptag,'is empty.');
       continue;
@@ -322,7 +322,7 @@ function buildAlertLogs(){
     if(dataDelayNodes.length>0){
       //sort by dataTime,then show,latert sort.
       sortArrayByAttr(dataDelayNodes,'dataTime','desc');//sortByKey(employees, 'age');
-      
+
       alterLogContent += `\n\n${bname} has ${dataDelayNodes.length} dataDelay nodes.\nDelay more than ${delayTime} minutes.\n`;
       var dataDelayLog = [];
       dataDelayNodes.forEach(function(nd){
@@ -349,7 +349,7 @@ function restorAlertNodes(){
 //*
 function updateAlertpolices(){
   //var postData={alertpolices:$("#apv").val()};
-  
+
   var postData={alertpolices:JSON.parse($("#apv").val())};
   //alert(postData);
   $.post('/api/locations/'+locInfo._id+'/ua',postData,function(data,status){
@@ -471,6 +471,7 @@ function viewAllData(){
       var iframeWin = parent.window[layero.find('iframe')[0]['name']];
       iframeWin.parentWin = crtWin;
       iframeWin.crtWinIndex = index;
+      //iframeWin.setDataObj(locInfo);
       //console.log('viewDashboard open over.');
     }
   });
@@ -575,4 +576,8 @@ function echoFreeNodes(fnList){
     var node = putNodeOnPosition(fn);
     //node.setDraggable(true);
   });
+}
+
+function getLocInfo(){
+  return locInfo;
 }

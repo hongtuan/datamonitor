@@ -64,13 +64,14 @@
               .text(dc);
               //.text(`${dc}datas,avg:${avgv}`);
             //add a link when has lid
-            if(d.lid) {
+            if(d.linkto) {
               //need get the min and max time here:
               //console.log('rang:',d.map[0].date,d.map[d.map.length - 1].date);
               var from = d.map[0].date;
               var to = d.map[d.map.length - 1].date;
               //var link = `<a href='/dm/vnd/${d.lid}/${d.pid}?from=${from}&to=${to}'>${dc}</a>`;
-              var link = `/dm/vnd/${d.lid}/${d.pid}?from=${from}&to=${to}`;
+              //var link = `${d.linkto}/${d.lid}/${d.pid}?from=${from}&to=${to}`;
+              var link = `${d.linkto}`;
               //append a rect for click
               var clkrect = g.append("g")
                 .attr("class","clkrect")
@@ -88,7 +89,6 @@
             }
           }
         }
-
 
         //add on 6/5/2017 by Tim
         function drawAverageValue(){

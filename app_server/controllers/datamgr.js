@@ -39,7 +39,7 @@ module.exports.synDataLogGraph = function(req, res) {
   var lid = req.params.lid;
   if (lid) {
     res.render('syn_data_log_graph', {lid:lid});
-    
+
     //llDao.getLocLogList(lid,llDao.logType.dataSync,300,function(err,dataSyncLogList){
     //});
   }
@@ -118,9 +118,51 @@ module.exports.showNodeAvgData = function(req, res) {
       console.log(err);
       res.status(406).json(err);
       return;
-    }    
+    }
     var dapExt = [{name:'DC',desc:'dataCount'},...dataAlertPolicy];
     res.render('node_avg_data',
       {nid:nid,lid:lid,query:req.query,dap:dapExt});
+  });
+};
+
+
+module.exports.showAllDataAvg = function(req, res) {
+  //console.log('In controllers:req.params.lid='+req.params.lid);
+  var lid = req.params.lid;
+  //locDao.getDataAlertPolicy(lid,function(err,dataAlertPolicy){
+  locDao.getNodesInfoInLocation(lid,function(err,nodesInfo){
+    if(err){
+      console.log(err);
+      res.status(406).json(err);
+      return;
+    }
+    //var insta
+    var installedNodes = [];
+    for(var pid in nodesInfo.pidNodeMap){
+      var node = nodesInfo.pidNodeMap[pid];
+      if(node.nid && node.nid.length > 0){
+        installedNodes.push({ptag:node.ptag,pid:pid});//[pid] = node;
+      }
+    }
+    //sort installedNodes by ptag
+    installedNodes.sort(function (a, b) {
+      if (a.ptag > b.ptag) {
+        return 1;
+      }
+      if (a.ptag < b.ptag) {
+        return -1;
+      }
+      // a 必须等于 b
+      return 0;
+    });
+    //add newline here.
+    for(var i=0;i<installedNodes.length-1;i++){
+      var node = installedNodes[i],nextNode = installedNodes[i+1];
+      if(node.ptag.charAt(0)!=nextNode.ptag.charAt(0)){
+        node['newline'] = true;
+      }
+    }
+    var dapExt = [{name:'DC',desc:'dataCount'},...nodesInfo.dap];
+    res.render('nd_alldata_avg', {lid:lid,query:req.query,dap:dapExt,installedNodes:installedNodes});
   });
 };

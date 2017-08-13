@@ -51,6 +51,7 @@ router.get('/dm/vnd/:lid/:nid',ctrlDataMgr.showNodeData);//ok
 router.get('/dm/sdt/:lid',ctrlDataMgr.showDataTime);//ok
 router.get('/dm/sndd/:lid',ctrlDataMgr.showNodeDataDashboard);//ok
 router.get('/dm/ad/:lid',ctrlDataMgr.showAllData);//ok
+router.get('/dm/adavg/:lid',ctrlDataMgr.showAllDataAvg);//ok
 
 router.get('/dm/nad/:lid/:nid',ctrlDataMgr.showNodeAvgData);//ok
 
