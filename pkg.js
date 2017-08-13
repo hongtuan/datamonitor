@@ -17,7 +17,7 @@ archive.on('error', function(err){
   throw err;
 });
 
-var pkgFileName = `pkg_${moment().format('YYYYMMDDHHmm')}.zip`;
+var pkgFileName = `../packages/pkg_${moment().format('YYYYMMDDHHmm')}.zip`;
 var fileObj = path.join(__dirname,pkgFileName);
 fs.exists(fileObj, function(exists) {
   if(exists) {
@@ -49,23 +49,23 @@ setTimeout(function() {
     console.log('sft',pkgFileName);
   });
 
-  //append version info 
+  //append version info
   archive.append(
     `build time:${moment().format('YYYY-MM-DD HH:mm:ss')}`,
     { name: 'version.txt' });
 
   archive.file('.env',{name:'.env'});
-  archive.file('expserver.js',{name:'expserver.js'});  
+  archive.file('expserver.js',{name:'expserver.js'});
   archive.file('package4server.json',{name:'package.json'});
-  
+
   archive.file('utils/util.js',{name:'utils/util.js'});
   archive.file('utils/mailsender.js',{name:'utils/mailsender.js'});
   archive.file('utils/datasyntask.js',{name:'utils/datasyntask.js'});
 
   archive.directory('client/');
   archive.directory('app_client/');
-  archive.directory('app_api/');  
-  archive.directory('app_server/');  
+  archive.directory('app_api/');
+  archive.directory('app_server/');
   archive.finalize();
   //callback(null);
 }, 2000);
