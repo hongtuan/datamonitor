@@ -47,6 +47,9 @@ block append refRes
     }
 
     var dataTimeRange;
+    function buildRangeParam(){
+      return `from=${dataTimeRange.from}&to=${dataTimeRange.to}&ctzo=${new Date().getTimezoneOffset()}`;
+    }
     var dataType,dataTypeDesc;
     function updateTimeRangeText(){
       var timeRangeCtrl = $("#timeRangeText");
@@ -93,7 +96,7 @@ block append refRes
           var nc = nodesCtrl[i];
           var nodeDataArray = data[nc.id];
           var cc = {id:nc.name,name:dataTypeDesc,
-            visible:nc.checked,linkto:`/dm/vnd/${lid}/${nc.id}?from=${dataTimeRange.from}&to=${dataTimeRange.to}`,showAvg:true};
+            visible:nc.checked,linkto:`/dm/vnd/${lid}/${nc.id}?${buildRangeParam()}`,showAvg:true};
           var dataA = [];
           nodeDataArray.forEach(function(nd){
             var di = {DateTime:nd.dataTime,Value:nd.dataObj[dataType||'SS']};
@@ -113,7 +116,7 @@ block append refRes
     }
 
     function toAvg(){
-      window.location = `/dm/adavg/!{lid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
+      window.location = `/dm/adavg/!{lid}?${buildRangeParam()}`;
       parent.layer.title('AllNodes-AvgData', crtWinIndex);
     }
     //var start = moment().hour(7).minute(0);
@@ -123,7 +126,7 @@ block append refRes
       var navHeight = $("#headingArea").outerHeight();
       $("#mainArea").css("padding-top",navHeight+5+"px");
       //var locationData = parentWin.locationData;
-      dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
+      dataTimeRange = {from:'!{query.from}',to:'!{query.to}',ctzo:'!{query.ctzo}'};
       //console.log(JSON.stringify(dataTimeRange,null,2));
       if(dataTimeRange.from == ''){
         dataTimeRange = timeRangeSelector.getDefaultRange();
@@ -163,7 +166,7 @@ block content
             span.sbb5
             a.btn.btn-primary.btn-xs.text-center(onclick="refresh()" title="Refresh this view") Refresh
             script.
-              timeRangeSelector.config({serverTimezoneOffset:'!{serverTimezoneOffset}',startHour:8,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
+              timeRangeSelector.config({startHour:9,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
                 dataTimeRange = selectedTimeRange;
                 refreshCharts();
               },function(){

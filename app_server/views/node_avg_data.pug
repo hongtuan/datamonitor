@@ -40,6 +40,9 @@ block append refRes
     }
 
     var dataTimeRange;
+    function buildRangeParam(){
+      return `from=${dataTimeRange.from}&to=${dataTimeRange.to}&ctzo=${new Date().getTimezoneOffset()}`;
+    }
     function updateTimeRangeText(){
       var timeRangeCtrl = $("#timeRangeText");
       var fmt = 'MM/DD/YYYY h:mm a';
@@ -93,12 +96,12 @@ block append refRes
     }
 
     function toNodeData(){
-      window.location = `/dm/vnd/!{lid}/!{nid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
+      window.location = `/dm/vnd/!{lid}/!{nid}?${buildRangeParam()}`;
       //parent.layer.title('NodeAvgData', crtWinIndex);
     }
 
     function toAllData(){
-      window.location = `/dm/ad/!{lid}?from=${dataTimeRange.from}&&to=${dataTimeRange.to}`;
+      window.location = `/dm/ad/!{lid}?${buildRangeParam()}`;
       parent.layer.title('AllNodesData', crtWinIndex);
     }
 
@@ -135,7 +138,7 @@ block append refRes
 
       setDlgTitle();
       //console.log('look:','!{query.from}','!{query.to}','over');
-      dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
+      dataTimeRange = {from:'!{query.from}',to:'!{query.to}',ctzo:'!{query.ctzo}'};
       //console.log('nodeAvg:dataTimeRange default=',JSON.stringify(dataTimeRange,null,2));
       //dataTimeRange = {from:'',to:''};
       if(dataTimeRange.from == '' || dataTimeRange.from == 'undefined'){
@@ -173,7 +176,7 @@ block content
             span.sbb5
             a.btn.btn-primary.btn-xs.text-center(onclick="refresh()" title="Refresh this view") Refresh
             script.
-              timeRangeSelector.config({rangeType:'RT2',startHour:8,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
+              timeRangeSelector.config({rangeType:'RT2',startHour:9,startMinute:0,endHour:17,endMinute:30}).show('timeRangeText',function(selectedTimeRange){
                 dataTimeRange = selectedTimeRange;
                 refreshCharts();
               },function(){

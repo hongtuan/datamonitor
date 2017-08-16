@@ -174,11 +174,12 @@ function executeSyncTask(lid,dataUrl){
 }
 
 function getTZOStr(tzo) {
-  var sign = '+', oh = '00', om = '00';
-  if(tzo > 0) sign = '-';
-  oh = Math.abs(tzo) / 60;
+  var sign = tzo > 0 ?'-':'+';
+  //var oh = '00', om = '00';
+  //if(tzo > 0) sign = '+';
+  var oh = Math.abs(tzo) / 60;
   if(oh < 9) oh = '0' + oh;
-  om = Math.abs(tzo) % 60;
+  var om = Math.abs(tzo) % 60;
   if(om < 30) om = '0' + om;
   return `${sign}${oh}:${om}`;
 }
@@ -192,7 +193,7 @@ function getTimeRange(req){
     var stzo = req.app.locals.serverTimezoneOffset;
     console.log('ctzo:',ctzo,'stzo:',stzo);
     if(ctzo != stzo) {
-      var tzos = getTZOStr(ctzo);
+      var tzos = getTZOStr(stzo - ctzo);
       from = from.replace('Z', tzos);
       to = to.replace('Z', tzos);
     }
@@ -214,7 +215,7 @@ function calcAvgData(dataList,timeRange,dataAlertPolicy){
 
   var avgData = {};
   var serverTZ = process.env.TZ;
-  console.log('TZ:',serverTZ,'dateRange:',JSON.stringify(dateRange,null,2));
+  //console.log('TZ:',serverTZ,'dateRange:',JSON.stringify(dateRange,null,2));
   for(let ds of dateRange) {
     var start = moment(ds).hour(startHour).minute(startMinute);
     var end = moment(ds).hour(endHour).minute(endMinute);
