@@ -13,6 +13,18 @@
   var start = moment().hour(startHour).minute(startMinute);
   var end = moment().hour(endHour).minute(endMinute);
 
+  function getZoneOffet(){
+    //var d = new Date();
+    //var tzo = d.getTimezoneOffset();
+    var sign = '+',oh='00',om='00';
+    if(clientTimezoneOffset>0) sign = '-';
+    oh = Math.abs(clientTimezoneOffset)/60;
+    if(oh<9) oh = '0'+oh;
+    om = Math.abs(clientTimezoneOffset)%60;
+    if(om<30) om = '0'+om;
+    return `${sign}${oh}:${om}`;
+  }
+
   function setStartEnd(){
     start = moment().hour(startHour).minute(startMinute);
     //end = moment().hour(endHour).minute(endMinute);
@@ -72,7 +84,10 @@
   timeRangeSelector.getDefaultRange = function(){
     //console.log('getDefaultRange');
     setStartEnd();
-    return {from:start.toISOString(),to:end.toISOString()};
+    return {
+      from:start.toISOString(),
+      to:end.toISOString(),
+      ctzo:new Date().getTimezoneOffset()};
   };
 
   timeRangeSelector.show = function(timeRangeTextID,cb,fail) {
@@ -95,7 +110,7 @@
       endWithCurTime = !(label.endsWith('Days')||label=='Yesterday');
       var text = `${start.format(fmt)} - ${endWithCurTime?end.format(fmt):end.hour(endHour).minute(endMinute).format(fmt)}`;
       timeRangeCtrl.val(text);
-  });//echoTimeRange
+    });//echoTimeRange
 
     //daterangepicker event.
     timeRangeCtrl.on('show.daterangepicker', (ev, picker)=>{
@@ -119,8 +134,10 @@
         //console.log('after set,picker.endDate:',JSON.stringify(picker.endDate,null,2));
         selectedRange = {
           from:picker.startDate.toISOString(),
-          to:picker.endDate.toISOString()
+          to:picker.endDate.toISOString(),
+          ctzo:new Date().getTimezoneOffset()
         };
+
         //console.log('selectedRange:',JSON.stringify(selectedRange,null,2));
         if(cb) cb(selectedRange);
       }else{

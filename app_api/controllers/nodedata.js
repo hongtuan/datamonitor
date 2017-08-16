@@ -173,6 +173,104 @@ function executeSyncTask(lid,dataUrl){
   });
 }
 
+function getTZOStr(tzo) {
+  var sign = '+', oh = '00', om = '00';
+  if(tzo > 0) sign = '-';
+  oh = Math.abs(tzo) / 60;
+  if(oh < 9) oh = '0' + oh;
+  om = Math.abs(tzo) % 60;
+  if(om < 30) om = '0' + om;
+  return `${sign}${oh}:${om}`;
+}
+
+function getTimeRange(req){
+  var from = req.query.from;
+  var to = req.query.to;
+  //do with client timeZone diff from severtimezone.
+  var ctzo = req.query.ctzo;
+  if(ctzo != undefined) {
+    var stzo = req.app.locals.serverTimezoneOffset;
+    console.log('ctzo:',ctzo,'stzo:',stzo);
+    if(ctzo != stzo) {
+      var tzos = getTZOStr(ctzo);
+      from = from.replace('Z', tzos);
+      to = to.replace('Z', tzos);
+    }
+  }
+  return {from:from,to:to};
+}
+
+function calcAvgData(dataList,timeRange,dataAlertPolicy){
+  //var from,to;
+  //console.log(JSON.stringify(dataList,null,2));
+  //console.log(from,to);
+  var mfrom = moment(timeRange.from);
+  var startHour = mfrom.hour(),startMinute = mfrom.minute();
+
+  var mto = moment(timeRange.to);
+  var endHour = mto.hour(),endMinute = mto.minute();
+
+  var dateRange = getDatesInRange(timeRange.from, timeRange.to);
+
+  var avgData = {};
+  var serverTZ = process.env.TZ;
+  console.log('TZ:',serverTZ,'dateRange:',JSON.stringify(dateRange,null,2));
+  for(let ds of dateRange) {
+    var start = moment(ds).hour(startHour).minute(startMinute);
+    var end = moment(ds).hour(endHour).minute(endMinute);
+    //console.log('start,end(ISO):',start.toISOString(),end.toISOString());
+    //console.log('start,end:',start.format('YYYY-MM-DD hh:mm:ss a'),end.format('YYYY-MM-DD hh:mm:ss a'));
+    //console.log('start,end(TZ):',start.format('YYYY-MM-DD hh:mm:ss a'),end.format('YYYY-MM-DD hh:mm:ss a'));
+    var navd = [];
+    for(let d of dataList) {
+      var md = moment(d.dataTime);
+      //console.log('md=',md.format('YYYY-MM-DD h:mm:ss'));
+      if(md.isBetween(start, end, null, '[]')) {
+        navd.push(d.dataObj);
+        //console.log('is between!',md,md.format('YYYY-MM-DD hh:mm:ss a'));
+      }else{
+        //console.log('Not between!',md,md.format('YYYY-MM-DD hh:mm:ss a'));
+      }
+    }
+    avgData[ds] = navd;
+    //console.log(JSON.stringify(navd,null,2));
+  }
+
+  //calc the avage:
+  //var emptyData = getInitData(dataAlertPolicy);
+  for(var ds in avgData) {
+    var navd = avgData[ds];
+    var avgDataValue = getInitData(dataAlertPolicy);
+    if(navd.length == 0) {
+      avgData[ds] = avgDataValue;
+      continue;
+    }
+
+    for(let d of navd) {
+      for(var dn in d) {
+        avgDataValue[dn] += d[dn];
+      }
+    }
+
+    for(var dn in avgDataValue) {
+      var avgValue = avgDataValue[dn] / navd.length;
+      avgDataValue[dn] = +avgValue.toFixed(2);
+      if(dn == 'DC') {
+        avgDataValue[dn] = navd.length;
+      }
+    }
+    avgData[ds] = avgDataValue;
+  }
+  var avgDataList = [];
+  for(var ds in avgData) {
+    avgDataList.push({
+      dataTime: ds,
+      dataObj: avgData[ds]
+    });
+  }
+  return avgDataList;
+}
+
 module.exports.readNodesRawData = function(req, res) {
   //console.log('save nodedata here.');
   var url = req.body.url||'http://xsentry.co/api/v1/sentry/C47F51001099/snapshots?top=3';
@@ -191,11 +289,13 @@ module.exports.getNodeData = function(req, res) {
       return;
     }
     var nid = req.params.nid;
-    var from = req.query.from;
-    var to = req.query.to;
-    //var fmt = 'MM/DD/YYYY hh:mm a';
-    //console.log('getNodeData:from',moment(from).format(fmt));
-    //console.log('getNodeData:to',moment(to).format(fmt));
+    var timeRange = getTimeRange(req);
+    console.log('timeRange',JSON.stringify(timeRange,null,2));
+    var from = timeRange.from;
+    var to = timeRange.to;
+    var fmt = 'YYYY-MM-DD hh:mm a';
+    console.log('getNodeData:from',from,moment(from).toISOString(),moment(from).format(fmt));
+    console.log('getNodeData:to',from,moment(to).toISOString(),moment(to).format(fmt));
     var timeRange = null;
     if(from && to){
       timeRange = {from:from,to:to};
@@ -344,12 +444,10 @@ module.exports.saveNodesData = function(req, res) {
 
 module.exports.getNodesData = function(req, res) {
   var lid = req.params.lid;
-  var from = req.query.from;
-  var to = req.query.to;
-  var timeRange = null;
-  if(from && to){
-    timeRange = {from:from,to:to};
-  }
+  var timeRange = getTimeRange(req);
+  console.log('timeRange',JSON.stringify(timeRange,null,2));
+  var from = timeRange.from;
+  var to = timeRange.to;
 
   locDao.getNodesInfoInLocation(lid,function(err,nodesInfo){
     if(err){
@@ -381,71 +479,6 @@ module.exports.getNodesData = function(req, res) {
   });
 };
 
-function calcAvgData(dataList,from,to,dataAlertPolicy){
-  //console.log(JSON.stringify(dataList,null,2));
-  //console.log(from,to);
-  var mfrom = moment(from);
-  var startHour = mfrom.hour(),startMinute = mfrom.minute();
-
-  var mto = moment(to);
-  var endHour = mto.hour(),endMinute = mto.minute();
-
-  var dateRange = getDatesInRange(from, to);
-
-  var avgData = {};
-  for(let ds of dateRange) {
-    var start = moment(ds).hour(startHour).minute(startMinute);
-    var end = moment(ds).hour(endHour).minute(endMinute);
-    //console.log('start,end:',start.format('YYYY-MM-DD hh:mm:ss a'),end.format('YYYY-MM-DD hh:mm:ss a'));
-    var navd = [];
-    for(let d of dataList) {
-      var md = moment(d.dataTime);
-      //console.log('md=',md.format('YYYY-MM-DD h:mm:ss'));
-      if(md.isBetween(start, end, null, '[]')) {
-        navd.push(d.dataObj);
-        //console.log('is between!',md,md.format('YYYY-MM-DD hh:mm:ss a'));
-      }
-    }
-    avgData[ds] = navd;
-    //console.log(JSON.stringify(navd,null,2));
-  }
-
-  //console.log(JSON.stringify(avgData,null,2));
-
-  //calc the avage:
-  //var emptyData = getInitData(dataAlertPolicy);
-  for(var ds in avgData) {
-    var navd = avgData[ds];
-    var avgDataValue = getInitData(dataAlertPolicy);
-    if(navd.length == 0) {
-      avgData[ds] = avgDataValue;
-      continue;
-    }
-
-    for(let d of navd) {
-      for(var dn in d) {
-        avgDataValue[dn] += d[dn];
-      }
-    }
-
-    for(var dn in avgDataValue) {
-      var avgValue = avgDataValue[dn] / navd.length;
-      avgDataValue[dn] = +avgValue.toFixed(2);
-      if(dn == 'DC') {
-        avgDataValue[dn] = navd.length;
-      }
-    }
-    avgData[ds] = avgDataValue;
-  }
-  var avgDataList = [];
-  for(var ds in avgData) {
-    avgDataList.push({
-      dataTime: ds,
-      dataObj: avgData[ds]
-    });
-  }
-  return avgDataList;
-}
 
 module.exports.getNodeAvgData = function(req, res) {
   var lid = req.params.lid;
@@ -456,11 +489,14 @@ module.exports.getNodeAvgData = function(req, res) {
       return;
     }
     var nid = req.params.nid;
-    var from = req.query.from;
-    var to = req.query.to;
-    //var fmt = 'MM/DD/YYYY hh:mm a';
-    //console.log('getNodeAvgData:from',moment(from).format(fmt));
-    //console.log('getNodeAvgData:to',moment(to).format(fmt));
+    var timeRange = getTimeRange(req);
+    console.log('timeRange',JSON.stringify(timeRange,null,2));
+    var from = timeRange.from;
+    var to = timeRange.to;
+
+    var fmt = 'YYYY-MM-DD hh:mm a';
+    console.log('getNodeAvgData:from',from,moment(from).toISOString(),moment(from).format(fmt));
+    console.log('getNodeAvgData:to',to,moment(to).toISOString(),moment(to).format(fmt));
     var timeRange = null;
     if(from && to){
       timeRange = {from:from,to:to};
@@ -472,7 +508,7 @@ module.exports.getNodeAvgData = function(req, res) {
         res.status(406).json(err);
       }
       //console.log('getNodeAvgData:dataList',dataList.length,JSON.stringify(dataList,null,2));
-      var avgDataList = calcAvgData(dataList,from,to,dataAlertPolicy);
+      var avgDataList = calcAvgData(dataList,timeRange,dataAlertPolicy);
       //console.log('getNodeAvgData:avgDataList',avgDataList.length,JSON.stringify(avgDataList,null,2));
       //console.log(JSON.stringify(avgDataList,null,2));
       res.status(200).json({dap:dataAlertPolicy,dataList:avgDataList});
@@ -482,12 +518,10 @@ module.exports.getNodeAvgData = function(req, res) {
 
 module.exports.getNodesDataAvg = function(req, res) {
   var lid = req.params.lid;
-  var from = req.query.from;
-  var to = req.query.to;
-  var timeRange = null;
-  if(from && to){
-    timeRange = {from:from,to:to};
-  }
+  var timeRange = getTimeRange(req);
+  console.log('timeRange',JSON.stringify(timeRange,null,2));
+  var from = timeRange.from;
+  var to = timeRange.to;
 
   locDao.getNodesInfoInLocation(lid,function(err,nodesInfo){
     if(err){
@@ -511,7 +545,7 @@ module.exports.getNodesDataAvg = function(req, res) {
         //only get installed nodes.
         if(node.nid && node.nid.length > 0){
           var data = pidDataMap[pid];
-          var avgDataList = calcAvgData(data,from,to,alertPolicy);
+          var avgDataList = calcAvgData(data,timeRange,alertPolicy);
           nodesData[pid] = avgDataList;
           //nodesData[pid] = doInterpolation(data,emptyData,timeRange);
         }
@@ -520,7 +554,6 @@ module.exports.getNodesDataAvg = function(req, res) {
     });
   });
 };
-
 
 module.exports.getSynDataLog = function(req, res) {
   var lid = req.params.lid;

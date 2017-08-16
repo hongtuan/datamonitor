@@ -15,7 +15,8 @@ module.exports.showNodeData = function(req, res) {
     }
     //console.log('showNodeData',lid,nid);
     res.render('show_node_data',
-      {nid:nid,lid:lid,query:req.query,dap:dataAlertPolicy});
+      {nid:nid,lid:lid,query:req.query,dap:dataAlertPolicy,
+          serverTimezoneOffset:req.app.locals.serverTimezoneOffset});
   });
 };
 
@@ -105,7 +106,9 @@ module.exports.showAllData = function(req, res) {
         node['newline'] = true;
       }
     }
-    res.render('nd_alldata', {lid:lid,query:req.query,dap:nodesInfo.dap,installedNodes:installedNodes});
+    res.render('nd_alldata', {lid:lid,query:req.query,dap:nodesInfo.dap,
+      installedNodes:installedNodes,
+      serverTimezoneOffset:req.app.locals.serverTimezoneOffset});
   });
 };
 
@@ -121,7 +124,8 @@ module.exports.showNodeAvgData = function(req, res) {
     }
     var dapExt = [{name:'DC',desc:'dataCount'},...dataAlertPolicy];
     res.render('node_avg_data',
-      {nid:nid,lid:lid,query:req.query,dap:dapExt});
+      {nid:nid,lid:lid,query:req.query,dap:dapExt,
+          serverTimezoneOffset:req.app.locals.serverTimezoneOffset});
   });
 };
 
@@ -163,6 +167,8 @@ module.exports.showAllDataAvg = function(req, res) {
       }
     }
     var dapExt = [{name:'DC',desc:'dataCount'},...nodesInfo.dap];
-    res.render('nd_alldata_avg', {lid:lid,query:req.query,dap:dapExt,installedNodes:installedNodes});
+    res.render('nd_alldata_avg', {lid:lid,query:req.query,dap:dapExt,
+        installedNodes:installedNodes,
+        serverTimezoneOffset:req.app.locals.serverTimezoneOffset});
   });
 };

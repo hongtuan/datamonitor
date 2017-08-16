@@ -121,6 +121,7 @@ block append refRes
     }
 
     $().ready(function() {
+      //console.log('!!serverTimezoneOffset!!','!{serverTimezoneOffset}');
       var navHeight = $("#headingArea").outerHeight();
       $("#mainArea").css("padding-top",navHeight+5+"px");
       //config datatable here:
@@ -133,14 +134,16 @@ block append refRes
       });
 
       setDlgTitle();
+      //console.log('look:','!{query.from}','!{query.to}','over');
       dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
-      console.log('nodeAvg:dataTimeRange',JSON.stringify(dataTimeRange,null,2));
+      //console.log('nodeAvg:dataTimeRange default=',JSON.stringify(dataTimeRange,null,2));
       //dataTimeRange = {from:'',to:''};
-      if(dataTimeRange.from == ''){
+      if(dataTimeRange.from == '' || dataTimeRange.from == 'undefined'){
         dataTimeRange = timeRangeSelector.getDefaultRange();
       }else{
         updateTimeRangeText();
       }
+      //console.log('nodeAvg:dataTimeRange',JSON.stringify(dataTimeRange,null,2));
       refreshCharts();
     });
 

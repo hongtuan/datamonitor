@@ -35,7 +35,7 @@ function dd2Ddm(x){
 	if( dd<0 ) { sign='-'; dd=-dd; }
 	var dv = Math.floor(dd);
 	var mv = roundnum((dd - dv)*60.0,3);
-	return [sign,dv,'\u00B0',mv,"'"].join('');	
+	return [sign,dv,'\u00B0',mv,"'"].join('');
 }
 
 function getDdmLat(x){
@@ -91,7 +91,7 @@ function ddm2Dd(ddm){
 	var m = (parts[2] ? parts[2] : '0.0') * 1.0;
 	var s = (parts[3] ? ('0.'+parts[3]) : '0.0') * 1.0;
 	var dec = (d + (m + s) / 60.0) * neg;
-	return roundnum(dec,6);//remain 6 fraction	
+	return roundnum(dec,6);//remain 6 fraction
 }
 
 function dms2Ddm(dms){
@@ -107,12 +107,12 @@ function dms2Ddm(dms){
 	// 3 : secondes
 	// 4 : fractions of seconde
 	// 5 : NSEW
-	var d = (parts[1] ? parts[1] : '0.0') * 1.0;	
+	var d = (parts[1] ? parts[1] : '0.0') * 1.0;
 	var m = (parts[2] ? parts[2] : '0.0') * 1.0;
 	var s = (parts[3] ? parts[3] : '0.0') * 1.0;
-	var r = (parts[4] ? ('0.' + parts[4]) : '0.0') * 1.0;	
+	var r = (parts[4] ? ('0.' + parts[4]) : '0.0') * 1.0;
 	var c = parts[5] ? parts[5] : '';
-	var dm = roundnum(m + (s+r)/60.0,3);//remain 3 fraction	
+	var dm = roundnum(m + (s+r)/60.0,3);//remain 3 fraction
 	return [d,'\u00B0',dm,"'",c].join('');
 }
 
@@ -170,7 +170,7 @@ function getTimeDistanceDesc(dist){
 	var  mSecondsInMinute = mSeconds * 60;
 	var  mSecondsInHour = mSecondsInMinute * 60;
 	var  mSecondsInDay = mSecondsInHour * 24;// 3600*24*1000
-  
+
   var d = Math.floor(dist/mSecondsInDay);
   var h = Math.floor(dist % mSecondsInDay / mSecondsInHour);
   var m = Math.floor(dist % mSecondsInHour / mSecondsInMinute);
@@ -233,23 +233,23 @@ function str2gmLatLng(str){
 function configMapNode(){
   /*/define pointInfo prototype to save node's info
   google.maps.Circle.prototype.pointInfo = null;
-  
+
   google.maps.Circle.prototype.setPointInfo = function(_pointInfo) {
     this.pointInfo = _pointInfo;
   };
-  
+
   google.maps.Circle.prototype.getPointInfo = function() {
     return this.pointInfo;
   };
   //*/
-  
+
   google.maps.Circle.prototype.changStatus = function(status) {
     var circleColor = nodeStatusColorMap[status];
   	var nco = getCircleOptions(this.getCenter(),circleColor,this.getDraggable());
   	//console.log(JSON.stringify(co,null,2));
     this.setOptions(nco);
   };
-  
+
   google.maps.Circle.prototype.flashNode = function(times,delay) {
   	//var co = getCircleOptions(this.getCenter(),status);
   	//console.log(JSON.stringify(co,null,2));
@@ -261,7 +261,7 @@ function configMapNode(){
       if(fc<0) clearInterval(taskId);
     },delay||300);
   };
-  
+
   //*define nodeInfo prototype to save node's info
   google.maps.Circle.prototype.nodeInfo = null;
   google.maps.Circle.prototype.setNodeInfo = function(ni) {
@@ -270,30 +270,30 @@ function configMapNode(){
   google.maps.Circle.prototype.getNodeInfo = function() {
     return this.nodeInfo;
   };
-  
+
   google.maps.Circle.prototype.initColor = 'green';
-  
+
   google.maps.Circle.prototype.setInitColor = function(_color) {
     this.initColor = _color;
   };
-  
+
   google.maps.Circle.prototype.getInitColor = function() {
     return this.initColor;
   };
-  
+
   google.maps.Circle.prototype.restoreInitStatus = function() {
     //return this.initColor;
     var initCo = getCircleOptions(this.getCenter(),this.initColor,this.getDraggable());
   	//console.log(JSON.stringify(co,null,2));
     this.setOptions(initCo);
   };
-  
+
   google.maps.Circle.prototype.initCenter = null;
-  
+
   google.maps.Circle.prototype.setInitCenter = function(_center) {
     this.initCenter = _center;
   };
-  
+
   google.maps.Circle.prototype.restoreInitCenter = function() {
     //return this.initColor;
     //var co = getCircleOptions(this.getCenter(),this.initColor,this.getDraggable());
@@ -409,7 +409,7 @@ function expArea(){
 }
 
 function impArea(){
-  //console.log('impArea here',selectedBoundaryId); 
+  //console.log('impArea here',selectedBoundaryId);
   if(selectedBoundaryId){
     //var url = `/locations/${locInfo._id}/ibdp/${selectedBoundaryId}`;
     var url = `/locations/${locInfo._id}/ibc/${selectedBoundaryId}`;
@@ -429,7 +429,7 @@ function impArea(){
       }
     );
   }
-} 
+}
 
 var boundsMenu = [
   [{
@@ -476,7 +476,7 @@ function showBoundaryTag(boundary){
       anchor: RichMarkerPosition.BOTTOM_LEFT,
       content: tagContent
   });
-  
+
   //* use click event to fire pop-pu menu now.
   boundTag.addListener('click',function(e){
     //console.log('boundTag click');
@@ -500,7 +500,7 @@ function showBoundary(boundary,bc){
 	//console.log('bname='+boundary.bname);
 	var bd = boundary.bd;
 	var pd = boundary.nodeList;
-	
+
   //deploy node count
 	//var inc = 0;
 	//put node circle first!
@@ -511,7 +511,7 @@ function showBoundary(boundary,bc){
     putNodeOnPosition(pi);
   }
   //boundary.inc = inc;
-  console.log('inc:',boundary.inc);
+  //console.log('inc:',boundary.inc);
   bidBoundaryMap[boundary.bid] = boundary;
 	var boundaryDesc = '';
   //draw boundary first:
@@ -707,7 +707,7 @@ function updateLocCenter(cb){
   //var sendData = {lid:locInfo._id,ctLatLng:locInfo.ctpos,address:locInfo.address};
   var centerInfo = {latLng:locInfo.ctpos,address:locInfo.address};
   //console.log(centerInfo);
-  //update to server.  
+  //update to server.
   $.post('/api/locations/'+locInfo._id+'/uc',centerInfo,function(response,status){
     parent.layer.close(lwi);
     parent.layer.msg(response);
@@ -811,7 +811,7 @@ function rotateMap(rDeg){
   //$("#map").css("-webkit-transform-style","preserve-3d");
   //transform-style: preserve-3d;
   $("#map").css("z-index","10");
-  
+
   //$(".nodetag").css("transform-origin","left bottom");
   //console.log('rDeg=',rDeg,$("#map").offset().top);
 }

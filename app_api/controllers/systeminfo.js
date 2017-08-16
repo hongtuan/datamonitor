@@ -15,6 +15,7 @@ module.exports.getSystemInfo = function(req, res) {
   //systemInfo.push({name:'uptime',value: serverUptime});//正常运行时间
   systemInfo.push({name:'uptime',value: util.getTimeDistanceDesc(serverUptime*1000)});//正常运行时间
   systemInfo.push({name:'serverTime',value: moment().format(dateTimeFormat)});//当前系统时间
+  systemInfo.push({name:'serverTimeZone',value: process.env.TZ});//当前系统时间
   systemInfo.push({name:'appStartTime',value: moment(req.app.locals.startTime).format(dateTimeFormat)});//应用系统启动时间
   var appRunTime = Date.now() - req.app.locals.startTime;
   systemInfo.push({name:'appRunTime',value: util.getTimeDistanceDesc(appRunTime)});//应用系统启动时间

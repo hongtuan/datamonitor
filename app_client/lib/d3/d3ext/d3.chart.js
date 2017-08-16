@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -89,7 +89,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
       .attr('y', -5) // push to the margin area below x-axis
       .attr('text-anchor', 'end')
       .text('time:');
-    
+
     var timeLegendML = _chartCanvas.append('text')
       .attr('class', 'legend-time')
       .attr('x', width)
@@ -122,14 +122,14 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
           var xMoment = moment(nearestDateVal);
           var moveX = _xScale(xMoment);
           var dataCount = 0;
-          //update legend values 
+          //update legend values
           d3.selectAll('.graph').data(_graphs, function(d) {
             return d.id;
           }).each(function(d) {
             //console.log(d.y);
             var g = d3.select(this);
             var dataValue = '';
-            //var v = _.findWhere(d.data, { DateTime: nearestDateVal });                            
+            //var v = _.findWhere(d.data, { DateTime: nearestDateVal });
             if (graphIdswithDataAtNearestDate.indexOf(d.id) >= 0) {
               var v = d.data[d.map[mX].idx];
               _.each(d.yVal, function(yDim, i) {
@@ -139,7 +139,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
               //show data value around dot.
               //g.select('.dvtext').text(dataValue).attr('x', moveX).attr('y', 30+100*(d.order+1)-(+dataValue));
               g.select('.dvtext').text(dataValue).attr('x', moveX);//.attr('y', (+dataValue));
-              
+
               //console.log(g.select('.dvtext').attr('y'));
             }
             //dataCount += dataValue != ''?1:0;
@@ -149,13 +149,13 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
             //g.select('.dvtext').text(dataValue).attr('x', mX);//.attr('y', mY);
             //g.select('.circle').text(dataValue);
           });
-          //move plot line to stick to nearest time where any value found , then update time and value legends                    
+          //move plot line to stick to nearest time where any value found , then update time and value legends
           ///timeLegend.text(xMoment.format('DD MMM'));
           timeLegend.text(xMoment.format('MM/DD/YYYY,h:mm:ss a'));//add time!
           //update move line time.
           timeLegendML.text(xMoment.format('h:mm:ss a'))
             .attr('x', 35+moveX);
-            
+
           dataCountText.text(dataCount);
           //var moveX = _xScale(xMoment);
           hoverLine.attr('x1', moveX).attr('x2', moveX);
@@ -179,11 +179,11 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
         hoverLine.style("opacity", 1e-6);
       })
       .on('mousemove', updateHLValue);
-    
+
     //try to response keyboard events here:
     d3.select("body")
     .on("keydown", function() {
-      console.log("keyCode: " + d3.event.keyCode);
+      //console.log("keyCode: " + d3.event.keyCode);
       var kc = d3.event.keyCode;
       switch(kc){
         case 37:
@@ -283,7 +283,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
     console.log('graph.data=\n',JSON.stringify(graph.data,null,2));
     var startIndex = _.sortedIndex(graph.data, xScale.domain()[0].toISOString());
     var endIndex = _.sortedIndex(graph.data, xScale.domain()[1].toISOString());//*/
-    
+
     //console.log('xScale.domain()[0]='+xScale.domain()[0],'xScale.domain()[1]='+xScale.domain()[1]);
     //console.log('xScale[0]='+xScale.domain()[0].toISOString(),'xScale[1]='+xScale.domain()[1].toISOString());
     //console.log('startIndex='+startIndex,'endIndex='+endIndex);
@@ -318,7 +318,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
       }
       cursorIndex = dataIndex;
     });
-    
+
     return map;
   }
 
@@ -331,7 +331,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
     //console.log('dates.length='+dates.length,'graph.data.length='+graph.data.length);
     var min = dates[0],
       max = dates[dates.length - 1],
-      streched = false; // assuming data is sorted        
+      streched = false; // assuming data is sorted
     if (min < _xDomain[0]) {
       _xDomain[0] = min;
       streched = true;
@@ -416,7 +416,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
 
     render();
   };
-  
+
   //add a new method to hide the chart.
   this.setChartVisible = function(graphId,visible) {
     //find graph in _graphs by graphId,modify it's visible = false;
@@ -453,13 +453,13 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
 
     render();
   }; //*/
-  
+
   function removeHiddenCharts(){
     /*/find data first
     var hiddenCharts = _.filter(_graphs, function(g){
       return g.visible == false;
     });//*/
-    
+
     var hiddenCids = [];
     _.chain(_graphs).filter(function(g){
         return g.visible == false;
@@ -489,7 +489,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
     //var xAxis = d3.svg.axis().scale(_xScale).orient("top").ticks(5);
     var xAxis = d3.axisTop(_xScale).ticks(5);//.orient("top").ticks(5);
     d3.select('.x.axis').call(xAxis);//*/
-    
+
     //draw anther x axis on the Bottom.
     //var xScaleBottom = d3.scaleTime().range([0, width]);
     /*
@@ -504,7 +504,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
     //remove graph ??
     graphs.exit().remove();
 
-    //update existing graphs 
+    //update existing graphs
     graphs.each(function(d) {
       //console.log('in graphs.each',d.visible,d.id);
       var g = d3.select(this);
@@ -515,7 +515,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
       }).each(function(t) {
         tx += graphHeight(t);
       });
-      
+
       //500 is Animated delay.
       g.transition().duration(500).attr('transform', function(d) {
         return 'translate(0, ' + tx + ')';
@@ -523,7 +523,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
       drawChart(d,g);
     });//*/
 
-    //add new graphs 
+    //add new graphs
     var newGraphs = graphs
       .enter()
       //.append('g')
@@ -538,7 +538,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
         });
         return 'translate(0, ' + tx + ')';
       });
-    
+
     newGraphs.each(function(d) {
       var g = d3.select(this);
       drawChart(d,g);

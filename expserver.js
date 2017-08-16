@@ -176,6 +176,7 @@ function onListening() {
 //record server startTime,for use later.
 var startTime = Date.now();
 app.locals.startTime = startTime;
+app.locals.serverTimezoneOffset = new Date().getTimezoneOffset();
 app.locals.dataSyncTask = {};
 app.locals.inspectNodeTask = {};
 dst.deployDataSynTask(app);

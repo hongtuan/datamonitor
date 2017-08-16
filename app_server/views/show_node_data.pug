@@ -135,15 +135,15 @@ block append refRes
 
       setDlgTitle();
       //console.log('before refreshCharts');
-      //console.log('query:','!{query.from}','!{query.to}');
+      //console.log('query:','!{query.from}','!{query.to}','over.');
       dataTimeRange = {from:'!{query.from}',to:'!{query.to}'};
-      console.log('nodeData:dataTimeRange',JSON.stringify(dataTimeRange,null,2));
-      if(dataTimeRange.from == ''){
+      //console.log('nodeData:dataTimeRange',JSON.stringify(dataTimeRange,null,2));
+      if(dataTimeRange.from == '' || dataTimeRange.from == 'undefined'){
         dataTimeRange = timeRangeSelector.getDefaultRange();
       }else{
         updateTimeRangeText();
       }
-      //console.log(JSON.stringify(dataTimeRange,null,2));
+      //console.log('nodeData:dataTimeRange',JSON.stringify(dataTimeRange,null,2));
       refreshCharts();
       //console.log('after refreshCharts');
     });
