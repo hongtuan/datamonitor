@@ -39,6 +39,7 @@ function initMap() {
 
   loadLocationData(function(){
     parent.layer.close(lwi);
+    $('#showBound').click();
     /*
     setTimeout(function(){
       rotateTag(40);
