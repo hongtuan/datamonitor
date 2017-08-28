@@ -1,4 +1,5 @@
 var os = require('os');
+var path = require('path');
 var moment = require('moment');
 var util = require('../../utils/util');
 var dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
@@ -17,6 +18,9 @@ module.exports.getSystemInfo = function(req, res) {
   systemInfo.push({name:'serverTime',value: moment().format(dateTimeFormat)});//当前系统时间
   systemInfo.push({name:'serverTimeZone',value: process.env.TZ});//当前系统时间
   systemInfo.push({name:'appStartTime',value: moment(req.app.locals.startTime).format(dateTimeFormat)});//应用系统启动时间
+  var versionInfo = util.loadTextContent(path.join(__dirname,'../../version.txt'));
+  console.log('versionInfo',versionInfo);
+  systemInfo.push({name:'appVersion',value:versionInfo});//应用系统版本。
   var appRunTime = Date.now() - req.app.locals.startTime;
   systemInfo.push({name:'appRunTime',value: util.getTimeDistanceDesc(appRunTime)});//应用系统启动时间
   systemInfo.push({name:'arch',value: os.arch()});//处理器架构
