@@ -1,16 +1,20 @@
-<div class="panel-body">
-  <div class="col-sm-12">
-    <md-select placeholder="logFile" name="fileKey" class="full-width" [(ngModel)]="selectedFileKey" required>
-      <md-option *ngFor="let file of files" [value]="file.fileKey">
-       {{ file.desc }}
-      </md-option>
-    </md-select>
-    <a class="btn btn-primary btn-xs" (click)="doloadFile()">View</a>
+<div class="widgets">
+  <div class="row">
+    <div class="col-md-12">
+	    <select  name="fileKey" [(ngModel)]="selectedFileKey">
+	      <option value=''>Please Select Log Type</option>
+	      <option *ngFor="let file of files" [value]="file.fileKey">
+         {{ file.desc }}
+        </option>
+	    </select>
+      <button class="btn btn-primary" (click)="doloadFile()">View</button>
+    </div>
   </div>
-  <div class="col-sm-12">
-    <div class="col-sm-12">
-      <div>ResponseData</div>
-      <textarea class="form-control" rows="8" id="resData" name="resData">{{fileContent}}</textarea>
+  <div class="row">
+    <div class="col-md-12">
+      <ba-card title="LogFileContent" baCardClass="with-scroll">
+        <textarea class="full-width" rows="20" id="fileContent" name="fileContent">{{fileContent}}</textarea>
+      </ba-card>
     </div>
   </div>
 </div>

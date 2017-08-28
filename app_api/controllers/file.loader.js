@@ -21,6 +21,7 @@ module.exports.loadFile = function(req, res) {
 	var fileName = path.join(__dirname,fileConfig[fn]);
 	console.log('fileName',fileName);
 	fc = util.loadTextContent(fileName);
+	if(fc == null) fc = 'file not exists.';
   }
   res.status(200).json({fn:fn,fc:fc});
 };

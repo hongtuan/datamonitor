@@ -2,6 +2,8 @@ import { NgModule }      from '@angular/core';
 import { CommonModule }  from '@angular/common';
 import { FormsModule }    from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { NgaModule }        from '../../theme/nga.module';
+
 import { MaterialModule, MdNativeDateModule } from '@angular/material';
 import { LogViewerService }  from '../../services/logviewer.service';
 import { LogViewerComponent } from './logviewer.component';
@@ -12,6 +14,7 @@ import { routing } from './logviewer.routing';
     CommonModule,
     FormsModule,
     FlexLayoutModule,
+    NgaModule,
     MaterialModule,
     MdNativeDateModule,
     routing
