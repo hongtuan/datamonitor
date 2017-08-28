@@ -14,6 +14,7 @@ var ctrlServerInfo = require('../controllers/serverinfo');
 var ctrlAuth = require('../controllers/authentication');
 
 var systemInfo = require('../controllers/systeminfo');
+var fileLoader = require('../controllers/file.loader');
 
 router.get('/locations', ctrlLocations.showList);
 router.post('/userloclist', ctrlLocations.showList);
@@ -64,6 +65,8 @@ router.post('/nd/:lid/sdtc/:sts', ctrlNodeData.synDataTaskCtrl);//ok
 router.post('/nd/:lid/eint', ctrlNodeData.executeInspectNodeTask);//ok
 
 router.get('/sysinfo', systemInfo.getSystemInfo);
+router.get('/fl', fileLoader.loadFile);
+
 //router.post('/nd/savend',ctrlNodeData.saveNodesData);//ok,but not use anymore.
 
 module.exports = router;

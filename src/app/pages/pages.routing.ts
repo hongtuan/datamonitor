@@ -16,7 +16,8 @@ export const routes: Routes = [
       { path: 'user', loadChildren: './user/user.module#UserModule' },
       { path: 'ndp/:lid/:src/:sc/:name', loadChildren: './nodedata/node-data-parser.module#NodeDataModule' },
       { path: 'sysinfo', loadChildren: './system/system.info.module#SystemInfoModule' },
-      //,{ path: 'mp1', loadChildren: './mypage1/my.page1.module#MyPage1Module' }
+      { path: 'logviewer', loadChildren: './logviewer/logviewer.module#LogViewerModule' },
+      //___newItemAppendHere___
     ]
   }
 ];
