@@ -1,0 +1,16 @@
+<div class="panel-body">
+  <div class="col-sm-12">
+    <input type="text" style="width:240px" [(ngModel)] = "apiUrl" />
+    <a class="btn btn-primary btn-xs" (click)="doTest()">Call</a>
+  </div>
+  <div class="col-sm-12">
+    <div class="col-sm-6">
+      <div>RequestData:</div>
+      <textarea class="form-control" rows="10" id="reqData" name="reqData"></textarea>
+    </div>
+    <div class="col-sm-6">
+      <div>ResponseData</div>
+      <textarea class="form-control" rows="8" id="resData" name="resData"></textarea>
+    </div>
+  </div>
+</div>

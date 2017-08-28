@@ -1,0 +1,16 @@
+<div class="panel-body">
+  <div class="col-sm-12">
+    <md-select placeholder="logFile" name="fileKey" class="full-width" [(ngModel)]="selectedFileKey" required>
+      <md-option *ngFor="let file of files" [value]="file.fileKey">
+       {{ file.desc }}
+      </md-option>
+    </md-select>
+    <a class="btn btn-primary btn-xs" (click)="doloadFile()">View</a>
+  </div>
+  <div class="col-sm-12">
+    <div class="col-sm-12">
+      <div>ResponseData</div>
+      <textarea class="form-control" rows="8" id="resData" name="resData">{{fileContent}}</textarea>
+    </div>
+  </div>
+</div>

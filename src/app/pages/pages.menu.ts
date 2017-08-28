@@ -60,7 +60,23 @@ export const PAGES_MENU = [
             order: 0
           }
         }
-      }
+      },
+      {
+        path: 'logviewer',  // path for our page
+        data: { // custom meinu declaration
+          menu: {
+            title: 'LogViewer', // menu title
+            resID:'R30003',
+            icon: 'ion-edit', // menu icon
+            pathMatch: 'prefix', // use it if item children not displayed in menu
+            hidden:false,
+            selected: false,
+            expanded: false,
+            order: 0
+          }
+        }
+      },
+      //___newItemAppendHere___
     ]
   }
 ];

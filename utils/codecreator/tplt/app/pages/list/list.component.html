@@ -1,0 +1,43 @@
+<div class="panel-body">
+  <button *ngIf="!isMonitor" class="btn btn-primary" (click)="openAddDlg()">新增医院</button>
+  <button *ngIf="!isMonitor" class="btn btn-primary" id="btRefresh" (click)="refreshList()">刷新</button>
+  <span>已接入医院列表</span>
+  <div class="listPanel">
+    <table class="table table-bordered">
+      <thead>
+        <tr class="btn-primary">
+          <th width="30">编码</th>
+          <th width="60">医院名</th>
+          <th width="150">地址</th>
+          <th width="60">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let hospital of pagedItems">
+          <td class="clkt" title="点击修改医院信息" (click)="openEditDlg(hospital)">{{hospital.hcode}}</td>
+          <td>{{hospital.name}}</td>
+          <td>{{hospital.address}}</td>
+          <td><button class="btn btn-primary" (click)="deleteHospital(hospital._id)">删除</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- pager -->
+    <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
+      <li [ngClass]="{disabled:pager.currentPage === 1}">
+        <a (click)="setPage(1)">首页</a>
+      </li>
+      <li [ngClass]="{disabled:pager.currentPage === 1}">
+        <a (click)="setPage(pager.currentPage - 1)">上一页</a>
+      </li>
+      <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+        <a (click)="setPage(page)">{{page}}</a>
+      </li>
+      <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+        <a (click)="setPage(pager.currentPage + 1)">下一页</a>
+      </li>
+      <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+        <a (click)="setPage(pager.totalPages)">尾页</a>
+      </li>
+    </ul>
+  </div>
+</div>
