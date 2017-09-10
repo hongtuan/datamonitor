@@ -1,5 +1,6 @@
 var moment = require('moment');
 var util = require('../../utils/util.js');
+var mailsender = require('../../utils/mailsender.js');
 var du = require('../../app_client/myjs/data_utils.js');
 
 var locDao = require('../dao/locationdao.js');
@@ -162,6 +163,53 @@ function executeSyncTask(lid,dataUrl){
         //console.log('logContent='+logContent);
         llDao.recordLocLog(lid,llDao.logType.dataSync,logContent,function(err,taskLog){
           if(err) console.log(err);
+          //check log here：
+          //llDao.getLocLogList();
+          llDao.getLocLogList(lid, llDao.logType.dataSync, 3, function(err, dataSyncLogList,location) {
+            var ucs = [];
+            var lastestLogDate = moment(dataSyncLogList[0].createdOn).format('YYYY-MM-DD h:mm a');
+            for(let slog of dataSyncLogList) {
+              var logContent = slog.logContent;
+              var udc = logContent.substr(logContent.lastIndexOf(':') + 1);
+              ucs.push(udc=='0'?0:1);
+            }
+            var ucStr = ucs.join('');
+            console.log('ucStr=',ucStr,'lastestLogDate=',lastestLogDate);
+            /*
+            mailsender.sendMail({
+              recipient: '"goodfriend" <3239048@qq.com>;"tht" <tht@sina.com>;"hongtuan" <hongtuang3@gmail.com>',
+              title: `Location:${location.name}'s data info`,
+              contentInText: `Location:${location.name} @ ${lastestLogDate} ucStr=${ucStr}`,
+              contentInHtml: `<h2>Location:${location.name} @ ${lastestLogDate} ucStr=${ucStr}</h2>`
+            },function(){
+              console.log('test mail send over.');
+            });//*/
+            switch(ucStr){
+              case '011':
+                console.log(`Location ${location.name} at ${lastestLogDate} around found lost data!`);
+                mailsender.sendMail({
+                  recipient: '"goodfriend" <3239048@qq.com>;"pgray" <pgray@nighthawkimagingservices.com>;"hongtuan" <hongtuang3@gmail.com>',
+                  title: `Location:${location.name}'s data lost!`,
+                  contentInText: `Location:${location.name} at ${lastestLogDate} around found data lost!(${ucStr})`,
+                  contentInHtml: `<h2>Location:${location.name} at ${lastestLogDate} around found data lost!(${ucStr})</h2>`
+                },function(){
+                  console.log('data lost mail send over.');
+                });
+                break;
+              case '100':
+                console.log(`Location ${location.name} at ${lastestLogDate} around had new data come up!`);
+                mailsender.sendMail({
+                  recipient: '"goodfriend" <3239048@qq.com>;"pgray" <pgray@nighthawkimagingservices.com>;"hongtuan" <hongtuang3@gmail.com>',
+                  title: `Location:${location.name}'s new data come up!`,
+                  contentInText: `Location:${location.name} at ${lastestLogDate} around new data come up!(${ucStr})`,
+                  contentInHtml: `<h2>Location:${location.name} at ${lastestLogDate} around new data come up!(${ucStr})</h2>`
+                },function(){
+                  console.log('data come up mail send over.');
+                });
+                break;
+            }
+          });
+
           //console.info('taskLog='+taskLog);
           //console.log('taskLog record over.');
         });

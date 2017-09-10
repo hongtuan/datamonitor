@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 //var NodeData = mongoose.model('NodeData');
+var locDao = require('../dao/locationdao.js');
 var LocationLog = mongoose.model('LocationLog');
 
 module.exports.logType = {dataSync:'dataSync',inspectNode:'inspectNode'};
@@ -56,7 +57,9 @@ module.exports.getLocLogList = function(lid,logType,limit,cb) {
           lastestLogList = locationLog.logList.slice(len-limit,len).reverse();
         }
       }
-      if(cb) cb(null,lastestLogList);
+      locDao.getLocationBaseInfo(lid,function(err,location){
+        if(cb) cb(null,lastestLogList,location);
+      });
     }
   );
 };

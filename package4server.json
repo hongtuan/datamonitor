@@ -5,7 +5,7 @@
   "author": "Tim <tht@sina.com>",
   "homepage": "http://www.timdev.cn",
   "scripts": {
-    "start": "node expserver.js"    
+    "start": "node expserver.js"
   },
   "private": true,
   "dependencies": {
@@ -62,6 +62,7 @@
     "ng2-slim-loading-bar": "4.0.0",
     "ng2-smart-table": "1.0.3",
     "ngx-uploader": "2.2.5",
+    "nodemailer": "^4.0.1",
     "normalize.css": "6.0.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
