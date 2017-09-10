@@ -239,7 +239,7 @@ function getTimeRange(req){
   var ctzo = req.query.ctzo;
   if(ctzo != undefined) {
     var stzo = req.app.locals.serverTimezoneOffset;
-    console.log('ctzo:',ctzo,'stzo:',stzo);
+    console.log(moment().format('YYYY-MM-DD h:mm:ss a'),'ctzo:',ctzo,'stzo:',stzo);
     if(ctzo != stzo) {
       var tzos = getTZOStr(stzo - ctzo);
       from = from.replace('Z', tzos);
