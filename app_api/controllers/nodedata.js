@@ -174,7 +174,7 @@ function executeSyncTask(lid,dataUrl){
               ucs.push(udc=='0'?0:1);
             }
             var ucStr = ucs.join('');
-            console.log('ucStr=',ucStr,'lastestLogDate=',lastestLogDate);
+            console.log(`lastestDataSynLogTime ${lastestLogDate},ucStr=${ucStr}.`);
             /*
             mailsender.sendMail({
               recipient: '"goodfriend" <3239048@qq.com>;"tht" <tht@sina.com>;"hongtuan" <hongtuang3@gmail.com>',
@@ -185,6 +185,8 @@ function executeSyncTask(lid,dataUrl){
               console.log('test mail send over.');
             });//*/
             switch(ucStr){
+              case '000':
+              case '001':
               case '011':
                 console.log(`Location ${location.name} at ${lastestLogDate} around found lost data!`);
                 mailsender.sendMail({
