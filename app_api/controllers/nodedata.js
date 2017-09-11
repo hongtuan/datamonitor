@@ -185,7 +185,7 @@ function executeSyncTask(lid,dataUrl){
               console.log('test mail send over.');
             });//*/
             switch(ucStr){
-              case '000':
+              //case '000':
               case '001':
               case '011':
                 console.log(`Location ${location.name} at ${lastestLogDate} around found lost data!`);
