@@ -27,7 +27,7 @@ export class NodeDataParserComponent implements OnInit {
   locationData:any;
   //nidPtagMap:any;
   constructor(private activatedRoute: ActivatedRoute,private nodeDataService:NodeDataService) {
-    console.log('NodeDataParserComponent:constructor called.');
+    //console.log('NodeDataParserComponent:constructor called.');
   }
   ngOnInit(): void {
     let params = this.activatedRoute.snapshot.params;
@@ -35,8 +35,8 @@ export class NodeDataParserComponent implements OnInit {
     this.datasrc = params['src'];
     this.snapcount = params['sc'];
     this.name = params['name'];
-    console.log('name',JSON.stringify(name,null,2));
-    
+    console.log('name',JSON.stringify(this.name,null,2));
+
     this.nodeDataService.getLocationData(this.lid).subscribe(
       locationData => {
         this.locationData = locationData;
@@ -47,29 +47,30 @@ export class NodeDataParserComponent implements OnInit {
         console.error(this.errMsg);
       }
     );
-    this.getRawData();
-    console.log('NodeDataParserComponent:ngOnInit called.');
+    setTimeout(()=>{this.getRawData()},200);
+    //this.getRawData();
+    //console.log('NodeDataParserComponent:ngOnInit called.');
   }
   rawData:string = '';
   rawDataStr:string = '';
   rawDataDesc:string = '';
-  
+
   parserData:string = '';
   parserDataDesc:string = '';
-  
+
   analysisResult:string = '';
-  
+
   latestDataTime:string = '';
   latestDataNid:string = '';
-  
+
   oldestDataTime:string = '';
   oldestDataNid:string = '';
-  
+
   nidList:string[] = [];
   simplifiedNodesData:string = '';
   noDataInfo:string = '';
   errMsg: string;
-  
+
   getRawData() :void{
     let url = du.buildDataUrl(this.datasrc,this.snapcount);
     //layer.load();
@@ -85,9 +86,9 @@ export class NodeDataParserComponent implements OnInit {
         layer.close(lwi);
       },
       errMsg => this.errMsg = errMsg
-    ); 
+    );
   }
-  
+
   getNodeTag(nid):string{
     /*
     for(var bname in this.locationData.BNTM){
@@ -98,7 +99,7 @@ export class NodeDataParserComponent implements OnInit {
     var node = this.locationData.NNM[nid];
     return `${node?node.ptag:'Mac'}[${nid}]`;
   }
-  
+
 
   nidTimeMap:any;
   parserRawData():void {
@@ -134,24 +135,24 @@ export class NodeDataParserComponent implements OnInit {
           this.oldestDataTime = nd.timestampISO;
           this.oldestDataNid = nd.nid;
         }
-        //record the nids 
+        //record the nids
         if(this.nidList.indexOf(nd.nid) == -1){
           this.nidList.push(nd.nid);
         }
       });
-      
+
       //console.log(`${nidList.length} nid found.`);
       //console.log(nidList.join('\r\n'));
       var rawDataCount = dataArray.length;
       //var str = ''+this.rawData.toString();
       var totalDataLength = this.rawData.length;
       var avgDataLength = Math.ceil(totalDataLength/rawDataCount);
-      
+
       this.analysisResult = `${rawDataCount} raw records,totalLength:${totalDataLength},avgLength:${avgDataLength}\n`;
       this.analysisResult += `${this.getNodeTag(this.latestDataNid)} sent the latestData@${du.iso2Locale(this.latestDataTime)}\n`;
       this.analysisResult += `${this.getNodeTag(this.oldestDataNid)} sent the oldestData@${du.iso2Locale(this.oldestDataTime)}\n`;
       this.analysisResult += `${this.nidList.length} Macs found.\n`;
-      
+
       this.noDataInfo = '';
       var totalNoDataCount = 0;
       var _noDataInfo = [];
@@ -184,11 +185,11 @@ export class NodeDataParserComponent implements OnInit {
         dataNodes.forEach(function(nd){
           nodeInfos += `${nd.node},@${du.iso2Locale(nd.dataTime)}\n`;
         });
-        
+
         this.analysisResult += `\n${dataNodes.length} Nodes in ${bname} data detail:\n`;
         this.analysisResult += nodeInfos;
-        
-        
+
+
         if(noDataNodes.length>0){
           _noDataInfo.push(`Area[${bname}],has ${noDataNodes.length} no data nodes:`);
           _noDataInfo.push(noDataNodes.join('\n'));
@@ -216,18 +217,18 @@ export class NodeDataParserComponent implements OnInit {
         this.analysisResult += `\nThere are ${unassignedNodes.length} Unassigned Mac:\n`;
         this.analysisResult += unassignedNodesInfo;
       }
-      
+
       //test simplifyNodeData
       var simplifiedND = du.simplifyNodesData(nodesData);
       this.simplifiedNodesData = JSON.stringify(simplifiedND,null,2);
       this.simplifiedNodesData += `\n${simplifiedND.length} rows simplifiedNodeData.`
     }
-    
+
     this.parserDataDesc = `${nodesData.length} raw records data parserd.`;
     this.parserData = JSON.stringify(nodesData,null,2);
-    console.log('parserRawData over.');
+    //console.log('parserRawData over.');
   }
-  
+
   saveNodesData(dataType:string):void{
     console.log('saveNodesData here.dataType='+dataType);
     if(this.parserData == ''){

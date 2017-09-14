@@ -60,7 +60,7 @@ export class LocationComponent implements OnInit {
       }
     );
   }
-  
+
   refreshList():void {
     var userInfo = this.authService.getUserInfo();
     //console.log('userInfo='+JSON.stringify(userInfo,null,2));
@@ -76,13 +76,13 @@ export class LocationComponent implements OnInit {
     this.refreshList();
     //console.log('this.isMonitor=',this.isMonitor);
   }
-  
+
   onLocationDeleted(lid: string) {
     this.locations = this.locations.filter(function(location){
       return location._id != lid;
     });
   }
-  
+
   deleteLocation(lid:string):void {
     //locMgr.deleteLocation(lid);
     //console.log('cid='+cid);
@@ -102,7 +102,7 @@ export class LocationComponent implements OnInit {
       );
     });
   }
-  
+
   deployLocation(location: Location):void {
     if(this.isMonitor) {
       //console.log('isMonitor='+this.isMonitor,'deployLocation jump over.');
@@ -110,11 +110,11 @@ export class LocationComponent implements OnInit {
     }
     layerHelper.deployLocation(location._id,location.name);
   }
-  
+
   monitoringLocation(location: Location):void {
     layerHelper.monitoringLocation(location._id,location.name);
   }
-  
+
   dataSynMgr(location: Location):void {
     if(this.isMonitor) {
       //console.log('isMonitor='+this.isMonitor,'dataSynMgr jump over.');
@@ -123,7 +123,7 @@ export class LocationComponent implements OnInit {
     layerHelper.openDlg('/dm/'+location._id+'/sdmgr',
       location,`${location.name}'s DataSyn Task Management.`,['640px','480px']);
   }
-  
+
   inspectNode(location: Location):void {
     if(this.isMonitor) {
       //console.log('isMonitor='+this.isMonitor,'inspectNode jump over.');
@@ -132,22 +132,18 @@ export class LocationComponent implements OnInit {
     layerHelper.openDlg('/dm/'+location._id+'/in',
       location,`${location.name}'s InspectNode Task Management.`,['380px','560px']);
   }
-  
+
   goParseData(location: Location):void{
     //console.log('location.datasrc='+location.datasrc);
     if(this.isMonitor) {
       //console.log('isMonitor='+this.isMonitor,'goParseData jump over.');
       return;
     }
-    //var data = {url:location.dataurl,lid:location._id};
-    //let link = ['/ndp',location.dataurl];
-    var jsonObj = {lid:location._id,datasrc:location.datasrc,
-      snapcount:location.snapcount,name:location.name};
+
     let link = ['/pages/ndp',location._id,location.datasrc,location.snapcount,location.name];
-    //console.log('link=',link);
-    //this.router.navigate(link,data);
+    console.log('link=',link);
+
     this.router.navigate(link);
-    //this.route.navigate(link);
     //console.log('goParseData over.');
   }
 
@@ -162,7 +158,7 @@ export class LocationComponent implements OnInit {
         src: url,
         style: "visibility:hidden;display:none"
       }).appendTo('body');//*/
-      
+
     }else{
       console.log('selectedLids is empty.');
     }
@@ -193,19 +189,19 @@ export class LocationComponent implements OnInit {
       this.selectedLids.length = 0;
     }
   }
-  
+
   latestDataOnImg(latestDataOn):string {
     var diffMin = moment().diff(moment(latestDataOn),'minutes');
     //console.log(latestDataOn,diffMin);
     return `/assets/myimgs/${diffMin<=15?'gb':'rb'}.jpg`;
   }
-  
+
   showLatestDataOn(latestDataOn):string {
     //var diffMin = moment().diff(moment(latestDataOn),'minutes');
     //console.log(latestDataOn,diffMin);
-    return moment(latestDataOn,"YYYY-MM-DD HH:mm");
+    return moment(latestDataOn).format("YYYY-MM-DD h:mm a");
   }
-  
+
   openAddDlg():void {
     let dialogRef = this.dialog.open(
       LocationDialogForm,DlgConfig);
