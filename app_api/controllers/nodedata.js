@@ -596,8 +596,10 @@ module.exports.getNodesDataAvg = function(req, res) {
         //only get installed nodes.
         if(node.nid && node.nid.length > 0){
           var data = pidDataMap[pid];
-          var avgDataList = calcAvgData(data,timeRange,alertPolicy);
-          nodesData[pid] = avgDataList;
+          if(data){
+            var avgDataList = calcAvgData(data,timeRange,alertPolicy);
+            nodesData[pid] = avgDataList;
+          }
           //nodesData[pid] = doInterpolation(data,emptyData,timeRange);
         }
       }

@@ -92,6 +92,7 @@ block append refRes
         for(var i = 0; i < nodesCtrl.length; i++){
           var nc = nodesCtrl[i];
           var nodeDataArray = data[nc.id];
+          if(nodeDataArray==undefined) continue;
           var cc = {id:nc.name,name:dataTypeDesc,
             visible:nc.checked,linkto:`/dm/nad/${lid}/${nc.id}?from=${dataTimeRange.from}&to=${dataTimeRange.to}`,showAvg:true};
           var dataA = [];
@@ -113,8 +114,8 @@ block append refRes
     }
 
     function toAllData(){
-      window.location = `/dm/ad/!{lid}?${buildRangeParam()}`;
-      parent.layer.title('AllNodesData', crtWinIndex);
+      window.location = `/dm/ad/${lid}?${buildRangeParam()}`;
+      //parent.layer.title('AllNodesData', crtWinIndex);
     }
 
     //var start = moment().hour(7).minute(0);
