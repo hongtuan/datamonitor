@@ -2,15 +2,13 @@
 * model define of location
 **/
 var mongoose = require('mongoose');
-/*
-var sensorDataSchema = new mongoose.Schema({
-    soid: {type: String, required: true},
-    data:[{name: String, value: Number }],
-    collectedOn: {
-      type: Date,
-      default: Date.now
-    }
-});//*/
+
+var alertLogSchema = new mongoose.Schema({
+  lid:{type: String, required: true},
+  dataType: {type: String, required: true},
+  dataRange:{min:Number,max:Number},
+  alertInfos:[{at:String,nid:String,ntag:String,dt: Date,dv:Number,_id:false}]
+});
 
 var LogSchema = new mongoose.Schema({
   logContent:String,
@@ -136,3 +134,4 @@ var locationSchema = new mongoose.Schema({
 mongoose.model('Location', locationSchema);
 mongoose.model('NodeData', nodeDataSchema);
 mongoose.model('LocationLog', LocationLogSchema);
+mongoose.model('AlertLog', alertLogSchema);

@@ -14,8 +14,8 @@ function rmFile(_file){
 function doUpdateTask(updateFileName){
   console.log('update file to remote host...');
   var cp = require('child_process');
-  var usPath = path.join(__dirname,'../packages/ruc.cmd');
-  var usWorkPath = path.join(__dirname,'../packages/');
+  var usPath = path.join(__dirname,'../dmpkg/ruc.cmd');
+  var usWorkPath = path.join(__dirname,'../dmpkg/');
   cp.execFile(usPath,[usWorkPath,updateFileName],
     function(err,stdout,stderr){
       if(err) console.log(err);
@@ -29,7 +29,7 @@ function doUpdateTask(updateFileName){
 //构建打包文件名
 var pkgFileName = `pkg_${moment().format('YYYYMMDDHHmm')}.zip`;
 //打包文件全路径
-var pkgFile = path.join(__dirname,`../packages/${pkgFileName}`);
+var pkgFile = path.join(__dirname,`../dmpkg/${pkgFileName}`);
 //删除已存在的文件
 rmFile(pkgFile);
 console.log('Prepare to do zip task...');
@@ -55,6 +55,7 @@ function createSrcPkg(cb){
   archive.file('utils/util.js',{name:'utils/util.js'});
   archive.file('utils/mailsender.js',{name:'utils/mailsender.js'});
   archive.file('utils/datasyntask.js',{name:'utils/datasyntask.js'});
+  archive.file('utils/data.monitor.task.js',{name:'utils/data.monitor.task.js'});
 
   archive.directory('client/');
   archive.directory('app_client/');

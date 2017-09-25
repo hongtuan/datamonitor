@@ -1,6 +1,7 @@
 var moment = require('moment');
 var util = require('../../utils/util.js');
-var mailsender = require('../../utils/mailsender.js');
+var dmt = require('../../utils/data.monitor.task.js');
+var mailSender = require('../../utils/mailsender.js');
 var du = require('../../app_client/myjs/data_utils.js');
 
 var locDao = require('../dao/locationdao.js');
@@ -189,7 +190,7 @@ function executeSyncTask(lid,dataUrl){
               case '001':
               case '011':
                 console.log(`Location ${location.name} at ${lastestLogDate} around found lost data!`);
-                mailsender.sendMail({
+                mailSender.sendMail({
                   recipient: '"goodfriend" <3239048@qq.com>;"pgray" <pgray@nighthawkimagingservices.com>;"hongtuan" <hongtuang3@gmail.com>',
                   title: `Location:${location.name}'s data lost!`,
                   contentInText: `Location:${location.name} at ${lastestLogDate} around found data lost!(${ucStr})`,
@@ -200,7 +201,7 @@ function executeSyncTask(lid,dataUrl){
                 break;
               case '100':
                 console.log(`Location ${location.name} at ${lastestLogDate} around had new data come up!`);
-                mailsender.sendMail({
+                mailSender.sendMail({
                   recipient: '"goodfriend" <3239048@qq.com>;"pgray" <pgray@nighthawkimagingservices.com>;"hongtuan" <hongtuang3@gmail.com>',
                   title: `Location:${location.name}'s new data come up!`,
                   contentInText: `Location:${location.name} at ${lastestLogDate} around new data come up!(${ucStr})`,
@@ -210,6 +211,8 @@ function executeSyncTask(lid,dataUrl){
                 });
                 break;
             }
+            //add data monitor task here on 9/24 by Tim
+            dmt.doDataMonitorTask(lid);
           });
 
           //console.info('taskLog='+taskLog);
