@@ -42,10 +42,11 @@ module.exports.doDataMonitorTask = function(lid) {
     //console.log('nodesInfo',ld);
     //fs.writeFileSync(path.join(__dirname,'jsonStr.txt'),jsonStr);
     var alertPolicy = locationData.dataPolicy;
-    var dataRange = {}, alertDataLog = {};
+    var dataRange = {},dataDesc = {}, alertDataLog = {};
     if (Array.isArray(alertPolicy)) {
       alertPolicy.forEach(function (ap) {
         dataRange[ap.name] = ap.range;
+        dataDesc[ap.name] = ap.desc;
         alertDataLog[ap.name] = {};
       });
     }
@@ -104,7 +105,7 @@ module.exports.doDataMonitorTask = function(lid) {
     for (let dn in alertDataLog) {
       var adl = alertDataLog[dn];
       if (adl.alertInfo) {
-        recordAlertLog(lid, {type: dn, range: dataRange[dn]}, adl.alertInfo, ++i * delay);
+        recordAlertLog(lid, {type: dn,desc:dataDesc[dn], range: dataRange[dn]}, adl.alertInfo, ++i * delay);
       }
     }
     setTimeout(() => {

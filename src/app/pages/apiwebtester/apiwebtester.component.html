@@ -1,0 +1,25 @@
+<div class="widgets">
+  <div class="row">
+    <div class="col-md-12">
+      <input type="text" [(ngModel)]="apiUrl" style="width:420px" />
+      <select  name="method" [(ngModel)]="selectedMethod">
+        <option *ngFor="let method of methods" [value]="method.type">
+         {{ method.desc }}
+        </option>
+      </select>
+      <button class="btn btn-primary" (click)="doTest()">Test</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <ba-card title="RequestData" baCardClass="with-scroll">
+        <textarea class="full-width" rows="15" id="reqData" name="reqData" [(ngModel)]="reqData"></textarea>
+      </ba-card>
+    </div>
+    <div class="col-md-6">
+      <ba-card title="ResponseData" baCardClass="with-scroll">
+        <textarea class="full-width" rows="15" id="resData" name="resData">{{resData}}</textarea>
+      </ba-card>
+    </div>
+  </div>
+</div>

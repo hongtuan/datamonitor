@@ -3,7 +3,8 @@ var moment = require('moment');
 var AlertLog = mongoose.model('AlertLog');
 
 module.exports.appendAlertLog = function(lid,dataInfo,alertInfo, cb) {
-  AlertLog.findOne({lid:lid,dataType: dataInfo.type},
+  AlertLog.findOne({lid:lid,dataType: dataInfo.type,
+    "dataRange.min":dataInfo.range.min,"dataRange.max":dataInfo.range.max},
     'lid dataType dataRange alertInfos',
     function(err, existRowData) {
       if (err) {
@@ -18,6 +19,7 @@ module.exports.appendAlertLog = function(lid,dataInfo,alertInfo, cb) {
         AlertLog.create({
           lid:lid,
           dataType: dataInfo.type,
+          dataDesc: dataInfo.desc,
           dataRange: dataInfo.range,
           alertInfos: alertInfo
         }, function(err, createdRowData) {
@@ -72,3 +74,28 @@ module.exports.appendAlertLog = function(lid,dataInfo,alertInfo, cb) {
     }
   );
 };
+
+module.exports.getAlertLog = function(lid,limit, cb) {
+  AlertLog.find({lid:lid})
+    .sort('"alertInfos.length"')
+    .select('lid dataType dataDesc dataRange alertInfos').exec(function (err, rows) {
+    if (err) {
+      console.log(err);
+      //res.status(500).json(err);
+      if(cb) cb(err,null);
+      return;
+    }
+    for(let row of rows){
+      if(row.alertInfos){
+        var len = row.alertInfos.length;
+        if(len<=limit){
+          row.alertInfos = row.alertInfos.reverse();
+        }else{
+          row.alertInfos = row.alertInfos.slice(len-limit,len).reverse();
+        }
+      }
+    }
+    //console.log(JSON.stringify(rows,null,2));
+    if(cb) cb(null,rows);
+  });
+}

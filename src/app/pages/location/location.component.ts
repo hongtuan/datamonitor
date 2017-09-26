@@ -133,6 +133,15 @@ export class LocationComponent implements OnInit {
       location,`${location.name}'s InspectNode Task Management.`,['380px','560px']);
   }
 
+  viewAlert(location: Location):void {
+    if(this.isMonitor) {
+      //console.log('isMonitor='+this.isMonitor,'inspectNode jump over.');
+      return;
+    }
+    let link = ['/pages/alv',location._id,location.name];
+    this.router.navigate(link);
+  }
+
   goParseData(location: Location):void{
     //console.log('location.datasrc='+location.datasrc);
     if(this.isMonitor) {
