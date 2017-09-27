@@ -7,6 +7,7 @@ var alertLogSchema = new mongoose.Schema({
   lid:{type: String, required: true},
   dataType: {type: String, required: true},
   dataDesc: String,
+  atimes: {type:Number,default:0},
   dataRange:{min:Number,max:Number},
   alertInfos:[{at:String,nid:String,ntag:String,dt: Date,dv:Number,_id:false}]
 });

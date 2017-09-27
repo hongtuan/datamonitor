@@ -78,7 +78,7 @@ module.exports.appendAlertLog = function(lid,dataInfo,alertInfo, cb) {
 module.exports.getAlertLog = function(lid,limit, cb) {
   AlertLog.find({lid:lid})
     .sort('"alertInfos.length"')
-    .select('lid dataType dataDesc dataRange alertInfos').exec(function (err, rows) {
+    .select('lid dataType atimes dataDesc dataRange alertInfos').exec(function (err, rows) {
     if (err) {
       console.log(err);
       //res.status(500).json(err);
@@ -88,6 +88,7 @@ module.exports.getAlertLog = function(lid,limit, cb) {
     for(let row of rows){
       if(row.alertInfos){
         var len = row.alertInfos.length;
+        row.atimes = len;
         if(len<=limit){
           row.alertInfos = row.alertInfos.reverse();
         }else{
@@ -96,6 +97,7 @@ module.exports.getAlertLog = function(lid,limit, cb) {
       }
     }
     //console.log(JSON.stringify(rows,null,2));
+    //console.log('in DAO:',rows[0].atimes);
     if(cb) cb(null,rows);
   });
 }

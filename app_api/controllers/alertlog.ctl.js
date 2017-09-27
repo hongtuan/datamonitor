@@ -7,6 +7,10 @@ module.exports.getAlertLog = function(req, res) {
       console.log(err);
       return res.status(500).json(err).end();
     }
+    /*/console.log('in CTL:',rows[0].atimes);
+    rows.forEach(function(alertLog){
+      console.log(alertLog.dataType,alertLog.atimes,alertLog.alertInfos.length);
+    });//*/
     res.status(200).json(rows);
   });
 }

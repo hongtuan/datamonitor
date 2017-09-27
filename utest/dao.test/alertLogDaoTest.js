@@ -18,6 +18,7 @@ testData.forEach(function(td){
     console.log(row);
   });
 });//*/
+/*
 for(let i=0;i<testData.length;i++){
   (function(_i){
     console.log(_i);
@@ -30,4 +31,14 @@ for(let i=0;i<testData.length;i++){
       console.log(row);
     });
   })(i);
-}
+}//*/
+
+alertLogDao.getAlertLog(lid,100,function(err,rows){
+  if(err){
+    console.log(err);
+    return;
+  }
+  //console.log(JSON.stringify(rows,null,2));
+  console.log('in CTL:',rows[0].atimes);
+  process.exit(0);
+});
