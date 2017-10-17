@@ -170,46 +170,6 @@ module.exports.getLocationBaseInfo = function(lid,cb){
   );
 };
 
-/*
-module.exports.getLocationContent = function(lid,cb){
-  //query location by lid
-  Location.findById(lid).select('boundaries').exec(function(err, location) {
-    if (err) {
-      console.log(err);
-      if(cb) cb(err,null);
-      return;
-    }
-    //cvt boundaries and points for client
-    var locationContent = [];
-    //if(Array.isArray(location.boundaries)){
-    location.boundaries.forEach(function(bound){
-      if(bound.status == 1){
-        var boundInfo = {};
-        boundInfo.bid = bound._id;
-        boundInfo.bname = bound.bname?bound.bname:'unNamed';
-        //boundInfo.bd = JSON.parse(bound.bdelimit);
-        boundInfo.bd = bound.bdelimit;
-        var pdA = [];
-        bound.points.forEach(function(p){
-          //append boundary info here.
-          pdA.push({
-            pid:p._id,
-            pos:p.coords,
-            nid:p.nodeid,
-            ptag:p.ptag,
-            bid:bound._id,
-            bname:boundInfo.bname
-          });
-        });
-        boundInfo.pd = pdA;
-        locationContent.push(boundInfo);
-      }
-    });
-    if(cb) cb(null,locationContent);
-  });
-};//*/
-
-
 module.exports.updateLocCenter = function(lid,centerInfo,cb){
   Location.findById(lid).select('ctpos gwpos').exec(function(err, location) {
     if (err) {
@@ -661,20 +621,20 @@ module.exports.getLocationData = function(lid,cb){
               pidNodeMap[node.pid] = node;
             }
           });
-  
+
           boundaryNidTagMap[boundaryData.bname] = nidTagMap;
-          
+
           boundaryData.nc = bound.points.length;
           boundaryData.inc = installedNodeCount;
           boundaryData.nodeList = nodeList;
           boundariesData.push(boundaryData);
-  
+
           totalNodeCount += bound.points.length;
           totalInstalledNodeCount += installedNodeCount;
         }
       });
     }
-    
+
     var fnList = [];
     if(location.freeNodes != null){
       location.freeNodes.forEach(function(p){
@@ -741,7 +701,7 @@ module.exports.getNodesInfoInLocation = function(lid,cb){
         });
       }
     });
-    
+
     location.freeNodes.forEach(function(p){
       if(p.status == '1'){
         var node = {

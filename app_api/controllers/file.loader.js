@@ -11,7 +11,9 @@ function bytes2M(b){
 var fileConfig = {
   forever:'../../../.forever/forever.log',
   console:'../../out.log',
-  error:'../../err.log'
+  error:'../../err.log',
+  NginxAccessLog:'../../nginx/access.log',
+  NginxErrorLog:'../../nginx/error.log',
 }
 
 module.exports.loadFile = function(req, res) {
@@ -19,17 +21,17 @@ module.exports.loadFile = function(req, res) {
   //console.log('fn',fn);
   var fc = '';
   if(fileConfig.hasOwnProperty(fn)){
-  	var fileName = path.join(__dirname,fileConfig[fn]);
-  	if(fs.existsSync(fileName)){
-    	console.log(`load file ${fileName}.`);
-    	fc = util.loadTextContent(fileName);
-    	var tmpA = fc.split('\n').reverse();
-    	var fi = fs.statSync(fileName);
-    	fc = `log file modify time:${moment(fi.mtime).format('YYYY-MM-DD h:mm:ss a')},size:${fi.size} \n`;
-    	fc += tmpA.join('\n');
-  	}else{
-  	  fc = `file ${fn} not exists.`;
-  	}
+    var fileName = path.join(__dirname,fileConfig[fn]);
+    if(fs.existsSync(fileName)){
+      console.log(`load file ${fileName}.`);
+      fc = util.loadTextContent(fileName);
+      var tmpA = fc.split('\n').reverse();
+      var fi = fs.statSync(fileName);
+      fc = `log file modify time:${moment(fi.mtime).format('YYYY-MM-DD h:mm:ss a')},size:${fi.size} \n`;
+      fc += tmpA.join('\n');
+    }else{
+      fc = `file ${fn} not exists.`;
+    }
   }
   res.status(200).json({fn:fn,fc:fc});
 };

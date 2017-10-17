@@ -1,12 +1,8 @@
-var request = require('request');
+//var request = require('request');
 var formidable = require("formidable");
 var moment = require('moment');
 var locDao = require('../../app_api/dao/locationdao.js');
 var util = require('../../utils/util');
-/*
-var apiOptions = {
-  server : 'http://localhost:'+(process.env.PORT || '3000')
-};//*/
 
 function getServerStartTime(req){
   var startTimeDesc = moment(req.app.locals.startTime).format('LLL');
@@ -17,26 +13,6 @@ function getServerStartTime(req){
   return startTimeDesc;
 }
 
-var renderListPage = function(req, res, rows){
-  var message;
-  if (!(rows instanceof Array)) {
-    message = "API lookup error";
-    rows = [];
-  } else {
-    if (!rows.length) {
-      message = "No Location found in DB";
-    }
-  }
-  /*
-  var startTimeDesc = moment(req.app.locals.startTime).format('LLL')
-    //dateFormat(req.app.locals.startTime, "yyyy-mm-dd hh:MM:ss");
-  var dist = Date.now()-req.app.locals.startTime;
-  startTimeDesc +=',it has running for '+util.getTimeDistanceDesc(dist);
-  console.log('startTimeDesc='+startTimeDesc);//*/
-  res.render('locations_list',
-    {title:"Current Location list.",rows:rows,
-      startTimeDesc:getServerStartTime(req),message: message});
-};
 
 //do not use api
 module.exports.add = function(req, res) {
@@ -45,33 +21,6 @@ module.exports.add = function(req, res) {
 	    success:req.session.success,errors:req.session.errors});
 	req.session.errors = null;
 };
-/*
-module.exports.edit = function(req, res) {
-  //console.log('server controllers===req.params.lid='+req.params.lid);
-  var requestOptions, path;
-  path = '/api/locations/edit/'+req.params.lid;
-  requestOptions = {
-    url : apiOptions.server + path,
-    method : "GET",
-    json : {}
-  };
-  request(
-    requestOptions,
-    function(err, response, body) {
-      if(err){
-        //process.env.PORT
-        console.error(err);
-        //console.info('process.env.PORT='+process.env.PORT);
-      } 
-      //var i, data;
-      //data = body;
-      res.render('location_edit',
-	      {title:'EditLocation',locData:JSON.stringify(body),
-	        success:req.session.success,errors:req.session.errors});
-	    req.session.errors = null;
-    }
-  );
-};//*/
 
 module.exports.inputCenter = function(req, res) {
   //console.log('In controller inputCenter : req.params.lid='+req.params.lid);
@@ -121,38 +70,10 @@ module.exports.impFreeNode = function(req, res) {
     var freeNodeData = JSON.parse(fc);
     console.log(JSON.stringify(freeNodeData,null,2));
     locDao.impFreeNodeData(freeNodeData,function(err,impCount){
-      res.status(200).json(`${impCount} free nodes imported.`);      
+      res.status(200).json(`${impCount} free nodes imported.`);
     });
   });
-  //res.status(200).json('ok');
-  //res.render('imp_file',
-  //  {lid:req.params.lid,impUrl:'/locations/ifn'});
 };
-/*
-module.exports.deleteOne = function(req, res) {
-  //console.log('In controllers:req.params.lid='+req.params.lid);
-  var lid = req.params.lid;
-  if (lid) {
-    var requestOptions, path;
-    path = '/api/locations/'+lid;
-    requestOptions = {
-      url : apiOptions.server + path,
-      method : "DELETE",
-      json : {}
-    };
-    request(
-      requestOptions,
-      function(err, response, body) {
-        if(err){
-          console.error(err);
-        }
-        //console.log('deleteOne,response='+response);
-        //console.log('deleteOne,body='+body);
-        res.status(200).json(util.jsonMsg(body));
-      }
-    );
-  }
-};//*/
 
 module.exports.showIndex = function(req, res) {
   res.render('index',
@@ -168,37 +89,13 @@ module.exports.showApp = function(req, res) {
     });
 };
 
-/*
-module.exports.showList = function(req, res) {
-  //res.render('locations_list', { });
-  //console.log('locationList!!');
-  var requestOptions, path;
-  path = '/api/locations';
-  requestOptions = {
-    url : apiOptions.server + path,
-    method : "GET",
-    json : {}
-  };
-  request(
-    requestOptions,
-    function(err, response, body) {
-      if(err){
-        //process.env.PORT
-        console.error(err);
-        //console.info('process.env.PORT='+process.env.PORT);
-      } 
-      var data = body;
-      renderListPage(req, res, data);
-    }
-  );
-};//*/
 
 module.exports.mgrPointInfo = function(req, res) {
   //render a template here.
   var lid = req.params.lid;
   var bid = req.params.bid;
   var pid = req.params.pid;
-  
+
   locDao.getPointInfo(lid,bid,pid,function(err,point){
     if (err) {
       console.log(err);
@@ -243,7 +140,7 @@ module.exports.expLocationList = function(req, res) {
       };//*/
       expLocations.push(expLoc);
     });
-    
+
     var headerInfo = [
       {title:'name',width:20},
       {title:'address',width:45},

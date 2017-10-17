@@ -11,7 +11,6 @@ module.exports.showNodeData = function(req, res) {
     if(err){
       console.log(err);
       res.status(406).json(err);
-      return;
     }
     //console.log('showNodeData',lid,nid);
     res.render('show_node_data',
@@ -40,9 +39,6 @@ module.exports.synDataLogGraph = function(req, res) {
   var lid = req.params.lid;
   if (lid) {
     res.render('syn_data_log_graph', {lid:lid});
-
-    //llDao.getLocLogList(lid,llDao.logType.dataSync,300,function(err,dataSyncLogList){
-    //});
   }
 };
 
@@ -52,6 +48,7 @@ module.exports.inspectNode = function(req, res) {
   llDao.getLocLogList(lid,llDao.logType.inspectNode,100,function(err,logList){
     if(err){
       console.error(err);
+      res.status(500).json(err);
     }
     res.render('inspect_node', {
       lid:lid,
