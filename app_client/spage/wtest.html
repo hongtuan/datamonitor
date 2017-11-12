@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>霍兰德职业兴趣测验</title>
+  <script src="../lib/jquery/dist/jquery.js"></script>
+  <script>
+    function showResult() {
+      var res = [0, 0, 0, 0, 0, 0];//I,R,C,E,S,A
+      var sv, cv;
+      var qcCtrls = $(":checkbox.qc");
+      for (var i = 0; i < qcCtrls.length; i++) {
+        var cbObj = qcCtrls[i];
+        if (cbObj.checked) {
+          sv = +cbObj.value;
+          cv = sv % 6;
+          res[cv] += 1;
+        }
+      }
+      var ct = ['I','R','C','E','S','A'];
+      var resObj = {I:0,R:0,C:0,E:0,S:0,A:0};
+      res.forEach(function (r,i) {
+        resObj[ct[i]] = r;
+      });
+      //alert(JSON.stringify(resObj));
+      var sortedKeys = Object.keys(resObj).sort(function(b,a){return resObj[a]-resObj[b]});
+      var sortedRes = [];
+      sortedKeys.forEach(function (k) {
+        sortedRes.push(k+'='+resObj[k]);
+      });
+      //alert(JSON.stringify(resObj),JSON.stringify(sortedRes));
+      alert(sortedRes.join(' '));
+      //alert(resStr);
+    }
+  </script>
+</head>
+<body>
+
+<div>霍兰德职业兴趣测验<br />
+  目的：协助个人了解自己的职业兴趣和职业倾向，以便及早为自己的职业生涯做好准备。<br />
+  以下有60道题目，如果你认为自己属于这一类的人，请选中该条目，反之，便不必选中。</div>
+<input type="button" value="完成" onclick="showResult()">
+<ul>
+  <li><input type="checkbox" class="qc" value="1">1．喜欢自己动手干一些具体的能直接看到效果的活。</li>
+  <li><input type="checkbox" class="qc" value="2">2．我喜欢弄清楚有关做一件事情的具体要求，以明确如何去做。</li>
+  <li><input type="checkbox" class="qc" value="3">3．我认为追求的目标应该尽量高些，这样才可能在实践中多获成功。</li>
+  <li><input type="checkbox" class="qc" value="4">4．我很看重人与人之间的友情。</li>
+  <li><input type="checkbox" class="qc" value="5">5．我常常想寻找独特的方式来表达自己的创造力。</li>
+  <li><input type="checkbox" class="qc" value="6">6．我喜欢阅读比较理性的书籍。</li>
+  <li><input type="checkbox" class="qc" value="7">7．我喜欢生活与工作场所布置的朴实些、实用些。</li>
+  <li><input type="checkbox" class="qc" value="8">8．在开始做一件事情以前，我喜欢有条不紊地做好所有准备工作。</li>
+  <li><input type="checkbox" class="qc" value="9">9．我善于带动他人、影响他人。</li>
+  <li><input type="checkbox" class="qc" value="10">10．为了帮助他人，我愿意做些自我牺牲。</li>
+  <li><input type="checkbox" class="qc" value="11">11．当我进人创造性工作时，我会忘却一切。</li>
+  <li><input type="checkbox" class="qc" value="12">12．在我找到解决困难的办法之前，通常我不会罢手。</li>
+  <li><input type="checkbox" class="qc" value="13">13．我喜欢直截了当，不喜欢说话婉转。</li>
+  <li><input type="checkbox" class="qc" value="14">14．我比较善于注意和检查细节。</li>
+  <li><input type="checkbox" class="qc" value="15">15．我乐于在所从事的工作中承担主要责任人。</li>
+  <li><input type="checkbox" class="qc" value="16">16．在解决我个人问题时，我喜欢找他人商量。</li>
+  <li><input type="checkbox" class="qc" value="17">17．我的情绪容易激动。</li>
+  <li><input type="checkbox" class="qc" value="18">18．一接触到有关新发明、新发现的信息，我就会感到兴奋。</li>
+  <li><input type="checkbox" class="qc" value="19">19．我喜欢在户外工作与活动。</li>
+  <li><input type="checkbox" class="qc" value="20">20．我喜欢有规律、干净整洁。</li>
+  <li><input type="checkbox" class="qc" value="21">21．每当我要作重大的决定之前，总觉得异常兴奋。</li>
+  <li><input type="checkbox" class="qc" value="22">22．当别人叙述个人烦恼时，我能做一个很好的倾听者。</li>
+  <li><input type="checkbox" class="qc" value="23">23．我喜欢观赏艺术展和好的戏剧与电影。</li>
+  <li><input type="checkbox" class="qc" value="24">24．我喜欢研究所有的细节，然后再做出合乎逻辑的决定。</li>
+  <li><input type="checkbox" class="qc" value="25">25．我认为手工操作和体力劳动永远不会过时。</li>
+  <li><input type="checkbox" class="qc" value="26">26．我不大喜欢由我一个人负责来作重大决定。</li>
+  <li><input type="checkbox" class="qc" value="27">27．我善于和能为我提供好处的人来往。</li>
+  <li><input type="checkbox" class="qc" value="28">28．我善于调节他人相互之间的矛盾。</li>
+  <li><input type="checkbox" class="qc" value="29">29．我喜欢比较别致的着装，喜欢新颖的色彩与风格。</li>
+  <li><input type="checkbox" class="qc" value="30">30．我对各种大自然的奥秘充满好奇。</li>
+  <li><input type="checkbox" class="qc" value="31">31．我不怕干体力活，通常还知道如何巧干体力活。</li>
+  <li><input type="checkbox" class="qc" value="32">32．在做决定时，我喜欢保险系数比较高的方案，不喜欢冒险。</li>
+  <li><input type="checkbox" class="qc" value="33">33．我喜欢竞争与挑战。</li>
+  <li><input type="checkbox" class="qc" value="34">34．我喜欢与人交往，以丰富自己的阅历。</li>
+  <li><input type="checkbox" class="qc" value="35">35．我善于用自己的工作来体现自己的情感。</li>
+  <li><input type="checkbox" class="qc" value="36">36．在动手做一件事情以前，我喜欢在脑中仔细思索几遍。</li>
+  <li><input type="checkbox" class="qc" value="37">37．我不喜欢购买现成的物品，希望能买到材料自己做。</li>
+  <li><input type="checkbox" class="qc" value="38">38．只要我按照规则做了，心里就会踏实。</li>
+  <li><input type="checkbox" class="qc" value="39">39．只要成果大，我愿意冒险。</li>
+  <li><input type="checkbox" class="qc" value="40">40．我通常能比较敏感地觉察他人的需求。</li>
+  <li><input type="checkbox" class="qc" value="41">41．音乐、绘画、文字，任何优美的东西都特别容易给我带来好心情。</li>
+  <li><input type="checkbox" class="qc" value="42">42．我把受教育看成是不断提高自我的一辈子的过程。</li>
+  <li><input type="checkbox" class="qc" value="43">43．我喜欢把东西拆开，然后再使之复原。</li>
+  <li><input type="checkbox" class="qc" value="44">44．我喜欢每一分钟都花得要有名堂。</li>
+  <li><input type="checkbox" class="qc" value="45">45．我喜欢启动一项项工作，而具体细节让其他人去负责。</li>
+  <li><input type="checkbox" class="qc" value="46">46．我喜欢帮助他人，提高他人的学习能力。</li>
+  <li><input type="checkbox" class="qc" value="47">47．我很善于想像。</li>
+  <li><input type="checkbox" class="qc" value="48">48．有时候我能独坐很长时间来阅读、思考或做一件难对付的事情。</li>
+  <li><input type="checkbox" class="qc" value="49">49．我不怎么在乎干活时弄脏自己。</li>
+  <li><input type="checkbox" class="qc" value="50">50．要能仔细地完整地做完一件事情，我就感到十分满足。</li>
+  <li><input type="checkbox" class="qc" value="51">51．我喜欢在团体中担当主角。</li>
+  <li><input type="checkbox" class="qc" value="52">52．如果我与他人有了矛盾，我喜欢采取平和的方式加以解决。</li>
+  <li><input type="checkbox" class="qc" value="53">53．我对环境布置比较讲究，哪怕是一般的色彩、图案都希望能赏心悦目。</li>
+  <li><input type="checkbox" class="qc" value="54">54．哪怕我明知结果会与我期盼相悖，我也要探究到底。</li>
+  <li><input type="checkbox" class="qc" value="55">55．我很看重有健壮灵活的身体。</li>
+  <li><input type="checkbox" class="qc" value="56">56．如果我说了我来干，我就会把这件事情彻底干好。</li>
+  <li><input type="checkbox" class="qc" value="57">57．我喜欢谈判，喜欢讨价还价。</li>
+  <li><input type="checkbox" class="qc" value="58">58．人们喜欢向我倾诉他们的烦恼。</li>
+  <li><input type="checkbox" class="qc" value="59">59．我喜欢尝试有创意的新的主意。</li>
+  <li><input type="checkbox" class="qc" value="60">60．凡事我都喜欢问一个“为什么”。</li>
+</ul>
+</body>
+</html>
