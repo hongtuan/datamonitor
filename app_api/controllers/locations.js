@@ -15,7 +15,7 @@ module.exports.create = function(req, res) {
       return;
     }
     var userInfo = req.body.userInfo;
-    console.log('userInfo',JSON.stringify(userInfo,null,2));
+    //console.log('userInfo',JSON.stringify(userInfo,null,2));
     if(userInfo && userInfo.role!='root' && location!=null){
       //fill lid to user here
       userDao.appendLoc2User(location._id,userInfo.uid,function(err,user){
@@ -23,7 +23,7 @@ module.exports.create = function(req, res) {
           console.error(err);
           return;
         }
-        console.log('appendLoc2User ok');
+        //console.log('appendLoc2User ok');
       });
     }
     res.status(201).json(location);
@@ -244,7 +244,7 @@ module.exports.updateBoundaryName = function(req, res) {
   var lid = req.params.lid;
   var bid = req.params.bid;
   var newName = req.params.nn;
-  console.log(lid,bid,newName);
+  //console.log(lid,bid,newName);
   locDao.updateBoundaryName(lid,bid,newName,function(err,updateRes){
     if(err){
       console.error(err);
@@ -258,7 +258,7 @@ module.exports.deleteBoundary = function(req, res) {
   //console.log('api:loadNodesData req.params.lid='+req.params.lid);
   var lid = req.params.lid;
   var bid = req.params.bid;
-  console.log(lid,bid);
+  //console.log(lid,bid);
   locDao.deleteBoundary(lid,bid,function(err,deleteRes){
     if(err){
       console.error(err);

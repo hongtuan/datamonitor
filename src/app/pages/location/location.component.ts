@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component,ElementRef, OnInit } from '@angular/core';
+import * as GoogleMapsLoader from 'google-maps';
 import { Router,ActivatedRoute }   from '@angular/router';
 import { MdDialog } from '@angular/material';
 
@@ -150,7 +151,7 @@ export class LocationComponent implements OnInit {
     }
 
     let link = ['/pages/ndp',location._id,location.datasrc,location.snapcount,location.name];
-    console.log('link=',link);
+    //console.log('link=',link);
 
     this.router.navigate(link);
     //console.log('goParseData over.');
@@ -216,7 +217,7 @@ export class LocationComponent implements OnInit {
       LocationDialogForm,DlgConfig);
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(JSON.stringify(result,null,2));
+      //console.log(JSON.stringify(result,null,2));
       if(result)
         //this.onLocationAdded.emit(result);
         this.locations.unshift(result);
@@ -229,7 +230,7 @@ export class LocationComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       //this.selectedOption = result;
-      console.log(`Dialog result: ${result}`);
+      //console.log(`Dialog result: ${result}`);
     });
   }
 }

@@ -6,6 +6,7 @@ function trimJSONStr(jStr){
 }
 
 module.exports.createLocation = function(locData,cb){
+  //console.log('locData='+JSON.stringify(locData));
   //create a location document here.
   Location.create({
     name: locData.name,
@@ -14,6 +15,7 @@ module.exports.createLocation = function(locData,cb){
     synperiod: locData.synperiod,
     monitperiod: locData.monitperiod,
     address: locData.address,
+    ctpos:locData.ctpos,
     contactInfo: locData.contactInfo,
     emails: locData.emails,
     //alertPolicy: trimJSONStr(locData.alertPolicy)
@@ -362,7 +364,7 @@ module.exports.updatePointInfo = function(point, cb) {
           break;
         }
       }
-      console.log('save free node over.');
+      //console.log('save free node over.');
     }else{
       var _point = null;
       for (var i in location.boundaries) {
@@ -378,7 +380,7 @@ module.exports.updatePointInfo = function(point, cb) {
           break;
         }
       }
-      console.log('save normal node over.');
+      //console.log('save normal node over.');
     }
     //save location here
     location.save(function(err, location) {

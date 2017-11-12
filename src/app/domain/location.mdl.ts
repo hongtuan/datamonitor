@@ -20,9 +20,9 @@ export class Location {
     this.contactInfo = config.contactInfo ||'';
     this.emails = config.emails || '';
     this.datasrc = config.datasrc || '';
-    this.snapcount = config.snapcount || '';
-    this.synperiod = config.synperiod || '';
-    this.monitperiod = config.monitperiod || '';
+    this.snapcount = config.snapcount || 10;
+    this.synperiod = config.synperiod || 600;
+    this.monitperiod = config.monitperiod || 900;
     this.alertPolicy = config.alertPolicy || '';
   }
 }

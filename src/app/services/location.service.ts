@@ -16,7 +16,7 @@ export class LocationService {
   private jsonRequestOptions = new RequestOptions({
     headers: new Headers({'Content-Type': 'application/json'})
   });
-  
+
   private extractData(res: Response) {
     //console.log('res='+JSON.stringify(res));
     let body = res.json();
@@ -24,7 +24,7 @@ export class LocationService {
     //  console.log('res_body='+JSON.stringify(body));
     return body || {};//must return body,not body.data
   }
-  
+
   private handleError (error: any) {
     //console.log('error='+JSON.stringify(error));
     //console.log('body='+JSON.stringify(error.json()));
@@ -35,7 +35,7 @@ export class LocationService {
     console.error(errMsg); // log to console instead
     return Observable.throw(errMsg);
   }
-  
+
   private apiUrl = '/api/locations/';  // URL to web api
   //private apiUrl = 'http://127.0.0.1:3000/api/locations/';  // URL to web api
   private getLocUrl = '/api/userloclist/';  // URL to web api
@@ -51,19 +51,20 @@ export class LocationService {
     return this.http.post(this.getLocUrl,userInfo,this.jsonRequestOptions)
       .map(this.extractData).catch(this.handleError);
   }
-  
+
   addLocation(formData:any,userInfo:any):Observable<Location> {
+    //console.log(JSON.stringify(formData));
     formData['userInfo'] = userInfo;
     return this.http.post(this.apiUrl,formData, this.jsonRequestOptions)
       .map(this.extractData).catch(this.handleError);
   }
-  
+
   updateLocation(formData:any):Observable<Location> {
     return this.http.put(this.apiUrl+'edit/'+formData._id,
       formData, this.jsonRequestOptions)
       .map(this.extractData).catch(this.handleError);
   }
-  
+
   deleteLocation(lid:string):Observable<any> {
     //console.log('ng:lid='+lid);
     return this.http.delete(this.apiUrl+lid)

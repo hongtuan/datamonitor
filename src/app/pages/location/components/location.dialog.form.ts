@@ -1,5 +1,6 @@
-import { Component, Inject, Output, EventEmitter, OnInit } from '@angular/core';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { Component, Inject, OnInit,AfterViewInit } from '@angular/core';
+import * as GoogleMapsLoader from 'google-maps';
+import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
 
 import { Location }             from '../../../domain/location.mdl';
 import { DlgMode }              from '../../../domain/definitions';
@@ -15,6 +16,9 @@ import { AuthService }      from '../../../services/auth.service';
     `.dlgheader {
       height:30px;
     }
+    .google-maps{
+      height:0px;
+    }
     .dlgbody{
       width: 660px;
       height:400px;
@@ -27,7 +31,7 @@ import { AuthService }      from '../../../services/auth.service';
     }`
   ]
 })
-export class LocationDialogForm implements OnInit {
+export class LocationDialogForm implements OnInit,AfterViewInit {
   location:Location;
   alertPolicyStr:string;
 
@@ -42,11 +46,11 @@ export class LocationDialogForm implements OnInit {
     {name:'FC',desc:'FanCounts',range:{min:0,max:0}},
     {name:'FD',desc:'FanData',range:{min:0,max:0}}
   ];
-  
+
   dlgTitle:string = 'AddLocation';
-  
+
   private dlgMode:DlgMode = DlgMode.Add;
-  
+
   constructor(@Inject(MD_DIALOG_DATA) public data: any,
     public dialogRef: MdDialogRef<LocationDialogForm>,
     private locationService: LocationService,
@@ -54,30 +58,71 @@ export class LocationDialogForm implements OnInit {
     this.location = new Location({name:'',address:'',contactInfo:'',emails:'',
     datasrc:'C47F51016BAC',snapcount:30,synperiod:600,monitperiod:600,alertPolicy:this.defaultAlertPolicy});
     this.alertPolicyStr = JSON.stringify(this.defaultAlertPolicy,null,2);
-    console.log('LocationDialogForm:constructor() called.');
+    //console.log('LocationDialogForm:constructor() called.');
   }
 
   ngOnInit(): void {
     if(this.data){
-      console.log(JSON.stringify(this.data,null,2));
+      //console.log(JSON.stringify(this.data,null,2));
       this.dlgMode = DlgMode.Edit;
       this.location = this.data;
       this.alertPolicyStr = JSON.stringify(this.location.alertPolicy,null,2);
       this.dlgTitle = 'EditLocation';
     }
-    console.log('LocationDialogForm:constructor() called.');
+    //console.log('LocationDialogForm:constructor() called.');
   }
-  
+
+  ngAfterViewInit() {
+    if(this.dlgMode == DlgMode.Edit) {
+      console.log('edit mode,do not need auto search.');
+      return;
+    }
+    //let el = this._elementRef.nativeElement.querySelector('.google-maps');
+    GoogleMapsLoader.KEY = 'AIzaSyACXZwCraYGZB_15hN6Ml1UmYAKDLHTBik';
+    GoogleMapsLoader.LIBRARIES = ['geometry', 'places'];
+    GoogleMapsLoader.LANGUAGE = 'en';
+    //GoogleMapsLoader.REGION = 'GB';
+
+    // TODO: do not load this each time as we already have the library after first attempt
+    GoogleMapsLoader.load((google) => {
+      //google.maps.event.addDomListener(window, 'load', function () {
+        var searchBox = document.getElementById('address');
+        var places = new google.maps.places.Autocomplete(searchBox);
+        //var places = new google.maps.places.Autocomplete(el);
+        google.maps.event.addListener(places, 'place_changed', () =>{
+          var place = places.getPlace();
+          var address = place.formatted_address;
+          var lat = place.geometry.location.lat();
+          var lng = place.geometry.location.lng();
+          var msg = `Address:${address},lat:${lat},lng:${lng}`;
+          searchBox.setAttribute("value",address);
+          var lat_lng = `${lat},${lng}`;
+          this.location.ctpos = lat_lng;
+          this.location.gwpos = lat_lng;
+          this.location.address = address;
+          //console.log(msg);
+        });
+      //});
+      /*
+      new google.maps.Map(el, {
+        center: new google.maps.LatLng(44.5403, -78.5463),
+        zoom: 8,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });//*/
+    });
+    //console.log('LocationDialogForm ngAfterViewInit called.');
+  }
+
   closeDlg():void {
     this.dialogRef.close(this.location);
   }
 
   onSubmit():void {
-    console.log('1.location=',this.location);    
+    //console.log('1.location=',this.location);
     this.location.alertPolicy = JSON.parse(this.alertPolicyStr);
-    console.log('2.location=',this.location);
+    //console.log('2.location=',this.location);
     if(this.dlgMode == DlgMode.Add){
-      console.log('do add task.');
+      //console.log('do add task.');
       var userInfo = this.authService.getUserInfo();
       this.locationService.addLocation(this.location,userInfo).subscribe(
         location =>{
@@ -92,7 +137,7 @@ export class LocationDialogForm implements OnInit {
       );
     }
     if(this.dlgMode == DlgMode.Edit){
-      console.log('do edit task.');
+      //console.log('do edit task.');
       this.locationService.updateLocation(this.location).subscribe(
         location =>{
           this.location = location;

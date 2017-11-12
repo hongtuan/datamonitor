@@ -1,0 +1,20 @@
+<div class="widgets">
+  <div class="row">
+    <div class="col-md-12">
+      <span><b>[{{name}}]</b>'s Top<input type="text" style="width:40px" [(ngModel)] = "topLimit"/> AlertLog</span>
+      <button class="btn btn-primary" (click)="loadAlertLog()">Refresh</button>
+    </div>
+  </div>
+  <div class="row">
+    <md-accordion class="col-md-12" *ngFor="let alertLog of alertLogList">
+      <md-expansion-panel [expanded]="alertLog.dataType==showType">
+        <md-expansion-panel-header>
+          <md-panel-title>{{alertLog.dataType}}({{alertLog.dataDesc}}),totalAlertTimes:{{alertLog.atimes}}</md-panel-title>
+          <md-panel-description>Not in Range[{{alertLog.dataRange.min}}~{{alertLog.dataRange.max}}] Top {{min(alertLog.atimes,topLimit)}} Alerts.</md-panel-description>
+        </md-expansion-panel-header>
+        <ng2-smart-table [settings]="settings" [source]="alertLog.alertInfos" (deleteConfirm)="onDeleteConfirm($event)">
+        </ng2-smart-table>
+      </md-expansion-panel>
+    </md-accordion>
+  </div>
+</div>

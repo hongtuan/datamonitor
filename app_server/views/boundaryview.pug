@@ -43,20 +43,20 @@ block append refRes
       //then,use dataPolicy to check data.
       checkDataItem(dataPolicy);
     }
-    
+
     function showTips(){
       //parent.layer.
       layer.tips('look', "#btTips");
       console.log('showTips called.');
     }
-    
+
     function goDeploy(){
       //console.log('goDeploy');
       //window.title = `Deploy Nodes In ${locInfo.name}`;
       parent.layer.title(`Deploy Nodes In ${locInfo.name}`, crtWinIndex);
       window.location = '/locations/' + locInfo._id + '/editbound';
     }
-    
+
     //$(document).ready(resizeMap);
     $().ready(function(){
       resizeMap();
@@ -80,7 +80,7 @@ block append refRes
   script(src='/lib/google/richmarker.js')
   script(src='/myjs/map-utils.js')
   script(src='/myjs/boundaryview.js')
-  script(async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyACXZwCraYGZB_15hN6Ml1UmYAKDLHTBik&libraries=geometry&callback=initMap')
+  script(async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyACXZwCraYGZB_15hN6Ml1UmYAKDLHTBik&libraries=geometry&language=en&callback=initMap')
 
 block content
   .container-fluid
