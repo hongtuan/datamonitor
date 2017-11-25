@@ -23,14 +23,18 @@ var DlgConfig = {
   templateUrl: 'user.dialog.form.html',
   styles: [
     `.dlgheader {
-      height:30px;
+      height: 24px;
+      margin: 0;
     }
-    .dlgbody{
-      width: 660px;
-      height:400px;
+    .dlgbody {
+      width: 540px;
+      height:360px;
+      border: solid 1px #e4e5e7;
+      margin: 5px 5px 10px 5px;
     }
     .dlgfooter{
-      height:30px;
+      height: 24px;
+      margin: 0;
     }
     .full-width {
       width: 100%;
@@ -64,10 +68,10 @@ var DlgConfig = {
   ]
 })
 export class UserDialogForm implements OnInit {
- 
+
   private errMsg: string;
   private locations:Location[];
-  
+
   user: User;
   roles:any[] = [];
   dlgTitle:string = 'AddUser';
@@ -79,7 +83,7 @@ export class UserDialogForm implements OnInit {
     private locationService: LocationService,
     private userService:UserService,
     public dialog: MdDialog) {
-      
+
     this.user = new User({name:'',email:''});
     for(let ai of AuthorizationInfo){
       this.roles.push(ai);
@@ -90,8 +94,8 @@ export class UserDialogForm implements OnInit {
 
   authedLocs:Array<any>=[];
   unAuthedLocs:Array<any>=[];
-  
-  updateAuthedLocInfo():void {    
+
+  updateAuthedLocInfo():void {
     this.locationService.getLocations({role:'root'}).subscribe(
       locations =>{
         this.locations = locations;
@@ -117,13 +121,13 @@ export class UserDialogForm implements OnInit {
             }
           }
           //console.log('updateAuthedLocInfo over.');
-        }        
+        }
       },
       error =>{
         layer.msg('load data failed.'+error);
       }
     );
-    
+
   }
 
   ngOnInit(): void {
@@ -134,11 +138,11 @@ export class UserDialogForm implements OnInit {
     }
     this.updateAuthedLocInfo();
   }
-  
+
   isDisabled():boolean{
     return this.dlgMode === DlgMode.Edit;
   }
-  
+
   openListSelectDlg(dlgSize:string):void {
     var tmpA = dlgSize.split(',');
     var dlgSizeConf = {width:tmpA[0]+'px',height:tmpA[1]+'px'};
@@ -155,10 +159,10 @@ export class UserDialogForm implements OnInit {
         });
         this.user.loclist = authedLids;
         this.updateAuthedLocInfo();
-      }      
+      }
     });
   }
-  
+
   closeDlg():void {
     //this.dialogRef.close(this.location);
   }
@@ -172,7 +176,7 @@ export class UserDialogForm implements OnInit {
           this.user = user;
           //this.onUserAdded.emit(user);
           layer.msg('User add success.');
-          this.dialogRef.close(this.user);          
+          this.dialogRef.close(this.user);
         },
         error => {
           this.errMsg = <any>error;
@@ -186,7 +190,7 @@ export class UserDialogForm implements OnInit {
         user => {
           this.user = user;
           layer.msg('User update success.');
-          this.dialogRef.close(this.user);   
+          this.dialogRef.close(this.user);
         },
         error =>{
           this.errMsg = <any>error;

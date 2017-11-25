@@ -14,21 +14,30 @@ import { AuthService }      from '../../../services/auth.service';
   templateUrl: 'location.dialog.form.html',
   styles: [
     `.dlgheader {
-      height:30px;
+      height: 24px;
+      margin: 0;
+    }
+    .dlgbody {
+      width: 540px;
+      height: 360px;
+      border: solid 1px #e4e5e7;
+      margin: 5px 5px 10px 5px;
+    }
+    .dlgfooter {
+      height: 24px;
+      margin: 0;
+    }
+    .pdf {
+      margin: 0;
+    }
+    .mdci{margin-bottom: 10px;}                      
+    .full-width {
+      width: 100%;
     }
     .google-maps{
       height:0px;
-    }
-    .dlgbody{
-      width: 660px;
-      height:400px;
-    }
-    .dlgfooter{
-      height:30px;
-    }
-    .full-width {
-      width: 100%;
-    }`
+    }    
+    `
   ]
 })
 export class LocationDialogForm implements OnInit,AfterViewInit {

@@ -9,8 +9,8 @@ import { UserDialogForm }   from './components/user.dialog.form';
 var DlgConfig = {
   disableClose:true,
   hasBackdrop:true,
-  width:'680px',
-  height:'520px'
+  width:'600px',
+  height:'480px'
 };
 
 @Component({
@@ -19,7 +19,11 @@ var DlgConfig = {
   styles: [
     `.clkt {
       cursor: pointer;
-    }`
+    }
+    #listPanel{
+      min-height:360px;
+    }
+    `
   ]
 })
 
@@ -30,7 +34,7 @@ export class UserComponent {
   constructor(private router: Router,
     private userService:UserService,
     public dialog: MdDialog) {
-      
+
   }
 
   getUsers(): void {
@@ -41,7 +45,7 @@ export class UserComponent {
       errMsg => this.errMsg = errMsg
     );
   }
-  
+
   ngOnInit(): void {
     this.getUsers();
   }
@@ -57,7 +61,7 @@ export class UserComponent {
   }
 
   deleteUser(uid:string):void {
-    layerHelper.confirm('Are you sure to delete this Record?', 
+    layerHelper.confirm('Are you sure to delete this Record?',
       'Delete Confirm',
       (index) => {
       this.userService.deleteUser(uid).subscribe(res=>{
@@ -73,7 +77,7 @@ export class UserComponent {
       });
     });
   }
-  
+
   openAddDlg():void {
     let dialogRef = this.dialog.open(UserDialogForm,DlgConfig);
     dialogRef.afterClosed().subscribe(user => {

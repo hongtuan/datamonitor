@@ -9,7 +9,7 @@
         <td>
           <md-input-container class="full-width">
             <input mdInput placeholder="EMail" name="emails" [(ngModel)]="user.email" tabindex="1" required/>
-          </md-input-container>          
+          </md-input-container>
         </td>
         <td>
           <md-input-container class="full-width">
@@ -33,7 +33,7 @@
       </tr>
       <tr>
         <td colspan="2">
-          <h2 class="example-h2">Role</h2>
+          <span class="example-h2">Role:</span>
           <md-radio-group class="example-radio-group" name="role" [(ngModel)]="user.role" required>
             <md-radio-button class="example-radio-button" *ngFor="let role of roles"
               [value]="role.value" [disabled]="isDisabled()">{{role.display}}</md-radio-button>
@@ -42,7 +42,7 @@
       </tr>
       <tr>
         <td colspan="2">
-          <h2 class="example-h2">Auth-Location</h2>
+          <div class="example-h2">Auth-Location</div>
           <div fxLayout="column" class="ml20" (dblclick)="openListSelectDlg('600,420')">
             <div *ngIf="authedLocs.length==0">DoubleClick to Select Locations.</div>
             <div *ngFor="let al of authedLocs">{{al.name}}</div>

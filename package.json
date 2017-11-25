@@ -9,6 +9,7 @@
     "ngsrun": "ng build --output-path client --sourcemaps false --watch true --prod",
     "start": "node expserver.js",
     "ng": "ng",
+    "ngp": "ng server --proxy-config proxy.conf.json",
     "rimraf": "rimraf",
     "changelog": "standard-changelog",
     "ngstart": "ng serve",

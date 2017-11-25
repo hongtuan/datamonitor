@@ -1,5 +1,4 @@
-import { Component,ElementRef, OnInit } from '@angular/core';
-import * as GoogleMapsLoader from 'google-maps';
+import { Component, OnInit } from '@angular/core';
 import { Router,ActivatedRoute }   from '@angular/router';
 import { MdDialog } from '@angular/material';
 
@@ -13,8 +12,9 @@ import { LocationService }  from '../../services/location.service';
 var DlgConfig = {
   disableClose:true,
   hasBackdrop:true,
-  width:'680px',
-  height:'520px'
+  width:'600px',
+  height:'486px',
+  panelClass: 'mydlg'
 };
 
 @Component({
@@ -40,7 +40,7 @@ export class LocationComponent implements OnInit {
   role:string;
   isMonitor:boolean = true;
   selectedLids:string[];
-  selectedLocation: Location;
+  //selectedLocation: Location;
 
   constructor(private route: ActivatedRoute,private router: Router,
     private locationService: LocationService,
