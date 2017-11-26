@@ -13,7 +13,7 @@ var DlgConfig = {
   disableClose:true,
   hasBackdrop:true,
   width:'600px',
-  height:'486px',
+  height:'440px',
   panelClass: 'mydlg'
 };
 
