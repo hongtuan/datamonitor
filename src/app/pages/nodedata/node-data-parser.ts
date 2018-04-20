@@ -1,7 +1,9 @@
 //our root app component
 import {  Component,Attribute,OnInit }     from '@angular/core'
-import { ActivatedRoute,Params }       from '@angular/router';
+import {ActivatedRoute, Params, Router} from '@angular/router';
 import { NodeDataService }          from '../../services/node-data.service';
+import * as moment from "moment";
+import _date = moment.unitOfTime._date;
 
 //var layer;// = require('../lib/layer/layer.js');
 //var layer4ng = require('../myjs/layer4ng.js');
@@ -26,7 +28,7 @@ export class NodeDataParserComponent implements OnInit {
   //nidNodeMap:any;
   locationData:any;
   //nidPtagMap:any;
-  constructor(private activatedRoute: ActivatedRoute,private nodeDataService:NodeDataService) {
+  constructor(private activatedRoute: ActivatedRoute,private router: Router,private nodeDataService:NodeDataService) {
     //console.log('NodeDataParserComponent:constructor called.');
   }
   ngOnInit(): void {
@@ -60,10 +62,10 @@ export class NodeDataParserComponent implements OnInit {
 
   analysisResult:string = '';
 
-  latestDataTime:string = '';
+  latestDataTime:any = null;
   latestDataNid:string = '';
 
-  oldestDataTime:string = '';
+  oldestDataTime:any = null;
   oldestDataNid:string = '';
 
   nidList:string[] = [];
@@ -119,20 +121,21 @@ export class NodeDataParserComponent implements OnInit {
       this.nidList = [];
       nodesData.forEach((nd)=>{
         this.nidTimeMap[nd.nid] = nd.timestampISO;
-        if(this.latestDataTime == '') {
-          this.latestDataTime = nd.timestampISO;
+        let _dataTime = moment(nd.timestampISO);
+        if(this.latestDataTime == null) {
+          this.latestDataTime = _dataTime;
           this.latestDataNid = nd.nid;
         }
-        if(nd.timestampISO.localeCompare(this.latestDataTime)>0){
-          this.latestDataTime = nd.timestampISO;
+        if(_dataTime.isAfter(this.latestDataTime)){
+          this.latestDataTime = _dataTime;
           this.latestDataNid = nd.nid;
         }
-        if(this.oldestDataTime == '') {
-          this.oldestDataTime = nd.timestampISO;
+        if(this.oldestDataTime == null) {
+          this.oldestDataTime = _dataTime;
           this.oldestDataNid = nd.nid;
         }
-        if(nd.timestampISO.localeCompare(this.oldestDataTime)<0){
-          this.oldestDataTime = nd.timestampISO;
+        if(_dataTime.isBefore(this.oldestDataTime)){
+          this.oldestDataTime = _dataTime;
           this.oldestDataNid = nd.nid;
         }
         //record the nids
@@ -149,8 +152,8 @@ export class NodeDataParserComponent implements OnInit {
       var avgDataLength = Math.ceil(totalDataLength/rawDataCount);
 
       this.analysisResult = `${rawDataCount} raw records,totalLength:${totalDataLength},avgLength:${avgDataLength}\n`;
-      this.analysisResult += `${this.getNodeTag(this.latestDataNid)} sent the latestData@${du.iso2Locale(this.latestDataTime)}\n`;
-      this.analysisResult += `${this.getNodeTag(this.oldestDataNid)} sent the oldestData@${du.iso2Locale(this.oldestDataTime)}\n`;
+      this.analysisResult += `${this.getNodeTag(this.latestDataNid)} sent the latestData@${this.latestDataTime.format('MM/DD/YYYY,h:mm A')}\n`;
+      this.analysisResult += `${this.getNodeTag(this.oldestDataNid)} sent the oldestData@${this.oldestDataTime.format('MM/DD/YYYY,h:mm A')}\n`;
       this.analysisResult += `${this.nidList.length} Macs found.\n`;
 
       this.noDataInfo = '';
@@ -250,5 +253,8 @@ export class NodeDataParserComponent implements OnInit {
         console.log('error!'+errMsg);
       }
     );
+  }
+  getBack():void{
+    this.router.navigate(['/pages/location']);
   }
 }

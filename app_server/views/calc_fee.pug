@@ -1,0 +1,47 @@
+extends layout_subpage
+block append refRes
+  script(src='/myjs/map-utils.js')
+  style.
+    .lform{padding-top:5px;}
+    .lbtxt{padding-top:5px;}
+    .btrow {padding-top:10px;}
+  script.
+    //location infomation object,for reuse in this page.
+    var parentWin;
+    var crtWinIndex;
+    var locInfo = {_id:"#{lid}"};
+    function doCalc(){
+      //alert('doSaveCenter');
+      var ci = $("#onf").val();
+      if(ci!=''){
+        parent.layer.msg(ci);
+        doClose();
+      }
+    }
+
+    function doClose(){
+      //console.log('window.name='+window.name);
+      var index = parent.layer.getFrameIndex(window.name);
+      //console.log('index='+index);
+      parent.layer.close(index);
+    }
+    $().ready(function() {
+      if(parentWin){
+        //console.log('parentWin=',parentWin.locInfo.ctpos);
+        $("#centerinfo").val(parentWin.locInfo.ctpos);
+      }
+      //console.log('input center on ready.');
+    });
+
+block content
+  rows
+    form.form-horizontal.lform(role="form")
+      form-group
+        label.col-xs-4.control-label.lbtxt(for="onf") one node fee$:
+        .col-xs-8
+          input.form-control.ilipt(type="text" id="onf" name="onf" placeholder='10')
+        br
+      .col-xs-offset-4.col-xs-4.btrow
+        a.btn.btn-primary.btn-xs(onclick="doCalc()") Save
+      .col-xs-4.btrow
+        a.btn.btn-primary.btn-xs(onclick="doClose()") Cancel

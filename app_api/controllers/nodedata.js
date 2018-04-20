@@ -244,14 +244,20 @@ function getTimeRange(req){
   var ctzo = req.query.ctzo;
   if(ctzo != undefined) {
     var stzo = req.app.locals.serverTimezoneOffset;
-    console.log(moment().format('YYYY-MM-DD h:mm:ss a'),'ctzo:',ctzo,'stzo:',stzo);
+    console.log('do tz cvt at:',moment().format('YYYY-MM-DD h:mm:ss a'),'ctzo:',ctzo,'stzo:',stzo);
+    console.log('before cvt:from=',from,'to=',to);
     if(ctzo != stzo) {
-      var tzos = getTZOStr(stzo - ctzo);
+      console.log('ctzo != stzo,need cvt.');
+      //var tzos = getTZOStr(stzo - ctzo);
+      var tzos = getTZOStr(ctzo - stzo);
       from = from.replace('Z', tzos);
       to = to.replace('Z', tzos);
+      console.log('after cvt:from=',from,'to=',to);
+    }else{
+      console.log('ctzo == stzo,do not need cvt.');
     }
   }
-  return {from:from,to:to};
+  return {from:moment(from),to:moment(to)};
 }
 
 function calcAvgData(dataList,timeRange,dataAlertPolicy){

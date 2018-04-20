@@ -102,7 +102,7 @@ function initMap() {
     heading: 90,
     tilt: 45//*/
   });
-  
+
   //console.log('rotateMap over.');
   map.addListener('zoom_changed',function(e){
     console.log('zoom='+map.getZoom());
@@ -136,10 +136,10 @@ function initMap() {
     geocoder.geocode({location: npos,region:'en'}, function(results, status) {
       if (status === 'OK') {
         if (results[1]) {
-          //window.alert(results[1].formatted_address);          
+          //window.alert(results[1].formatted_address);
           locInfo.ctpos = [npos.lat(),npos.lng()].join(',');
           var address = results[0].formatted_address;
-          locInfo.address = address.replace('美国',', USA');          
+          locInfo.address = address.replace('美国',', USA');
           updateLocCenter();
         } else {
           parent.layer.msg('No results found');
@@ -147,7 +147,7 @@ function initMap() {
       } else {
         parent.layer.msg('Geocoder failed due to: ' + status);
       }
-    });    
+    });
   });
   //
 
@@ -160,13 +160,13 @@ function initMap() {
   crtRectInfoWin = new google.maps.InfoWindow();
   crtPolygonInfoWin = new google.maps.InfoWindow();
   //crtCircleInfoWin = new google.maps.InfoWindow();
-  
+
   //initConfig();
   setupSearchBox();
   setupDrawingManager();
   //echo useage here:
   //showHelp();
-  
+
   configMapNode();
   setupRichMarker();
   //rotateMap(40);
@@ -181,11 +181,11 @@ function initMap() {
     //updateNodeTag();
   });
   console.log('initMap called.');
-  
+
   //$("#menutest").smartMenu(boundsMenu,{name:'testMenu',type:'left'});
   //console.log('over.');
   //setupTxtOverlay();
-  
+
   //console.log('uid='+getUserInfo().uid);
   //console.log('crtUser:'+JSON.stringify(getUserInfo(),null,2));
 }
@@ -415,9 +415,9 @@ function putNodeOnPosition(ni){
     }
   });
   return node;
-  
+
   //changeNodeTag(ni.pid,nodeStatus);
-  
+
   //var customTxt = '<div>'+ni.ptag+'</div>'
   //var txt = new TxtOverlay(p, customTxt, "customBox", map);
   //txt.draggable = true; not work
@@ -511,7 +511,7 @@ function showNewNids() {
       anchor: RichMarkerPosition.BOTTOM_LEFT,
       content: div
     });
-    
+
     //bind events in this function:
     (function(lockedNidMarker) {
       //bind dragend event here:
@@ -545,7 +545,7 @@ function showNewNids() {
           //var tnBid = targetNode.nodeInfo.bid;
           var tnPtag = targetNode.nodeInfo.ptag;
           var nid = lockedNidMarker.getNid();
-          parent.layer.confirm(`Put ${nid} on node ${tnPtag}?`, 
+          parent.layer.confirm(`Put ${nid} on node ${tnPtag}?`,
             {icon: 3, title:'Put Confirm',btn: ['Yes','No']},
             //select Yes
             function(index){
@@ -672,48 +672,6 @@ function downloadByIframe(url){
   }
 }
 
-function impArea_bak(){
-  console.log('impArea here',selectedBoundaryId); 
-  if(selectedBoundaryId){
-    var url = `/locations/${locInfo._id}/ibdp/${selectedBoundaryId}`;
-    //show an input textarea to get input here:
-    var cntHtml = `
-      <script>
-      var parentWin;
-      var crtWinIndex;
-      function doImport(){
-        console.log('cool!',$("#data").val());
-        var dataObjA = JSON.parse($("#data").val());
-        console.log(dataObjA.length);
-        var url = '/locations/${locInfo._id}/ibc/${selectedBoundaryId}';
-        $.post(url,{data:dataObjA},function(data,status){
-          console.log(data);
-          //parentWin.location.reload();
-          //parent.layer.close(crtWinIndex);
-        });
-      }
-      </script>
-      <div>Paste data here:</div>
-      <textarea rows="3" name="data" id="data" cols="30"></textarea><br />
-      <input type="button" value="import" onclick="doImport()">
-    `;
-    parent.layer.open({
-      type: 2,
-      title: 'Import data',
-      area: ['400px', '320px'],
-      closeBtn: 0,
-      shadeClose: true,
-      skin: 'yourclass',
-      content: url,
-      success: function(layero, index){
-        //second window,need use parent.
-        var iframeWin = parent.window[layero.find('iframe')[0]['name']];
-        iframeWin.parentWin = crtWin;
-        iframeWin.crtWinIndex = index;
-      }//*/
-    });
-  }
-}//*/
 
 function refreshNode(pid,toStatus,nid){
   ///console.log('cool',pid,status);
@@ -760,7 +718,10 @@ function moveNodes(){
 }
 
 var boundsMgrMenu = [
-  [{
+  [/*{
+    text: "Location Brief",
+    func: viewLocationBrief
+  },*/{
     text: "Brief",
     func: viewBoundsInfo
   },{
@@ -786,7 +747,7 @@ function addBoundsMeun(tagId){
 }
 
 function enableMove(){
-  
+
 }
 
 var pointMgrMenu = [
@@ -812,7 +773,7 @@ function echoFreeNodes(fnList){
 
 
 function expFreeNode(){
-  //console.log('do location export here.');  
+  //console.log('do location export here.');
   var url = `/locations/${locInfo._id}/efn`;
     //console.log(url);
   downloadFile(url);

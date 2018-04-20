@@ -1,0 +1,46 @@
+#dlg-frame{
+  width: 596px;
+  height: 426px;
+}
+.dlgheader {
+  height: 36px;
+  margin: -10px -10px 0px 0px;
+  padding: 0;
+}
+.mdci {
+  margin-bottom: 8px;
+}
+.dlgbody {
+  border: solid 1px #e4e5e7;
+  padding: 5px;
+  margin: 5px 0px 0px 0px;
+}
+.dlgfooter {
+  height: 36px;
+  margin: 8px 0px 0px 0px;
+}
+.srtinput {
+  margin: 0;
+  width: 100%;
+  height: 50px;
+}
+.mrtinput {
+  margin: 0;
+  width: 100%;
+  height: 90px;
+}
+.full-width{
+  width: 100%;
+}
+.half-width{
+  width: 40%;
+}
+
+.shortipt{width:240px;}
+.radioipt{width:200px;height: 24px}
+.apname{width:20px}
+.apdesc{width:120px}
+.aprange{width:50px}
+.google-maps{
+  height:0px;
+}

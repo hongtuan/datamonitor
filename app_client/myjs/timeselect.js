@@ -135,7 +135,8 @@
         selectedRange = {
           from:picker.startDate.toISOString(),
           to:picker.endDate.toISOString(),
-          ctzo:new Date().getTimezoneOffset()
+          //ctzo:new Date().getTimezoneOffset()
+          ctzo:moment().zone()
         };
 
         //console.log('selectedRange:',JSON.stringify(selectedRange,null,2));

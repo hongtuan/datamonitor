@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit,AfterViewInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit,AfterViewInit } from '@angular/core';
 import * as GoogleMapsLoader from 'google-maps';
 import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
 
@@ -12,40 +12,14 @@ import { AuthService }      from '../../../services/auth.service';
 @Component({
   selector: 'location-dialog-form',
   templateUrl: 'location.dialog.form.html',
-  styles: [
-    `.dlgheader {
-      height: 24px;
-      margin: 0;
-    }
-    .dlgbody {
-      width: 540px;
-      height: 315px;
-      border: solid 1px #e4e5e7;
-      margin: 5px 5px 10px 5px;
-    }
-    .dlgfooter {
-      height: 24px;
-      margin: 0;
-    }
-    .pdf {
-      margin: 0;
-    }
-    .mdci{margin-bottom: 10px;}                      
-    .full-width {
-      width: 100%;
-    }
-    .shortipt{width:240px;}
-    .radioipt{width:200px;height: 24px}
-    .apname{width:20px}
-    .apdesc{width:120px}
-    .aprange{width:50px}
-    .google-maps{
-      height:0px;
-    }
-    `
+  styleUrls: [
+    '../../theme/common.dialog.form.css',
+    './location.dialog.form.css'
   ]
 })
 export class LocationDialogForm implements OnInit,AfterViewInit {
+  elementRef: ElementRef;
+
   location:Location;
   //alertPolicyStr:string;
 
@@ -68,9 +42,11 @@ export class LocationDialogForm implements OnInit,AfterViewInit {
   private dlgMode:DlgMode = DlgMode.Add;
 
   constructor(@Inject(MD_DIALOG_DATA) public data: any,
+              elementRef: ElementRef,
     public dialogRef: MdDialogRef<LocationDialogForm>,
     private locationService: LocationService,
     private authService:AuthService) {
+    this.elementRef = elementRef;
     this.location = new Location({name:'',address:'',contactInfo:'',emails:'',
     datasrc:'C47F51016BAC',snapcount:30,synperiod:600,monitperiod:600,alertPolicy:this.defaultAlertPolicy});
     //this.alertPolicyStr = JSON.stringify(this.defaultAlertPolicy,null,2);
@@ -78,6 +54,7 @@ export class LocationDialogForm implements OnInit,AfterViewInit {
   }
 
   ngOnInit(): void {
+    $(this.elementRef.nativeElement).parent().draggable({containment:'#draggable-parent'});
     if(this.data){
       //console.log(JSON.stringify(this.data,null,2));
       this.dlgMode = DlgMode.Edit;
@@ -94,7 +71,6 @@ export class LocationDialogForm implements OnInit,AfterViewInit {
     console.log('now search for ',st);
   }
 
-
   ngAfterViewInit() {
     if(this.dlgMode == DlgMode.Edit) {
       console.log('edit mode,do not need auto search.');
@@ -107,9 +83,26 @@ export class LocationDialogForm implements OnInit,AfterViewInit {
 
     // TODO: do not load this each time as we already have the library after first attempt
     GoogleMapsLoader.load((google) => {
+      function geolocate() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+              center: geolocation,
+              radius: position.coords.accuracy
+            });
+            this.autocomplete.setBounds(circle.getBounds());
+          });
+        }
+      }
       var searchBox = document.getElementById('address');
       this.autocomplete = new google.maps.places.Autocomplete(searchBox);
+      //this.autocomplete.
       this.autocomplete.setTypes([this.searchType]);
+      geolocate();
       google.maps.event.addListener(this.autocomplete, 'place_changed', () => {
         var place = this.autocomplete.getPlace();
         var address = place.formatted_address;
@@ -122,7 +115,6 @@ export class LocationDialogForm implements OnInit,AfterViewInit {
         this.location.gwpos = lat_lng;
         this.location.address = address;
         //console.log(msg);//
-
       });
     });
     //console.log('LocationDialogForm ngAfterViewInit called.');

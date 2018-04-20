@@ -1,5 +1,5 @@
-<form #locForm="ngForm" (ngSubmit)="onSubmit()" class="pdf">
-  <div fxLayout="column" fxLayoutAlign="start none">
+<form #locForm="ngForm" (ngSubmit)="onSubmit()">
+  <div fxLayout="column" fxLayoutAlign="space-between stretch" fxLayoutGap="0px" id="dlg-frame">
     <div md-dialog-title fxLayout="row" fxLayoutAlign="space-between" class="dlgheader">
       <span>{{dlgTitle}}</span>
       <button md-dialog-close md-icon-button tabindex="-1">

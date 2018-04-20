@@ -2,7 +2,8 @@
 function deleteLocation(lid) {
   layer.confirm('Are you sure to delete this Location?', {
     icon: 3,
-    title: 'Delete Confirm'
+    title: 'Delete Confirm',
+    btn: ['Ok','Cancel']
   }, (index) => {
     this.locationService.deleteLocation(lid).then(res => {
       //console.log('res='+JSON.stringify(res));

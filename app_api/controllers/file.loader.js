@@ -24,11 +24,12 @@ module.exports.loadFile = function(req, res) {
     var fileName = path.join(__dirname,fileConfig[fn]);
     if(fs.existsSync(fileName)){
       console.log(`load file ${fileName}.`);
-      fc = util.loadTextContent(fileName);
-      var tmpA = fc.split('\n').reverse();
+      var _fc = util.loadTextContent(fileName);
+      //var tmpA = _fc.split('\n').reverse();
       var fi = fs.statSync(fileName);
       fc = `log file modify time:${moment(fi.mtime).format('YYYY-MM-DD h:mm:ss a')},size:${fi.size} \n`;
-      fc += tmpA.join('\n');
+      //fc += tmpA.join('\n');
+      fc += _fc;
     }else{
       fc = `file ${fn} not exists.`;
     }

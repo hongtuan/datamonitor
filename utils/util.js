@@ -18,7 +18,7 @@ module.exports = {
     var  mSecondsInMinute = mSeconds * 60;
     var  mSecondsInHour = mSecondsInMinute * 60;
     var  mSecondsInDay = mSecondsInHour * 24;// 3600*24*1000
-  
+
     var d = Math.floor(dist/mSecondsInDay);
     var h = Math.floor(dist % mSecondsInDay / mSecondsInHour);
     var m = Math.floor(dist % mSecondsInHour / mSecondsInMinute);
@@ -65,7 +65,7 @@ module.exports.sendJsonContent = function(res, status, content, msgName) {
     if(msgName && typeof msgName == 'string'){
       var obj = {};
       obj[msgName] = content
-      res.json(obj);  
+      res.json(obj);
     }else{
       res.json({msg:content});
     }
@@ -133,16 +133,16 @@ module.exports.downloadExcelFile = function(res,data,headerInfo,fnPre) {
   //console.log(JSON.stringify(boundaryData,null,2));
   //fs.appendFileSync(tmpFileObj.name,JSON.stringify(fc,null,2));
   //console.log("File content write over.");
-  
+
   var xl = require('excel4node');
-  // Create a new instance of a Workbook class 
+  // Create a new instance of a Workbook class
   var wb = new xl.Workbook();
-  
-  // Add Worksheets to the workbook 
+
+  // Add Worksheets to the workbook
   var ws = wb.addWorksheet('Sheet A');
   //var ws2 = wb.addWorksheet('Sheet B');
-  
-  // Create a reusable style 
+
+  // Create a reusable style
   var headerStyle = wb.createStyle({
     font: {
       bold: true,
@@ -155,7 +155,7 @@ module.exports.downloadExcelFile = function(res,data,headerInfo,fnPre) {
       //bgColor: '#d7e2f4', // HTML style hex value. optional. defaults to black
       fgColor: '#d7e2f4' // HTML style hex value. required.
     }
-  });  
+  });
   var dataStyle = wb.createStyle({
     font: {
       color: 'black',
@@ -163,19 +163,19 @@ module.exports.downloadExcelFile = function(res,data,headerInfo,fnPre) {
     },
     numberFormat: '$#,##0.00; ($#,##0.00); -'
   });
-  
+
   for (var i = 0; i < headerInfo.length; i++) {
     ws.column(i+1).setWidth(headerInfo[i].width);
     ws.cell(1, i + 1).string(headerInfo[i].title).style(headerStyle);
   }
-  
+
   for (var i = 0; i < data.length; i++) {
     for (var j = 0; j < headerInfo.length; j++) {
       //console.log(data[i][j]);
       ws.cell(i + 2, j + 1).string(data[i][j]).style(dataStyle);
     }
   }
-  
+
   wb.write(tmpFileObj.name,function (err, stats) {
     var fn = `${fnPre||'file'}_${moment().format('YYYYMMDDHHmm')}.xlsx`;
     //console.log(fn);
@@ -195,4 +195,18 @@ module.exports.loadTextContent = function(pathname,encode) {
     console.log(pathname+' not exists.');
     return null;
   }
-}
+};
+
+module.exports.getUrlContent = function(url,cb){
+  //console.info('reading data from['+url+']...');
+  superagent.get(url).end(function(err, urlContent) {
+    // var dataList = [];
+    if (err) {
+      console.error(err);
+      if (cb) cb(err, null);
+      return;
+    }
+    if (cb) cb(null, urlContent);
+  });
+};
+

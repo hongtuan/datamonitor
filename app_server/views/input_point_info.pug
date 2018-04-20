@@ -30,12 +30,11 @@ block append refRes
         parent.layer.msg('Point info is not invalid:\n'+inputCheckRes);
       }
     }
-    
+
     function doDeletePoint(){
       //console.log('doDeletePoint...');
       parent.layer.confirm('Are you sure to delete this Node?', {
-        icon: 3,
-        title: 'Delete Confirm'
+        icon: 3,title: 'Delete Confirm',btn: ['Yes','No']
       }, (index) => {
           parent.layer.close(index);
           var pointData = $("#forma").serializeObject();

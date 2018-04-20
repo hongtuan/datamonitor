@@ -153,3 +153,6 @@ module.exports.expLocationList = function(req, res) {
   });
 };
 
+module.exports.calcFee = function(req, res) {
+  res.render('calc_fee');
+}

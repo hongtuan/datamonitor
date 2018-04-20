@@ -1,3 +1,4 @@
+const _ = require('lodash');
 function iso2Locale(isoDateStr){
   return new Date(isoDateStr).toLocaleString('en-US');
 }
@@ -22,7 +23,15 @@ function sortArrayByAttr(array, attr,order) {
 }
 
 
-function parserNodeData(joa){
+function parserNodeData(ndList){
+  const sda = [];
+  for (let item of ndList) {
+    const sd = {};
+    sd[item.id] = item.readings[0].value;
+    sda.push(sd);
+  }
+  return sda;
+  /*
   var sda = [];
   for(var i in joa){
     var sd = {
@@ -32,11 +41,28 @@ function parserNodeData(joa){
     sd[joa[i].id] = joa[i].readings[0].value;
     sda.push(sd);
   }
-  return sda;
+  return sda;//*/
 }
 
 function parserNodes(nodeArray){
-  var sdA = [];
+  const sdA = [];
+  for (let item of nodeArray) {
+    // const nd = {oid:node.oid};
+    for (let node of item.nodes) {
+      let dataTime = node.timestamp.startsWith('000')?item.timestamp:node.timestamp;
+      let localeDataTime = dataTime.startsWith('000')?dataTime : iso2Locale(dataTime);
+      const sd = {
+        oid: item.oid,
+        sentryId: item.sentryId,
+        timestampISO: dataTime,
+        timestamp: localeDataTime,
+        nid: node.id,
+        data: parserNodeData(node.sensors)
+      };
+      sdA.push(sd);
+    }
+  }
+  /*
   for (var i in nodeArray) {
     var sd = {
       oid:nodeArray[i].oid,
@@ -46,7 +72,7 @@ function parserNodes(nodeArray){
       data:parserNodeData(nodeArray[i].nodes[0].sensors)
     };
     sdA.push(sd);
-  }
+  }//*/
   return sdA;
 }
 

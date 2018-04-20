@@ -1,13 +1,13 @@
 !function(){
   var layerHelper = {};
   layerHelper.confirm = function(info,title,cb){
-    layer.confirm(info, 
-      {icon: 3, title:title||'Confirm'},function(index) {
+    layer.confirm(info,
+      {icon: 3, title:title||'Confirm',btn: ['Yes','No']},function(index) {
         if(cb) cb();
         layer.close(index);
     });
   };
-  
+
   layerHelper.openDlg = function(dlgPageUrl,dataObj,dlgTitle,dlgSize,maxSize){
     layer.open({
       type: 2,
@@ -27,7 +27,7 @@
       }
     });
   }
-  
+
   layerHelper.deployLocation = function(lid,locName) {
     var index = layer.open({
       type: 2,
@@ -46,7 +46,7 @@
     });
     layer.full(index);
   }
-  
+
   layerHelper.monitoringLocation = function(lid,locName) {
     var index = layer.open({
       type: 2,
@@ -75,4 +75,3 @@
 
   this.layerHelper = layerHelper;
  }();
- 

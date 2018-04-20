@@ -5,6 +5,7 @@
       <input type="text" style="width:116px" [(ngModel)] = "datasrc" />
       <input type="text" style="width:36px" [(ngModel)] = "snapcount" />
       <button class="btn btn-primary" (click)="getRawData()">Refresh</button>
+      <button class="btn btn-primary" (click)="getBack()">Back</button>
     </div>
   </div>
   <div class="row">
@@ -14,7 +15,7 @@
       </ba-card>
       <ba-card title="No Data Nodes" baCardClass="with-scroll">
         <textarea class="full-width" rows="8" id="noDataInfo" name="noDataInfo">{{noDataInfo}}</textarea>
-      </ba-card>      
+      </ba-card>
     </div>
     <div class="col-md-6">
       <ba-card title="Raw Data:{{rawDataDesc}}" baCardClass="with-scroll">

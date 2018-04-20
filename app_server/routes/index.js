@@ -20,6 +20,7 @@ router.get('/locations/:lid/ic', ctrlLocations.inputCenter);
 router.get('/locations/:lid/efn', ctrlLocations.expFreeNode);
 router.get('/locations/:lid/ifp', ctrlLocations.impFile);
 router.post('/locations/ifn', ctrlLocations.impFreeNode);
+router.get('/locations/calcfee', ctrlLocations.calcFee);
 
 //router.post('/locations/:lid/ua', ctrlLocations.updateAlertpolices);
 

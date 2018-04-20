@@ -30,9 +30,10 @@
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.js",
+        "./assets/lib/jquery-ui/jquery-ui.min.js",
         "../node_modules/tether/dist/js/tether.js",
         "../node_modules/bootstrap/dist/js/bootstrap.js",
-        
+
         "../node_modules/moment/min/moment.min.js",
         "assets/lib/smartmenu/js/jquery-smartMenu.js",
         "assets/layer/layer.js",

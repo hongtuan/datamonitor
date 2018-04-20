@@ -339,6 +339,28 @@ function showBoundaryBrief(boundary){
 }
 
 var selectedBoundaryId = null;
+function viewLocationBrief(){
+  console.log('look.');
+  parent.layer.open({
+    type: 2,
+    title: 'CalcFee',
+    fix: false,
+    resize:false,
+    shadeClose: true,
+    maxmin: false,
+    closeBtn:1,
+    shadeClose: false,
+    area : ['480px' , '320px'],
+    content: '/locations/calcfee',
+    success: function(layero, index){
+      //second window,need use parent.
+      var iframeWin = parent.window[layero.find('iframe')[0]['name']];
+      iframeWin.parentWin = crtWin;
+      iframeWin.crtWinIndex = index;
+      //console.log('inputCenter success.');
+    }
+  });
+}
 
 function viewBoundsInfo(){
   //console.log('ViewInfo here',selectedBoundaryId,'hehe.');
@@ -378,8 +400,7 @@ function deleteBounds() {
     }
     //delete confirm:
     parent.layer.confirm('Are you sure to delete this Area?', {
-      icon: 3,
-      title: 'Delete Confirm'
+      icon: 3,title: 'Delete Confirm',btn: ['Yes','No']
     }, (index) => {
       //execute delete task
       var url = `/api/locations/${locInfo._id}/delb/${selectedBoundaryId}`;
