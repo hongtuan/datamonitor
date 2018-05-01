@@ -85,34 +85,6 @@ module.exports.saveNodesData = function(lid,nodesData, cb) {
         if(cb) cb(errs,saveRes);
       }
     );
-    /*
-    totalDataCount = nodesData.length;
-    var newDataCount = 0;
-    var oldDataCount = 0;
-    var finishCount = 0;
-    //console.log('get '+totalDataCount+' nodes data.');
-    var errs = [];
-    nodesData.forEach(function(nd){
-      saveOneNodeData(lid,nd,function(err,savedCount){
-        if(err) errs.push(err);
-        newDataCount += savedCount;
-        if(err == null && savedCount == 0) oldDataCount += 1;
-        finishCount++;
-        //if finishCount gt totalDataCount
-        if(finishCount >= totalDataCount) {
-          var saveRes = {
-            total:totalDataCount,
-            new:newDataCount,
-            old:oldDataCount,
-            finish:finishCount
-          };
-          //fill pid here:
-          fillNodePid(lid,null);
-          //call back here:
-          if(cb) cb(errs,saveRes);
-        }
-      });
-    });//*/
   }else{
     console.log('nodesData is not Array.');
     const saveRes = {
@@ -133,27 +105,17 @@ module.exports.fillLastestNodeDataByRaw = function(lid,nodesData, cb) {
       if(cb) cb(err,null);
       return;
     }
-    //if(Array.isArray(location.boundaries)){
     let updateCount = 0;
     location.boundaries.forEach(function(boundar){
-      // boundar.points.forEach(function(point){
       for(let point of boundar.points){
-        // var point = boundar.points[i];
-        //console.info('point=>',JSON.stringify(point,null,2));
-        // if(point.nodeid == undefined) continue;
         if(!point.nodeid) continue;
         for(let nodeData of nodesData){
-          // var nodeData = lastestNodesData[j];
-          //matched nodeid,then try to update it
-          // if(nodeData.nid == point.nodeid){
           if(nodeData.nid === point.nodeid){
             var ndTime = new Date(nodeData.timestampISO).getTime();
             var pTime = new Date(point.latestdatatime).getTime();
-            //if(point.latestdata.length == 0 || nodeData.timestampISO>point.latestdatatime) {
             if(point.latestdata.length === 0 || ndTime>pTime) {
               point.latestdata = nodeData.data;
               point.latestdatatime = nodeData.timestampISO;
-              //console.log(point.ptag,point.nodeid,'update over.');
               updateCount++;
               break;
             }
@@ -162,21 +124,15 @@ module.exports.fillLastestNodeDataByRaw = function(lid,nodesData, cb) {
       }
     });
 
-    //for free node,need fill latestdata
-    //for(var i=0;i<location.freeNodes.length;i++){
     for(let point of location.freeNodes){
-      // var point = location.freeNodes[i];
       if(!point.nodeid) continue;
       for(let nodeData of nodesData){
-        // var nodeData = lastestNodesData[j];
         if(nodeData.nid === point.nodeid){
           var ndTime = new Date(nodeData.timestampISO).getTime();
           var pTime = new Date(point.latestdatatime).getTime();
-          //if(point.latestdata.length == 0 || nodeData.timestampISO>point.latestdatatime) {
           if(point.latestdata.length === 0 || ndTime>pTime) {
             point.latestdata = nodeData.data;
             point.latestdatatime = nodeData.timestampISO;
-            //console.log(point.ptag,point.nodeid,'update over.');
             updateCount++;
             break;
           }
@@ -184,10 +140,8 @@ module.exports.fillLastestNodeDataByRaw = function(lid,nodesData, cb) {
       }
     }
 
-    console.info('updateCount='+updateCount);
+    // console.info('updateCount='+updateCount);
     if(updateCount>0) {
-      //console.info('Need update location.');
-      //update latestDataOn when updateCount>0
       location.latestDataOn = new Date();//.toISOString();
       //save location!!!
       location.save(function(err,updatedLocation){

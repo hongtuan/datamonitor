@@ -148,30 +148,30 @@ function doInterpolation(data,emptyData,dataTimeRange){
 function executeSyncTask(lid,dataUrl, cb){
   //read data from data server
   util.getNodesData(dataUrl,function(err,nodesData){
-    console.log('step1 getNodesData ok.', lid, nodesData.length);
+    // console.log('step1 getNodesData ok.', lid, nodesData.length);
     // then write data to db:
     ndDao.saveNodesData(lid,nodesData,function(errs,saveRes){
       if(errs.length>0){
         console.log(errs.join('\n'));
       }
-      console.log('step2 saveNodesData ok.', lid, saveRes.finish);
+      // console.log('step2 saveNodesData ok.', lid, saveRes.finish);
       //call fill lastestNodeData here:
       ndDao.fillLastestNodeDataByRaw(lid,nodesData,function(err,updateRes){
         if(err){
           console.error("fillLastestNodeDataByRaw failed:"+err);
           return;
         }
-        console.log('step3 fillLastestNodeDataByRaw ok.', lid);
+        // console.log('step3 fillLastestNodeDataByRaw ok.', lid);
         const logContent = du.simplifyStrKVJSONObj(saveRes)+','+
           du.simplifyStrKVJSONObj(updateRes);
-        console.log('logContent='+logContent);
+        // console.log('logContent='+logContent);
         llDao.recordLocLog(lid,llDao.logType.dataSync,logContent,function(err,taskLog){
           if(err) console.log(err);
-          console.log('step4 recordLocLog ok.');
+          // console.log('step4 recordLocLog ok.');
           //check log here：
           //llDao.getLocLogList();
           llDao.getLocLogList(lid, llDao.logType.dataSync, 3, function(err, dataSyncLogList,location) {
-            console.log('step5 getLocLogList ok.');
+            // console.log('step5 getLocLogList ok.');
             var ucs = [];
             var lastestLogDate = moment(dataSyncLogList[0].createdOn).format('YYYY-MM-DD h:mm a');
             for(let slog of dataSyncLogList) {
@@ -181,15 +181,6 @@ function executeSyncTask(lid,dataUrl, cb){
             }
             var ucStr = ucs.join('');
             console.log(`lastestDataSynLogTime ${lastestLogDate},ucStr=${ucStr}.`);
-            /*
-            mailsender.sendMail({
-              recipient: '"goodfriend" <3239048@qq.com>;"tht" <tht@sina.com>;"hongtuan" <hongtuang3@gmail.com>',
-              title: `Location:${location.name}'s data info`,
-              contentInText: `Location:${location.name} @ ${lastestLogDate} ucStr=${ucStr}`,
-              contentInHtml: `<h2>Location:${location.name} @ ${lastestLogDate} ucStr=${ucStr}</h2>`
-            },function(){
-              console.log('test mail send over.');
-            });//*/
             switch(ucStr){
               //case '000':
               case '001':
@@ -220,7 +211,6 @@ function executeSyncTask(lid,dataUrl, cb){
             dmt.doDataMonitorTask(lid);
             if(cb) cb();
           });
-
           //console.info('taskLog='+taskLog);
           //console.log('taskLog record over.');
         });

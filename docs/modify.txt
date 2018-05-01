@@ -21,3 +21,37 @@
 
 --简化登录界面
 /adminframe/src/app/pages/login/login.html
+
+module.exports.getAlertLog = function(lid,limit, cb) {
+  AlertLog.find({lid:lid},
+    {lid:1, dataType:1, atimes:1, dataDesc:1, dataRange:1,alertInfos: { $slice: +limit*-1 }})
+    // .sort('"alertInfos.length"')
+    // .sort('-atimes')
+    // .select('lid dataType atimes dataDesc dataRange alertInfos')
+    .lean()
+    .exec(function (err, rows) {
+    if (err) {
+      console.log(err);
+      //res.status(500).json(err);
+      if(cb) cb(err,null);
+      return;
+    }
+    for(let row of rows){
+      if(row.alertInfos){
+        row.atimes = row.alertInfos.length;
+        row.alertInfos = row.alertInfos.reverse();
+        /*
+        var len = row.alertInfos.length;
+        row.atimes = len;
+        if(len<=limit){
+          row.alertInfos = row.alertInfos.reverse();
+        }else{
+          row.alertInfos = row.alertInfos.slice(len-limit,len).reverse();
+        }//*/
+      }
+    }
+    //console.log(JSON.stringify(rows,null,2));
+    //console.log('in DAO:',rows[0].atimes);
+    if(cb) cb(null,rows);
+  });
+}
