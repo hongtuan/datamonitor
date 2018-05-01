@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-//mongoose.set('debug', true);//打印执行语句 生产应该关闭
+// mongoose.set('debug', true);//打印执行语句 生产应该关闭
 var gracefulShutdown;
 //var dbURI = 'mongodb://localhost/rsdb';
 var dbURI = 'mongodb://rsdb:rsdb@localhost/rsdb';
@@ -9,7 +9,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 //(node:6700) DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) is deprecated,
 mongoose.Promise = global.Promise;
-mongoose.connect(dbURI,{useMongoClient: true});
+// mongoose.connect(dbURI,{useMongoClient: true});
+mongoose.connect(dbURI);
 // CONNECTION EVENTS
 mongoose.connection.on('connected', function() {
   console.log('Mongoose connected to ' + dbURI);

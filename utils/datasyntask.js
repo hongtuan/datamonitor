@@ -1,17 +1,17 @@
-var locDao = require('../app_api/dao/locationdao.js');
-var du = require('../app_client/myjs/data_utils.js');
-var nd = require('../app_api/controllers/nodedata.js');
+const locDao = require('../app_api/dao/locationdao.js');
+const du = require('../app_client/myjs/data_utils.js');
+const nd = require('../app_api/controllers/nodedata.js');
 
 function deploySynTask(location,app){
-  var lid = location.id;
-  var taskId = app.locals.dataSyncTask[lid];
-  var dataUrl = du.buildDataUrl(location.datasrc,location.snapcount);
-  //console.log(location.id,dataUrl,location.synperiod);
+  const lid = location.id;
+  let taskId = app.locals.dataSyncTask[lid];
+  const dataUrl = du.buildDataUrl(location.datasrc,location.snapcount);
+  console.log(lid,dataUrl,location.synperiod);
   //execute immediately one time.
   setTimeout(function(){
     nd.executeSyncTask(lid,dataUrl);
   },Math.floor(Math.random()*1000));
-  //deploy autotask.
+  // deploy autotask.
   if(taskId) clearInterval(taskId);
   taskId = setInterval(
     function(){nd.executeSyncTask(lid,dataUrl);},

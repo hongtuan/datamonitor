@@ -1,16 +1,16 @@
-var moment = require('moment');
-var util = require('../../utils/util.js');
-var dmt = require('../../utils/data.monitor.task.js');
-var mailSender = require('../../utils/mailsender.js');
-var du = require('../../app_client/myjs/data_utils.js');
+const moment = require('moment');
+const util = require('../../utils/util.js');
+const dmt = require('../../utils/data.monitor.task.js');
+const mailSender = require('../../utils/mailsender.js');
+const du = require('../../app_client/myjs/data_utils.js');
 
-var locDao = require('../dao/locationdao.js');
-var ndDao = require('../dao/nodedatadao.js');
-var llDao = require('../../app_api/dao/locationlogdao.js');
+const locDao = require('../dao/locationdao.js');
+const ndDao = require('../dao/nodedatadao.js');
+const llDao = require('../../app_api/dao/locationlogdao.js');
 
 //create emptyData for Interpolation
 function getEmptyData(dap){
-  var emptyData = {isSham:true};
+  const emptyData = {isSham:true};
   dap.forEach(function(_dap){
     emptyData[_dap.name] = 0;
   });
@@ -18,7 +18,7 @@ function getEmptyData(dap){
 }
 
 function getInitData(dap){
-  var emptyData = {DC:0};
+  const emptyData = {DC:0};
   dap.forEach(function(_dap){
     emptyData[_dap.name] = 0;
   });
@@ -30,20 +30,20 @@ function getDatesInRange(from,to,fmt='YYYY-MM-DD'){
   //var toDate = to.substr(0,to.indexOf('T'));
   //console.log('fromDate,toDate',fromDate,toDate);
   //var start = moment(fromDate),end = moment(toDate);
-  var start = moment(from),end = moment(to);
-  var dc = end.diff(start,'days');
-  var dateRange = [start.format(fmt)];
+  const start = moment(from),end = moment(to);
+  let dc = end.diff(start,'days');
+  const dateRange = [start.format(fmt)];
   do{
     dateRange.push(start.add(1,'d').format(fmt));
-  }while(--dc>0);
+  }while(--dc > 0);
   return dateRange;
 }
 
 function cvtNodeData(nd,ptag){
   //cvtNodeData here:
-  var dataInfo = [];
+  const dataInfo = [];
   nd.data.forEach(function(d){
-    for(var k in d){
+    for(let k in d){
       dataInfo.push(k+':'+d[k]);
     }
   });
@@ -56,10 +56,10 @@ function cvtNodeData(nd,ptag){
 }
 
 function getDataItem(data,dataName){
-  for(var i in data){
-    var d = data[i];
-    for(var pro in d){
-      if(pro == dataName)
+  for(let i in data){
+    const d = data[i];
+    for(let pro in d){
+      if(pro === dataName)
         return d[pro];
     }
   }
@@ -70,7 +70,7 @@ function doInterpolation(data,emptyData,dataTimeRange){
   //if data is empty,just add to two empty data by from,to
   var iData = [];
   var dl = data?data.length:0;
-  if(dl == 0){
+  if(dl === 0){
     iData.push({
       dataTime:dataTimeRange.from,
       dataObj:emptyData
@@ -145,34 +145,39 @@ function doInterpolation(data,emptyData,dataTimeRange){
   return iData;
 }
 
-function executeSyncTask(lid,dataUrl){
+function executeSyncTask(lid,dataUrl, cb){
   //read data from data server
   util.getNodesData(dataUrl,function(err,nodesData){
-    //then write data to db:
+    console.log('step1 getNodesData ok.', lid, nodesData.length);
+    // then write data to db:
     ndDao.saveNodesData(lid,nodesData,function(errs,saveRes){
       if(errs.length>0){
         console.log(errs.join('\n'));
       }
+      console.log('step2 saveNodesData ok.', lid, saveRes.finish);
       //call fill lastestNodeData here:
       ndDao.fillLastestNodeDataByRaw(lid,nodesData,function(err,updateRes){
         if(err){
           console.error("fillLastestNodeDataByRaw failed:"+err);
           return;
         }
-        var logContent = du.simplifyStrKVJSONObj(saveRes)+','+
+        console.log('step3 fillLastestNodeDataByRaw ok.', lid);
+        const logContent = du.simplifyStrKVJSONObj(saveRes)+','+
           du.simplifyStrKVJSONObj(updateRes);
-        //console.log('logContent='+logContent);
+        console.log('logContent='+logContent);
         llDao.recordLocLog(lid,llDao.logType.dataSync,logContent,function(err,taskLog){
           if(err) console.log(err);
+          console.log('step4 recordLocLog ok.');
           //check log here：
           //llDao.getLocLogList();
           llDao.getLocLogList(lid, llDao.logType.dataSync, 3, function(err, dataSyncLogList,location) {
+            console.log('step5 getLocLogList ok.');
             var ucs = [];
             var lastestLogDate = moment(dataSyncLogList[0].createdOn).format('YYYY-MM-DD h:mm a');
             for(let slog of dataSyncLogList) {
               var logContent = slog.logContent;
               var udc = logContent.substr(logContent.lastIndexOf(':') + 1);
-              ucs.push(udc=='0'?0:1);
+              ucs.push(udc === '0' ? 0 : 1);
             }
             var ucStr = ucs.join('');
             console.log(`lastestDataSynLogTime ${lastestLogDate},ucStr=${ucStr}.`);
@@ -213,6 +218,7 @@ function executeSyncTask(lid,dataUrl){
             }
             //add data monitor task here on 9/24 by Tim
             dmt.doDataMonitorTask(lid);
+            if(cb) cb();
           });
 
           //console.info('taskLog='+taskLog);
@@ -451,8 +457,8 @@ module.exports.executeInspectNodeTask = function(req, res) {
   });
 };
 
-module.exports.executeSyncTask = function(lid,dataUrl) {
-  executeSyncTask(lid,dataUrl);
+module.exports.executeSyncTask = function(lid,dataUrl, cb) {
+  executeSyncTask(lid,dataUrl,cb);
 };
 
 module.exports.synDataTaskCtrl = function(req, res) {

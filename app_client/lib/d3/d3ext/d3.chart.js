@@ -96,13 +96,13 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
       .attr('y', 10) // push to the margin area below x-axis
       .attr('text-anchor', 'end')
       .text('');
-
+    /*
     var dataCountText = _chartCanvas.append('text')
       .attr('class', 'legend-time')
       .attr('x', width)
       .attr('y', 10) // push to the margin area below x-axis
       .attr('text-anchor', 'end')
-      .text('dataCount');
+      .text('dataCount');//*/
 
     function updateHLValue() {
       var mouse = d3.mouse(this);
@@ -156,7 +156,7 @@ define(['moment', 'underscore', 'd3.chart.analog'], function(moment) {
           timeLegendML.text(xMoment.format('h:mm:ss a'))
             .attr('x', 35+moveX);
 
-          dataCountText.text(dataCount);
+          //dataCountText.text(dataCount);
           //var moveX = _xScale(xMoment);
           hoverLine.attr('x1', moveX).attr('x2', moveX);
         }else{

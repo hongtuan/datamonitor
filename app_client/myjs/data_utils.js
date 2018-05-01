@@ -62,17 +62,8 @@ function parserNodes(nodeArray){
       sdA.push(sd);
     }
   }
-  /*
-  for (var i in nodeArray) {
-    var sd = {
-      oid:nodeArray[i].oid,
-      timestamp:nodeArray[i].timestamp.startsWith('000')?nodeArray[i].timestamp:iso2Locale(nodeArray[i].timestamp),
-      timestampISO:nodeArray[i].timestamp,
-      nid:nodeArray[i].nodes[0].id,
-      data:parserNodeData(nodeArray[i].nodes[0].sensors)
-    };
-    sdA.push(sd);
-  }//*/
+  // here sort the data by timestampISO
+  _.sortBy(sdA, ['timestampISO']);
   return sdA;
 }
 

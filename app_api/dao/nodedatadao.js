@@ -1,20 +1,21 @@
-var mongoose = require('mongoose');
-var NodeData = mongoose.model('NodeData');
-var Location = mongoose.model('Location');
+const mongoose = require('mongoose');
+const NodeData = mongoose.model('NodeData');
+const Location = mongoose.model('Location');
+const async = require('async');
 
 function saveOneNodeData(lid, nd, cb) {
   //just save not exist nodedata.
-  NodeData.findOne({locid:lid,nodeid: nd.nid, collectedOn: nd.timestampISO},
+  NodeData.findOne({locid:lid, nodeid: nd.nid, collectedOn: nd.timestampISO},
     'nodeid',
     function(err, existNodeData) {
-      //console.log('existNodeData='+existNodeData);
+      // console.log('existNodeData=', existNodeData);
       if (err) {
         console.log(err);
         if(cb) cb(err,0);
         return;
       }
       //console.log('nodeData='+nodeData);
-      if (existNodeData == null) {
+      if (!existNodeData) {
         //console.log('Find new data,need save.');
         //create a new document.
         NodeData.create({
@@ -44,8 +45,47 @@ function saveOneNodeData(lid, nd, cb) {
 module.exports.saveNodesData = function(lid,nodesData, cb) {
   //console.log('Save nodesData here.');
   //console.log(req.body);
-  var totalDataCount = 0;
+  let totalDataCount = 0;
   if(Array.isArray(nodesData)) {
+    let index = 0;
+    let errs = [];
+    totalDataCount = nodesData.length;
+    let newDataCount = 0;
+    let oldDataCount = 0;
+    let finishCount = 0;
+    async.until(
+      function() { return index >= nodesData.length; },
+      function(callback) {
+        const nd = nodesData[index];
+        // console.log(`query group ${index+1}...`);
+        index++;
+        saveOneNodeData(lid,nd,function(err,savedCount){
+          if(err) errs.push(err);
+          newDataCount += savedCount;
+          if(err === null && savedCount === 0) oldDataCount += 1;
+          finishCount++;
+          callback(null, index);
+        });
+      },
+      function afterRun(err, n) {
+        // 5 seconds have passed, n = 5
+        if (err) {
+          console.log(err);
+        }
+        console.log('n=',n, 'totalDataCoun=', totalDataCount,'finishCount=' ,finishCount);
+        const saveRes = {
+          total:totalDataCount,
+          new:newDataCount,
+          old:oldDataCount,
+          finish:finishCount
+        };
+        //fill pid here:
+        fillNodePid(lid,null);
+        //call back here:
+        if(cb) cb(errs,saveRes);
+      }
+    );
+    /*
     totalDataCount = nodesData.length;
     var newDataCount = 0;
     var oldDataCount = 0;
@@ -72,11 +112,20 @@ module.exports.saveNodesData = function(lid,nodesData, cb) {
           if(cb) cb(errs,saveRes);
         }
       });
-    });
+    });//*/
+  }else{
+    console.log('nodesData is not Array.');
+    const saveRes = {
+      total:0,
+      new:0,
+      old:0,
+      finish:0
+    };
+    if(cb) cb(null,saveRes);
   }
 };
 
-module.exports.fillLastestNodeDataByRaw = function(lid,lastestNodesData, cb) {
+module.exports.fillLastestNodeDataByRaw = function(lid,nodesData, cb) {
   //console.info('lastestNodesData.length',lastestNodesData.length);
   Location.findOne({_id:lid},'boundaries freeNodes',function(err, location) {
     if(err){
@@ -85,21 +134,23 @@ module.exports.fillLastestNodeDataByRaw = function(lid,lastestNodesData, cb) {
       return;
     }
     //if(Array.isArray(location.boundaries)){
-    var updateCount = 0;
+    let updateCount = 0;
     location.boundaries.forEach(function(boundar){
-      //boundar.points.forEach(function(point){
-      for(var i in boundar.points){
-        var point = boundar.points[i];
+      // boundar.points.forEach(function(point){
+      for(let point of boundar.points){
+        // var point = boundar.points[i];
         //console.info('point=>',JSON.stringify(point,null,2));
-        if(point.nodeid == undefined) continue;
-        for(var j in lastestNodesData){
-          var nodeData = lastestNodesData[j];
+        // if(point.nodeid == undefined) continue;
+        if(!point.nodeid) continue;
+        for(let nodeData of nodesData){
+          // var nodeData = lastestNodesData[j];
           //matched nodeid,then try to update it
-          if(nodeData.nid == point.nodeid){
+          // if(nodeData.nid == point.nodeid){
+          if(nodeData.nid === point.nodeid){
             var ndTime = new Date(nodeData.timestampISO).getTime();
             var pTime = new Date(point.latestdatatime).getTime();
             //if(point.latestdata.length == 0 || nodeData.timestampISO>point.latestdatatime) {
-            if(point.latestdata.length == 0 || ndTime>pTime) {
+            if(point.latestdata.length === 0 || ndTime>pTime) {
               point.latestdata = nodeData.data;
               point.latestdatatime = nodeData.timestampISO;
               //console.log(point.ptag,point.nodeid,'update over.');
@@ -110,19 +161,19 @@ module.exports.fillLastestNodeDataByRaw = function(lid,lastestNodesData, cb) {
         }
       }
     });
-    
+
     //for free node,need fill latestdata
     //for(var i=0;i<location.freeNodes.length;i++){
-    for(var i in location.freeNodes){
-      var point = location.freeNodes[i];
-      if(point.nodeid == undefined) continue;
-      for(var j in lastestNodesData){
-        var nodeData = lastestNodesData[j];
-        if(nodeData.nid == point.nodeid){
+    for(let point of location.freeNodes){
+      // var point = location.freeNodes[i];
+      if(!point.nodeid) continue;
+      for(let nodeData of nodesData){
+        // var nodeData = lastestNodesData[j];
+        if(nodeData.nid === point.nodeid){
           var ndTime = new Date(nodeData.timestampISO).getTime();
           var pTime = new Date(point.latestdatatime).getTime();
           //if(point.latestdata.length == 0 || nodeData.timestampISO>point.latestdatatime) {
-          if(point.latestdata.length == 0 || ndTime>pTime) {
+          if(point.latestdata.length === 0 || ndTime>pTime) {
             point.latestdata = nodeData.data;
             point.latestdatatime = nodeData.timestampISO;
             //console.log(point.ptag,point.nodeid,'update over.');
@@ -132,8 +183,8 @@ module.exports.fillLastestNodeDataByRaw = function(lid,lastestNodesData, cb) {
         }
       }
     }
-    
-    //console.info('updateCount='+updateCount);
+
+    console.info('updateCount='+updateCount);
     if(updateCount>0) {
       //console.info('Need update location.');
       //update latestDataOn when updateCount>0
@@ -143,7 +194,7 @@ module.exports.fillLastestNodeDataByRaw = function(lid,lastestNodesData, cb) {
         if(err){
           console.error(err);
         }
-        //console.info('location save over.');
+        console.info('location save over.');
       });
     }
     //what ever update,do cb
@@ -247,7 +298,7 @@ function fillNodePid(lid,cb) {
       if(cb) cb(err,0);
       return;
     }
-    
+
     if(rows.length == 0){
       if(cb) cb(null,0);
       //console.log('No records need fill pid.');
@@ -271,14 +322,14 @@ function fillNodePid(lid,cb) {
           });
         }
       });
-      
+
       location.freeNodes.forEach(function(p){
         if(p.status == '1'){
           if(p.nodeid && p.nodeid.length>0)
             nidPidMap[p.nodeid] = p._id;
         }
       });
-      
+
       //console.log(JSON.stringify(nidPidMap,null,2));
       var fillCount = 0;
       //for(var i in rows){

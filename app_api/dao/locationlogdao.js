@@ -1,21 +1,53 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 //var NodeData = mongoose.model('NodeData');
-var locDao = require('../dao/locationdao.js');
-var LocationLog = mongoose.model('LocationLog');
+const locDao = require('../dao/locationdao.js');
+const LocationLog = mongoose.model('LocationLog');
 
 module.exports.logType = {dataSync:'dataSync',inspectNode:'inspectNode'};
 
 module.exports.recordLocLog = function(lid,logType,logContent,cb){
-  LocationLog.findOne({locid: lid,logType:logType}, 'logList',
+  // console.log(lid,logType,logContent);
+  LocationLog.update(
+    { locid: lid, logType:logType },
+    { $push : { logList: {logContent:logContent} } },
+    function(err, updatedLocationLog){
+      if(err){
+        console.log(err);
+        if(cb) cb(err,null);
+        return;
+      }
+      // console.log(JSON.stringify(updatedLocationLog,null,2));
+      if(updatedLocationLog.nModified === 1){
+        if(cb) cb(null,{logContent: logContent});
+      }else{
+        // insert new record
+        LocationLog.create({
+            locid:lid, logType:logType, logList:[{logContent:logContent}]},
+          function(err,newLocationLog){
+            if(err){
+              console.log(err);
+              if(cb) cb(err,null);
+              return;
+            }
+            if(cb) cb(null,newLocationLog.logList[0]);
+          }
+        );
+      }
+    }
+  );
+  /*
+  LocationLog.findOne(
+    {locid: lid, logType:logType},
+    'logList',
     function(err, existLocationLog) {
       if(err) {
         if(cb) cb(err,null);
         return;
       }
-      if(existLocationLog == null){
+      if(!existLocationLog){
         //insert new record
         LocationLog.create({
-          locid:lid,logType:logType,logList:[{logContent:logContent}]},
+          locid:lid, logType:logType, logList:[{logContent:logContent}]},
           function(err,newLocationLog){
             if(err){
               console.log(err);
@@ -37,7 +69,7 @@ module.exports.recordLocLog = function(lid,logType,logContent,cb){
         });
       }
     }
-  );
+  );//*/
 };
 
 module.exports.getLocLogList = function(lid,logType,limit,cb) {
