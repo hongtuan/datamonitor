@@ -109,7 +109,7 @@ function doInterpolation(data,emptyData,dataTimeRange){
       dtB = moment(dB.dataTime);
 
       dist = dtB.diff(dtA,'minutes');
-      if(dist >= 30){//add a data close to dtA;
+      if(dist > 30){//add a data close to dtA;
         iData.push({
           dataTime:dtA.add(15,'minutes'),
           dataObj:emptyData
