@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 // mongoose.set('debug', true);//打印执行语句 生产应该关闭
 var gracefulShutdown;
 //var dbURI = 'mongodb://localhost/rsdb';
-var dbURI = 'mongodb://rsdb:rsdb@localhost/rsdb';
+var dbURI = 'mongodb://rsdbOUser:kent1605@localhost/rsdb';
 
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MONGOLAB_URI;

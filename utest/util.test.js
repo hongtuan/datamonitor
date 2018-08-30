@@ -22,10 +22,19 @@ util.getNodesData(testUrl, function (err, dataList) {
     //for(data of dataList) {
     //  console.log(JSON.stringify(data, null, 2));
     //}
-    const fileName = `${gateWayMac}_${moment().format('YYYYMMDDHHmm')}.json`;
+    console.log('dataList.length=', dataList.length);
+    let nids = [];
+    for(let data of dataList){
+      if(!nids.includes(data.nid)){
+        nids.push(data.nid);
+      }
+    }
+    console.log('nids.length=', nids.length);
+    const fileName = `./testData/${gateWayMac}_${moment().format('YYYYMMDDHHmm')}.json`;
     fs.writeFileSync(path.join(__dirname, fileName),JSON.stringify(dataList, null, 2));
   }
 });
+
 //*/
 /*
 util.getUrlContent(testUrl, function (err, content) {
@@ -35,7 +44,7 @@ util.getUrlContent(testUrl, function (err, content) {
   }
   if (content && _.isObject(content)) {
     // if(typeof urlContent == 'object'){
-    const fileName = `${gateWayMac}_${moment().format('YYYYMMDDHHmm')}.json`;
+    const fileName = `./testData/raw_${gateWayMac}_${moment().format('YYYYMMDDHHmm')}.json`;
     const dataObj = JSON.parse(content.text);
     fs.writeFileSync(path.join(__dirname, fileName),JSON.stringify(dataObj, null, 2));
   }

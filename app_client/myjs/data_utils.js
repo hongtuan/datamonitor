@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const moment = require('moment');
 function iso2Locale(isoDateStr){
   return new Date(isoDateStr).toLocaleString('en-US');
 }
@@ -46,6 +47,7 @@ function parserNodeData(ndList){
 
 function parserNodes(nodeArray){
   const sdA = [];
+  const ndCache = {};
   for (let item of nodeArray) {
     // const nd = {oid:node.oid};
     for (let node of item.nodes) {
@@ -59,9 +61,23 @@ function parserNodes(nodeArray){
         nid: node.id,
         data: parserNodeData(node.sensors)
       };
-      sdA.push(sd);
+      let nd = ndCache[node.id];
+      if (nd) {
+        const dist = moment(nd.timestampISO).diff(moment(sd.timestampISO), 'minutes');
+        if (dist > 0) {
+          ndCache[node.id] = sd;
+        }
+      }else{
+        ndCache[node.id] = sd;
+      }
+      //sdA.push(sd);
     }
   }
+
+  _.each(ndCache, (value, key) => {
+    sdA.push(value);
+  });
+
   // here sort the data by timestampISO
   _.sortBy(sdA, ['timestampISO']);
   return sdA;
