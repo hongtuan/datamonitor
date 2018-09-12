@@ -38,9 +38,9 @@ interface NodeModule {
  *
  */
 
-interface JQuery {
-  easyPieChart;
-}
+//interface JQuery {
+//  easyPieChart;
+//}
 
 declare var GoogleMapsLoader:any;
 declare var L:any;
@@ -49,7 +49,9 @@ declare var Chart:any;
 declare var Chartist:any;
 declare const chroma: any;
 declare var moment:any;
+declare var _:any;
 declare var layer: any;
 declare var layerHelper:any;
-declare var du:any;
-//declare var $:any; 
+declare var dataParser:any;
+declare var jQuery:any;
+declare var $:any;

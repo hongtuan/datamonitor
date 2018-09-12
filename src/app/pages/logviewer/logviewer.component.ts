@@ -13,10 +13,9 @@ import { LogViewerService }  from '../../services/logviewer.service';
   //styleUrls: ['./xxx.component.css']
 })
 export class LogViewerComponent {
-  title = 'apiTester';
   files:any[] =[
-    {desc:'forever',fileKey:'forever'},
-    {desc:'console',fileKey:'console'},
+    {desc:'database',fileKey:'database'},
+    {desc:'system',fileKey:'system'},
     {desc:'error',fileKey:'error'},
     {desc:'NginxAccessLog',fileKey:'NginxAccessLog'},
     {desc:'NginxErrorLog',fileKey:'NginxErrorLog'},

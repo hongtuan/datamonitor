@@ -1,7 +1,7 @@
-var alDao = require('../dao/alertlogdao.js');
+const alDao = require('../dao/alertlogdao.js');
 module.exports.getAlertLog = function(req, res) {
-  var lid = req.params.lid;
-  var limitRows = req.params.lr;
+  const lid = req.params.lid;
+  const limitRows = req.params.lr;
   alDao.getAlertLog(lid,limitRows||100,function(err,rows){
     if (err) {
       console.log(err);
@@ -13,4 +13,5 @@ module.exports.getAlertLog = function(req, res) {
     });//*/
     res.status(200).json(rows);
   });
-}
+};
+

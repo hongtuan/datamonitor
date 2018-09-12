@@ -10,7 +10,9 @@ var expressSession = require('express-session');
 require('dotenv').load();
 var express = require("express");
 var path = require('path');
-var logger = require('morgan');
+//var logger = require('morgan');
+const logger = require('./app_api/config/log4js.config');
+var log4js = require('log4js');
 
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -31,14 +33,15 @@ var app = express();
 app.set('views', path.join(__dirname,'app_server', 'views'));
 app.set('view engine', 'pug');
 //app.set('view options', { layout: false });
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 app.use(expressValidator());
 
 app.use(cookieParser());
 
 //app.use(logger(':date[iso] :method :url :status :res[content-length] :response-time ms'));
-
+app.use(log4js.connectLogger(log4js.getLogger("http"), { level: 'trace' }));
 //app.use(express.static(path.join(__dirname, 'dist')));
 app.use(express.static(path.join(__dirname, 'client')));
 app.use(express.static(path.join(__dirname, 'app_client')));
@@ -179,9 +182,11 @@ app.locals.startTime = startTime;
 app.locals.serverTimezoneOffset = new Date().getTimezoneOffset();
 app.locals.dataSyncTask = {};
 app.locals.inspectNodeTask = {};
+app.locals.longTaskInfo = {};
 dst.deployDataSynTask(app);
 //var taskID1 = dst.deployDataSynTask('url1',5000);
 //app.locals.taskID1 = taskID1;
 //console.log('JWT_SECRET='+process.env.JWT_SECRET);
+logger.sysLogger.info('app startup ok.');
 exports.App = app;
 

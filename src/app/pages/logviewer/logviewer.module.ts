@@ -4,7 +4,8 @@ import { FormsModule }    from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgaModule }        from '../../theme/nga.module';
 
-import { MaterialModule, MdNativeDateModule } from '@angular/material';
+//import { MaterialModule, MdNativeDateModule } from '@angular/material';
+import { MaterialRefModule } from '../../theme/material.ref.module';
 import { LogViewerService }  from '../../services/logviewer.service';
 import { LogViewerComponent } from './logviewer.component';
 import { routing } from './logviewer.routing';
@@ -15,8 +16,9 @@ import { routing } from './logviewer.routing';
     FormsModule,
     FlexLayoutModule,
     NgaModule,
-    MaterialModule,
-    MdNativeDateModule,
+    //,
+    //MdNativeDateModule,
+    MaterialRefModule,
     routing
   ],
   declarations: [

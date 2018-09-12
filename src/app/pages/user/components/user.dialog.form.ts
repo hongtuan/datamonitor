@@ -1,5 +1,5 @@
 import { Component, Inject, Output, EventEmitter, OnInit } from '@angular/core';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { User }                         from '../../../domain/user.mdl';
 import { Location }                     from '../../../domain/location.mdl';
@@ -9,14 +9,6 @@ import { DlgMode, AuthorizationInfo }   from '../../../domain/definitions';
 import { LocationService }    from '../../../services/location.service';
 import { UserService }        from '../../../services/user.service';
 
-import { ListSelectDragula } from './list.select.dragula';
-
-var DlgConfig = {
-  disableClose:true,
-  hasBackdrop:true,
-  width:'640px',
-  height:'480px'
-};
 
 @Component({
   selector: 'user-dialog-form',
@@ -28,7 +20,7 @@ var DlgConfig = {
     }
     .dlgbody {
       width: 540px;
-      height:360px;
+      height:180px;
       border: solid 1px #e4e5e7;
       margin: 5px 5px 10px 5px;
     }
@@ -78,11 +70,11 @@ export class UserDialogForm implements OnInit {
 
   private dlgMode:DlgMode = DlgMode.Add;
 
-  constructor(@Inject(MD_DIALOG_DATA) public data: any,
-    public dialogRef: MdDialogRef<UserDialogForm>,
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any,
+    public dialogRef: MatDialogRef<UserDialogForm>,
     private locationService: LocationService,
     private userService:UserService,
-    public dialog: MdDialog) {
+    public dialog: MatDialog) {
 
     this.user = new User({name:'',email:''});
     for(let ai of AuthorizationInfo){
@@ -143,29 +135,6 @@ export class UserDialogForm implements OnInit {
     return this.dlgMode === DlgMode.Edit;
   }
 
-  openListSelectDlg(dlgSize:string):void {
-    var tmpA = dlgSize.split(',');
-    var dlgSizeConf = {width:tmpA[0]+'px',height:tmpA[1]+'px'};
-    var dataPkg = {selectedModel:[...this.authedLocs],unSelectedModel:[...this.unAuthedLocs]};
-    let dialogRef = this.dialog.open(
-      ListSelectDragula,$.extend({}, DlgConfig,dlgSizeConf,{data:dataPkg}));
-
-    dialogRef.afterClosed().subscribe(result => {
-      if(result != "" && Array.isArray(result)){
-        var authedLids = [];
-        result.forEach(function(item){
-          //console.log(item.name,item.value);
-          authedLids.push(item.value);
-        });
-        this.user.loclist = authedLids;
-        this.updateAuthedLocInfo();
-      }
-    });
-  }
-
-  closeDlg():void {
-    //this.dialogRef.close(this.location);
-  }
 
   onSubmit():void {
     //console.log('onSubmit here.',JSON.stringify(this.user,null,2));

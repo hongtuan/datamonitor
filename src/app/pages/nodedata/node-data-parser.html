@@ -1,32 +1,54 @@
 <div class="widgets">
   <div class="row">
     <div class="col-md-12">
-      <span>Parse<b>[{{name}}]</b>'s RAW data</span>
-      <input type="text" style="width:116px" [(ngModel)] = "datasrc" />
-      <input type="text" style="width:36px" [(ngModel)] = "snapcount" />
-      <button class="btn btn-primary" (click)="getRawData()">Refresh</button>
-      <button class="btn btn-primary" (click)="getBack()">Back</button>
+      <span>Parse<b>[{{name}}]</b>'s data</span>
+      gateWay:<input type="text" style="width:144px" name="datasrc" [(ngModel)] = "datasrc" />
+      snapshotsCount:<input type="text" style="width:36px" name="snapcount" [(ngModel)] = "snapcount" />
+      timeGap:<input type="text" style="width:40px" name="timeGap" [(ngModel)] = "timeGap" />minutes
+      <button class="btn btn-primary" name="getBtn" (click)="getRawData()">Refresh</button>
+      <button class="btn btn-primary" name="backBtn" (click)="getBack()">Back</button>
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6">
-      <ba-card title="AnalysisResult" baCardClass="with-scroll">
-        <textarea class="full-width" rows="14"  id="analysisResult" name="analysisResult">{{analysisResult}}</textarea>
-      </ba-card>
-      <ba-card title="No Data Nodes" baCardClass="with-scroll">
-        <textarea class="full-width" rows="8" id="noDataInfo" name="noDataInfo">{{noDataInfo}}</textarea>
-      </ba-card>
-    </div>
-    <div class="col-md-6">
-      <ba-card title="Raw Data:{{rawDataDesc}}" baCardClass="with-scroll">
-        <textarea class="full-width" rows="5" id="rawdata" name="rawdata">{{rawDataStr}}</textarea>
-      </ba-card>
-      <ba-card title="Parserd Data:{{parserDataDesc}}" baCardClass="with-scroll">
-        <textarea class="full-width" rows="5" id="parserdata" name="parserdata">{{parserData}}</textarea>
-      </ba-card>
-      <ba-card title="SimplifiedNodesData" baCardClass="with-scroll">
-        <textarea class="full-width" rows="5" id="simplifiedNodesData" name="simplifiedNodesData">{{simplifiedNodesData}}</textarea>
-      </ba-card>
-    </div>
+    <mat-accordion class="col-md-12">
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>NewNodeData:{{analysisResult.newNodeData.desc}}</mat-panel-title>
+          <mat-panel-description>Display the latest data on each node.</mat-panel-description>
+        </mat-expansion-panel-header>
+        <textarea class="full-width" rows="15">{{analysisResult.newNodeData.str}}</textarea>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <mat-accordion class="col-md-12">
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>PastNodeData:{{analysisResult.pastNodeData.desc}}</mat-panel-title>
+          <mat-panel-description>Display the past data of all node.</mat-panel-description>
+        </mat-expansion-panel-header>
+        orderBy:
+        <input type="radio" name="pastOrderBy" value="time" checked (click)="updatePastDataOrder('time')">Time
+        <input type="radio" name="pastOrderBy" value="nid" (click)="updatePastDataOrder('nid')">Mac
+        <input class="btn btn-primary" type="button" value="Save" (click)="savePastNodeData()">
+        <textarea class="full-width" rows="25">{{analysisResult.pastNodeData.str}}</textarea>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <mat-accordion class="col-md-12">
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>AnalysisResult</mat-panel-title>
+          <mat-panel-description>Display the AnalysisResult here.</mat-panel-description>
+        </mat-expansion-panel-header>
+        <textarea class="full-width" rows="15">{{analysisResultDesc}}</textarea>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <mat-accordion class="col-md-12">
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Raw Data:{{analysisResult.rawData.desc}}</mat-panel-title>
+          <mat-panel-description>Display the RAW data here.</mat-panel-description>
+        </mat-expansion-panel-header>
+        <textarea class="full-width" rows="15">{{analysisResult.rawData.str}}</textarea>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>

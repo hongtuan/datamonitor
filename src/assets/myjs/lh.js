@@ -1,5 +1,5 @@
 !function(){
-  var layerHelper = {};
+  const layerHelper = {};
   layerHelper.confirm = function(info,title,cb){
     layer.confirm(info,
       {icon: 3, title:title||'Confirm',btn: ['Yes','No']},function(index) {
@@ -26,10 +26,10 @@
         }
       }
     });
-  }
+  };
 
   layerHelper.deployLocation = function(lid,locName) {
-    var index = layer.open({
+    const index = layer.open({
       type: 2,
       title: `Deploy Nodes In ${locName}`,
       maxmin: true,
@@ -39,16 +39,16 @@
       area: ['800px', '600px'],
       content: '/locations/' + lid + '/editbound',
       success: function(layero, index) {
-        var iframeWin = window[layero.find('iframe')[0]['name']];
+        const iframeWin = window[layero.find('iframe')[0]['name']];
         iframeWin.crtWinIndex = index;
         iframeWin.crtWin = iframeWin;
       }
     });
     layer.full(index);
-  }
+  };
 
   layerHelper.monitoringLocation = function(lid,locName) {
-    var index = layer.open({
+    const index = layer.open({
       type: 2,
       title: `Monitoring ${locName}`,
       maxmin: true,
@@ -64,14 +64,29 @@
       }
     });
     layer.full(index);
-  }
+  };
 
   layerHelper.downloadFile = function(fileContentUrl){
     $("<iframe/>").attr({
       src: fileContentUrl,
       style: "visibility:hidden;display:none"
     }).appendTo('body');
-  }
+  };
+
+  layerHelper.showInfo = function (info,title) {
+    layer.open({
+      type: 1,
+      title:title||'Information',
+      id: '_info_',
+      content: '<div style="padding:20px 20px;font-size:1.5em;">'+ info +'</div>',
+      btn: 'OK',
+      btnAlign: 'c', //center
+      shade: 0, //no shade
+      yes: function(){
+        layer.closeAll();
+      }
+    });
+  };
 
   this.layerHelper = layerHelper;
- }();
+}();

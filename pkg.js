@@ -50,7 +50,7 @@ function createSrcPkg(cb){
   //添加特定的文件和目录
   archive.file('.env',{name:'.env'});
   archive.file('expserver.js',{name:'expserver.js'});
-  archive.file('package4server.json',{name:'package.json'});
+  archive.file('package.json',{name:'package.json'});
 
   archive.file('utils/util.js',{name:'utils/util.js'});
   archive.file('utils/mailsender.js',{name:'utils/mailsender.js'});

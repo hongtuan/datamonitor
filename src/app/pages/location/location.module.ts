@@ -1,10 +1,10 @@
 import { NgModule }      from '@angular/core';
 import { CommonModule }  from '@angular/common';
 import { FormsModule }    from '@angular/forms';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule,NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MaterialModule, MdNativeDateModule } from '@angular/material';
-
+//import { MaterialModule, MdNativeDateModule } from '@angular/material';
+import { MaterialRefModule } from '../../theme/material.ref.module';
 import { LocationDialogForm } from './components/location.dialog.form';
 
 import { LocationComponent } from './location.component';
@@ -16,8 +16,9 @@ import { routing } from './location.routing';
     FormsModule,
     NgbDropdownModule,
     FlexLayoutModule,
-    MaterialModule,
-    MdNativeDateModule,    
+    //MaterialModule,
+    //MdNativeDateModule,
+    MaterialRefModule,
     routing
   ],
   declarations: [
@@ -27,6 +28,6 @@ import { routing } from './location.routing';
   entryComponents: [
     LocationDialogForm,
   ],
-  providers: []
+  providers: [NgbModal]
 })
 export class LocationModule {}

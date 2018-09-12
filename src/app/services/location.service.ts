@@ -38,7 +38,7 @@ export class LocationService {
 
   private apiUrl = '/api/locations/';  // URL to web api
   //private apiUrl = 'http://127.0.0.1:3000/api/locations/';  // URL to web api
-  private getLocUrl = '/api/userloclist/';  // URL to web api
+  //private getLocUrl = '/api/userloclist/';  // URL to web api
   //private getLocUrl = 'http://127.0.0.1:3000/api/userloclist/';  // URL to web api
 
   constructor(private http: Http) { }
@@ -48,14 +48,14 @@ export class LocationService {
     //  .map(this.extractData).catch(this.handleError);
     //console.log('in LocationService:'+
     //      JSON.stringify(userInfo,null,2));
-    return this.http.post(this.getLocUrl,userInfo,this.jsonRequestOptions)
+    return this.http.post(`${this.apiUrl}ull`,userInfo,this.jsonRequestOptions)
       .map(this.extractData).catch(this.handleError);
   }
 
   addLocation(formData:any,userInfo:any):Observable<Location> {
     //console.log(JSON.stringify(formData));
     formData['userInfo'] = userInfo;
-    return this.http.post(this.apiUrl,formData, this.jsonRequestOptions)
+    return this.http.post(this.apiUrl+'create',formData, this.jsonRequestOptions)
       .map(this.extractData).catch(this.handleError);
   }
 

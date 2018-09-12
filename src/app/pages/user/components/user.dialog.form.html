@@ -1,59 +1,50 @@
-<div md-dialog-title fxLayout="row" fxLayoutAlign="space-between center" class="dlgheader">
+<div mat-dialog-title fxLayout="row" fxLayoutAlign="space-between center" class="dlgheader">
   <span>{{dlgTitle}}</span>
-  <button md-dialog-close md-icon-button tabindex="-1"><md-icon>close</md-icon></button>
+  <button mat-dialog-close mat-icon-button tabindex="-1"><mat-icon>close</mat-icon></button>
 </div>
 <form #locForm="ngForm">
-  <div md-dialog-content class="dlgbody">
+  <div mat-dialog-content class="dlgbody">
     <table class="full-width" cellspacing="0">
       <tr>
         <td>
-          <md-input-container class="full-width">
-            <input mdInput placeholder="EMail" name="emails" [(ngModel)]="user.email" tabindex="1" required/>
-          </md-input-container>
+          <mat-form-field class="full-width">
+            <input matInput placeholder="EMail" name="emails" [(ngModel)]="user.email" tabindex="1" required/>
+          </mat-form-field>
         </td>
         <td>
-          <md-input-container class="full-width">
-            <input mdInput placeholder="Name" name="name" [(ngModel)]="user.name" tabindex="2" required />
-          </md-input-container>
+          <mat-form-field class="full-width">
+            <input matInput placeholder="Name" name="name" [(ngModel)]="user.name" tabindex="2" required />
+          </mat-form-field>
         </td>
       </tr>
       <tr>
         <td>
-          <md-input-container class="full-width">
-            <input mdInput placeholder="Password" name="password" [(ngModel)]="user.password" tabindex="3" required/>
-          </md-input-container>
+          <mat-form-field class="full-width">
+            <input matInput placeholder="Password" name="password" [(ngModel)]="user.password" tabindex="3" required/>
+          </mat-form-field>
         </td>
         <td>
-          <md-input-container>
-            <input mdInput [mdDatepicker]="picker" placeholder="ExpiredOn" name="expiredOn" [(ngModel)]="user.expiredOn" required>
-            <button mdSuffix [mdDatepickerToggle]="picker"></button>
-          </md-input-container>
-          <md-datepicker #picker></md-datepicker>
+          <mat-form-field>
+            <input matInput [matDatepicker]="picker1" placeholder="expire date" name="expiredOn" [(ngModel)]="user.expiredOn" required>
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
         </td>
       </tr>
       <tr>
         <td colspan="2">
           <span class="example-h2">Role:</span>
-          <md-radio-group class="example-radio-group" name="role" [(ngModel)]="user.role" required>
-            <md-radio-button class="example-radio-button" *ngFor="let role of roles"
-              [value]="role.value" [disabled]="isDisabled()">{{role.display}}</md-radio-button>
-          </md-radio-group>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <div class="example-h2">Auth-Location</div>
-          <div fxLayout="column" class="ml20" (dblclick)="openListSelectDlg('600,420')">
-            <div *ngIf="authedLocs.length==0">DoubleClick to Select Locations.</div>
-            <div *ngFor="let al of authedLocs">{{al.name}}</div>
-          </div>
+          <mat-radio-group class="example-radio-group" name="role" [(ngModel)]="user.role" required>
+            <mat-radio-button class="example-radio-button" *ngFor="let role of roles"
+              [value]="role.value" [disabled]="isDisabled()">{{role.display}}</mat-radio-button>
+          </mat-radio-group>
         </td>
       </tr>
     </table>
   </div>
-  <div md-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="20px" class="dlgfooter">
-    <button type="button" md-raised-button color="primary"
+  <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="20px" class="dlgfooter">
+    <button type="button" mat-raised-button color="primary"
       tabindex="7"  (click)="onSubmit()" [disabled]="!locForm.valid">Save</button>
-    <button md-button md-dialog-close  tabindex="8">Cancel</button>
+    <button mat-button mat-dialog-close  tabindex="8">Cancel</button>
   </div>
 </form>

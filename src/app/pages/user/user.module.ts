@@ -1,14 +1,12 @@
 import { NgModule }      from '@angular/core';
 import { CommonModule }  from '@angular/common';
 import { FormsModule }    from '@angular/forms';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MaterialModule, MdNativeDateModule } from '@angular/material';
-
-import { DragulaModule } from 'ng2-dragula';
-
+import { MaterialRefModule } from '../../theme/material.ref.module';
+import { AngularDualListBoxModule } from 'angular-dual-listbox';
 import { UserDialogForm } from './components/user.dialog.form';
-import { ListSelectDragula } from './components/list.select.dragula';
+import { AssignLocationComponent } from './components/assign.location';
 
 import { UserComponent }   from './user.component';
 import { routing } from './user.routing';
@@ -19,20 +17,19 @@ import { routing } from './user.routing';
     FormsModule,
     NgbDropdownModule,
     FlexLayoutModule,
-    MaterialModule,
-    MdNativeDateModule,
-    DragulaModule,
+    MaterialRefModule,
+    AngularDualListBoxModule,
     routing
   ],
   declarations: [
     UserComponent,
-    UserDialogForm,    
-    ListSelectDragula
+    UserDialogForm,
+    AssignLocationComponent
   ],
   entryComponents: [
     UserDialogForm,
-    ListSelectDragula
+    AssignLocationComponent
   ],
-  providers: []
+  providers: [NgbModal]
 })
 export class UserModule {}

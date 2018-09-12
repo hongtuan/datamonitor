@@ -22,6 +22,27 @@ module.exports.appendLoc2User = function(lid,uid, cb) {
   });
 };
 
+module.exports.updateLocList = function(uid,loclist, cb) {
+  //console.log(lid,uid);
+  User.findById(uid).select('loclist').exec(function(err,user){
+    if(err){
+      console.error(err);
+      if(cb) cb(err,null);
+      return;
+    }
+    user.loclist = loclist;
+    user.save(function(err,updatedUser){
+      if(err){
+        console.error(err);
+        if(cb) cb(err,null);
+        return;
+      }
+      //console.log('cool!');
+      if(cb) cb(null,updatedUser);
+    });
+  });
+};
+
 module.exports.getUserLocList = function(uid, cb) {
   //console.log(lid,uid);
   User.findById(uid).select('loclist').exec(function(err,user){

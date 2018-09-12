@@ -1,6 +1,6 @@
 import { Component, ElementRef, Inject, OnInit,AfterViewInit } from '@angular/core';
 import * as GoogleMapsLoader from 'google-maps';
-import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { Location }             from '../../../domain/location.mdl';
 import { DlgMode }              from '../../../domain/definitions';
@@ -41,9 +41,9 @@ export class LocationDialogForm implements OnInit,AfterViewInit {
 
   private dlgMode:DlgMode = DlgMode.Add;
 
-  constructor(@Inject(MD_DIALOG_DATA) public data: any,
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any,
               elementRef: ElementRef,
-    public dialogRef: MdDialogRef<LocationDialogForm>,
+    public dialogRef: MatDialogRef<LocationDialogForm>,
     private locationService: LocationService,
     private authService:AuthService) {
     this.elementRef = elementRef;
@@ -54,7 +54,7 @@ export class LocationDialogForm implements OnInit,AfterViewInit {
   }
 
   ngOnInit(): void {
-    $(this.elementRef.nativeElement).parent().draggable({containment:'#draggable-parent'});
+    //$(this.elementRef.nativeElement).parent().draggable({containment:'#draggable-parent'});
     if(this.data){
       //console.log(JSON.stringify(this.data,null,2));
       this.dlgMode = DlgMode.Edit;

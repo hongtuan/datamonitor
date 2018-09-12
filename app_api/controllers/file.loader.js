@@ -9,12 +9,13 @@ function bytes2M(b){
   return m.toFixed(0);
 }
 var fileConfig = {
-  forever:'../../../.forever/forever.log',
+  database:'../../logs/database/database.log',
+  system:'../../logs/system/system.log',
   console:'../../out.log',
   error:'../../err.log',
   NginxAccessLog:'../../nginx/access.log',
   NginxErrorLog:'../../nginx/error.log',
-}
+};
 
 module.exports.loadFile = function(req, res) {
   var fn = req.query.fn;

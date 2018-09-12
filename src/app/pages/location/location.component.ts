@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router,ActivatedRoute }   from '@angular/router';
-import { MdDialog } from '@angular/material';
+import { MatDialog } from '@angular/material';
 
 import { Location }               from '../../domain/location.mdl';
 import { LocationDialogForm } from './components/location.dialog.form';
@@ -45,7 +45,7 @@ export class LocationComponent implements OnInit {
   constructor(private route: ActivatedRoute,private router: Router,
     private locationService: LocationService,
     private authService:AuthService,
-    public dialog: MdDialog) {
+    public dialog: MatDialog) {
     //console.log('LocationComponent constructor calle.');
     //console.log(moment().format('YYYY-MM-DD HH:mm:ss'),'called.');
   }

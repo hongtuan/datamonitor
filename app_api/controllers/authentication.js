@@ -1,6 +1,7 @@
 var passport = require('passport');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
+const userDao = require('../dao/userdao.js');
 //var util = require('../../utils/util');
 var sendJSONresponse = function(res, status, content) {
   res.status(status);
@@ -75,6 +76,25 @@ module.exports.updateUser = function(req, res) {
       //console.log('after update:'+JSON.stringify(user));
       res.status(200).json(user);
     });
+  });
+};
+
+module.exports.updateLocList = function(req, res) {
+  if(!req.body.loclist) {
+    sendJSONresponse(res, 400, {
+      "message": "All fields required"
+    });
+    return;
+  }
+  var uid = req.params.uid;
+  const loclist = req.body.loclist;
+  userDao.updateLocList(uid,loclist,(err,result)=>{
+    if(err){
+      //console.log(err);
+      res.status(500).json('uid['+uid+'] not found.'+err);
+      return;
+    }
+    res.status(200).json({message:'ok'});
   });
 };
 

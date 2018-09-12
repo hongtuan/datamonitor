@@ -1,7 +1,19 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
+const async = require('async');
+const _ = require('lodash');
+const cdDao = require('./common.document.dao');
 const NodeData = mongoose.model('NodeData');
 const Location = mongoose.model('Location');
-const async = require('async');
+const sysLogger = require('log4js').getLogger('system');
+const dbLogger = require('log4js').getLogger('database');
+const date_fmt = 'YYYY-MM-DD HH:mm:ss';
+function fmt(m){
+  return m.format(date_fmt);
+}
+function fmtStr(timeStr){
+  return moment(timeStr).format(date_fmt);
+}
 
 function saveOneNodeData(lid, nd, cb) {
   //just save not exist nodedata.
@@ -10,7 +22,7 @@ function saveOneNodeData(lid, nd, cb) {
     function(err, existNodeData) {
       // console.log('existNodeData=', existNodeData);
       if (err) {
-        console.log(err);
+        dbLogger.error(err);
         if(cb) cb(err,0);
         return;
       }
@@ -25,7 +37,7 @@ function saveOneNodeData(lid, nd, cb) {
           collectedOn: nd.timestampISO
         }, function(err, createdNodeData) {
           if (err) {
-            console.log(err);
+            dbLogger.error(err);
             if(cb) cb(err,0);
             return;
           }
@@ -47,46 +59,43 @@ module.exports.saveNodesData = function(lid,nodesData, cb) {
   //console.log(req.body);
   let totalDataCount = 0;
   if(Array.isArray(nodesData)) {
-    let index = 0;
-    let errs = [];
+    //let errs = [];
     totalDataCount = nodesData.length;
     let newDataCount = 0;
     let oldDataCount = 0;
     let finishCount = 0;
-    async.until(
-      function() { return index >= nodesData.length; },
-      function(callback) {
-        const nd = nodesData[index];
-        // console.log(`query group ${index+1}...`);
-        index++;
-        saveOneNodeData(lid,nd,function(err,savedCount){
-          if(err) errs.push(err);
-          newDataCount += savedCount;
-          if(err === null && savedCount === 0) oldDataCount += 1;
-          finishCount++;
-          callback(null, index);
-        });
-      },
-      function afterRun(err, n) {
-        // 5 seconds have passed, n = 5
-        if (err) {
-          console.log(err);
+    async.forEachOfSeries(nodesData,(nd,index,callback)=>{
+      saveOneNodeData(lid,nd,function(err,savedCount){
+        if(err) {
+          dbLogger.error(err);
+          callback(err);
+          return;
         }
-        console.log('n=',n, 'totalDataCoun=', totalDataCount,'finishCount=' ,finishCount);
-        const saveRes = {
-          total:totalDataCount,
-          new:newDataCount,
-          old:oldDataCount,
-          finish:finishCount
-        };
-        //fill pid here:
-        fillNodePid(lid,null);
-        //call back here:
-        if(cb) cb(errs,saveRes);
+        newDataCount += savedCount;
+        if(err === null && savedCount === 0) oldDataCount += 1;
+        finishCount++;
+        callback();
+      });
+    },function (err) {
+      if (err) {
+        dbLogger.error(err);
+        if(cb) cb(err,null);
+        return;
       }
-    );
+      dbLogger.info('totalDataCount=', totalDataCount,'finishCount=' ,finishCount);
+      const saveRes = {
+        total:totalDataCount,
+        new:newDataCount,
+        old:oldDataCount,
+        finish:finishCount
+      };
+      //fill pid here:
+      fillNodePid(lid,null);
+      //call back here:
+      if(cb) cb(null,saveRes);
+    });
   }else{
-    console.log('nodesData is not Array.');
+    dbLogger.info('nodesData is not Array.');
     const saveRes = {
       total:0,
       new:0,
@@ -181,7 +190,7 @@ module.exports.getNodeData = function(lid,nid,timeRange, cb) {
   NodeData.find(filter).limit(18000).sort('collectedOn').
     select('data collectedOn').exec(function (err, rows) {
       if (err) {
-        console.log(err);
+        dbLogger.error(err);
         //res.status(500).json(err);
         if(cb) cb(err,null);
         return;
@@ -213,10 +222,12 @@ module.exports.getNodesData = function(lid,timeRange, cb) {
     };
   }
   //console.log('timeRange in DAO:',JSON.stringify(filter,null,2));
-  NodeData.find(filter).limit(18000).sort('pid collectedOn').
-    select('pid data collectedOn').exec(function (err, rows) {
+  NodeData.find(filter).limit(18000)
+    .select('pid data collectedOn')
+    .sort('pid collectedOn')
+    .exec(function (err, rows) {
       if (err) {
-        console.log(err);
+        dbLogger.error(err);
         //res.status(500).json(err);
         if(cb) cb(err,null);
         return;
@@ -247,7 +258,7 @@ function fillNodePid(lid,cb) {
   //get records which pid is empty.
   NodeData.find({locid:lid,pid:null}).select('nodeid').exec(function (err, rows) {
     if (err) {
-      console.log(err);
+      dbLogger.error(err);
       //res.status(500).json(err);
       if(cb) cb(err,0);
       return;
@@ -261,7 +272,7 @@ function fillNodePid(lid,cb) {
     //console.log('Find '+rows.length+' rows need fill pid.');
     Location.findById(lid).select('boundaries freeNodes').exec(function(err, location) {
       if (err) {
-        console.log(err);
+        dbLogger.error(err);
         if(cb) cb(err,0);
         return;
       }
@@ -309,4 +320,202 @@ function fillNodePid(lid,cb) {
 //for test this method.
 module.exports.fillNodePid = function(lid,cb) {
   fillNodePid(lid,cb);
+};
+
+function querySavedNodeData(lid,nid,timeRange, cb){
+  const queryOption = {
+    filter:{
+      locid:lid,
+      nodeid:nid,
+      collectedOn:{
+        $gte:timeRange.from,
+        $lt:timeRange.to
+      }
+    },
+    select:'_id',
+  };
+  cdDao.getDocuments(NodeData, queryOption, (err,result)=>{
+    if(err){
+      if(cb) cb(err,null);
+      return;
+    }
+    if(cb) cb(null,{sdc:result.rows.length});//saved data count
+  });
+}
+
+function insertNodeData(lid,nid,ndList,cb){
+  const dataArray = [];
+  for(let nd of ndList){
+    dataArray.push({
+      locid:lid,
+      nodeid: nd.nid,
+      data: nd.data,
+      collectedOn: nd.timestampISO
+    });
+  }
+  cdDao.createDocuments(NodeData,dataArray,(err, docs)=>{
+    if(err){
+      if(cb) cb(err,null);
+      return;
+    }
+    //直接返回插入记录的行数
+    if(cb) cb(null, docs.length);
+  });
+}
+
+function replaceNodeData(lid,nid,oldDataCount,timeRange,ndList,cb){
+  const queryOption = {
+    deleteCount : oldDataCount,
+    filter:{
+      locid:lid,
+      nodeid: nid,
+      collectedOn:{
+        $gte:timeRange.from,
+        $lt:timeRange.to
+      }
+    }
+  };
+  cdDao.deleteDocuments(NodeData,queryOption,(err,deleteCount)=>{
+    if(err){
+      if(cb) cb({message:'deleteOldData failed.'},null);
+      return;
+    }
+    if(deleteCount>0){
+      const dataArray = [];
+      for(let nd of ndList){
+        dataArray.push({
+          locid:lid,
+          nodeid: nd.nid,
+          data: nd.data,
+          collectedOn: nd.timestampISO
+        });
+      }
+      cdDao.createDocuments(NodeData,dataArray,(err, docs)=>{
+        if(err){
+          if(cb) cb({message:'insert new data failed.'},null);
+          return;
+        }
+        //返回追加的记录数，即删除后追加的行数，appendCount
+        if(cb) cb(null, docs.length - deleteCount);
+      });
+    }
+  });
+}
+
+function savePastNodeData(lid,pastNodeData,cb,pcb){
+  let totalNodeCount = _.keys(pastNodeData).length;
+  let finishedNodeCount = 0;
+  let totalDataCount = 0;
+  let totalOldCount = 0;
+  let totalRemoveCount = 0;
+  let totalAppendCount = 0;
+  const adst = moment();
+  async.forEachOfSeries(pastNodeData,(ndList,nid,callback)=>{
+    const sortedList = _.sortBy(ndList,['timestampISO']);
+    const dataBegin = moment(sortedList[0].timestampISO);
+    const dataEnd = moment(sortedList[sortedList.length - 1].timestampISO);
+    //queryOption.filter.nodeid = nid;
+    const groupedData = [];
+    const timeGap = 24;
+    for(let from = dataBegin.clone().hour(0).minute(0).second(0);
+        from.isBefore(dataEnd);from.add(timeGap,'hours')){
+      let to = from.clone().add(timeGap,'hours');
+      const fd = _.filter(sortedList,(item)=>{
+        const t = moment(item.timestampISO);
+        //rang:[...)
+        return t.diff(from,'seconds')>=0 && t.diff(to,'seconds') < 0;
+      });
+      if(fd && fd.length > 0){
+        //console.log(`~~${fmt(from)}~${fmt(to)} has data:${fd.length}`);
+        groupedData.push({
+          timeRange:{from:from.toISOString(),to:to.toISOString()},
+          data:fd
+        });
+      }else{
+        //console.log(`${fmt(from)}~${fmt(to)} no data`);
+      }
+    }
+    // group data by day.
+    sysLogger.info(`${nid} in[${fmt(dataBegin)} ~ ${fmt(dataEnd)}] sent data count: ${sortedList.length},groupBy ${timeGap} hours to ${groupedData.length}.`);
+    let nodeDataCount = sortedList.length;
+    let nodeAppendCount = 0;
+    let nodeRemoveCount = 0;
+    let nodeSavedCount = 0;
+    async.forEachOfSeries(groupedData,(item,index,callback)=>{
+      querySavedNodeData(lid,nid,item.timeRange,(err,result)=>{
+        sysLogger.info(`${fmtStr(item.timeRange.from)}~${fmtStr(item.timeRange.to)} has data:${item.data.length}`);
+        if(err){
+          callback(err);
+          return;
+        }
+        let savedDataCount = result.sdc;
+        nodeSavedCount += savedDataCount;
+        dbLogger.info('savedDataCount=',savedDataCount);
+        if(savedDataCount == 0){
+          dbLogger.info('insert data here...');
+          insertNodeData(lid,nid,item.data,(err,inertCount)=>{
+            if(err){
+              callback(err);
+              return;
+            }
+            nodeAppendCount += inertCount;
+            callback();
+          });
+        }else{
+          if(savedDataCount < item.data.length){
+            dbLogger.info('remove old data first,then insert new data.');
+            replaceNodeData(lid,nid,savedDataCount,item.timeRange,item.data,(err,appendCount)=>{
+              if(err){
+                callback(err);
+                return;
+              }
+              nodeRemoveCount += savedDataCount;
+              nodeAppendCount += appendCount;
+              callback();
+            });
+          }else{
+            dbLogger.info('do not need insert data.');
+            callback();
+          }
+        }
+      });
+    },function(err) {
+      sysLogger.info(`nodeDataCount=${nodeDataCount},nodeAppendCount=${nodeAppendCount},nodeSavedCount=${nodeSavedCount},nodeRemoveCount=${nodeRemoveCount}`);
+      totalDataCount += nodeDataCount;
+      totalOldCount += nodeSavedCount;
+      totalRemoveCount += nodeRemoveCount;
+      totalAppendCount += nodeAppendCount;
+      finishedNodeCount++;
+      if(pcb){
+        pcb({
+          finished:finishedNodeCount,
+          totalNode:totalNodeCount
+        });
+      }
+      if(err){
+        sysLogger.error(err);
+        callback(err);
+        return
+      }
+      callback();
+    });
+  },function(err){
+    let useTime = moment().diff(adst,'seconds');
+    sysLogger.info(`save data use ${useTime} seconds`);
+    sysLogger.info(`totalDataCount=${totalDataCount},totalOldCount=${totalOldCount},totalAppendCount=${totalAppendCount},totalRemoveCount=${totalRemoveCount}`);
+    if(err){
+      sysLogger.error(err);
+    }
+    if(cb) cb(null,{
+      useTime:useTime,
+      totalDataCount:totalDataCount,
+      totalOldCount:totalOldCount,
+      totalAppendCount:totalAppendCount,
+      totalRemoveCount:totalRemoveCount
+    });
+  });
+}
+
+module.exports.savePastNodeData = function(lid,pastNodeData,cb,pcb) {
+  savePastNodeData(lid,pastNodeData,cb,pcb);
 };

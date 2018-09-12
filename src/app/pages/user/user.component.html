@@ -23,11 +23,10 @@
           <td>{{user.expiredOn | date:'yMdjm'}}</td>
           <td>
             <button class="btn btn-primary" (click)="deleteUser(user._id)">Delete</button>
+            <button class="btn btn-primary" (click)="assignLocation(user)">AssignLocation</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
-
-

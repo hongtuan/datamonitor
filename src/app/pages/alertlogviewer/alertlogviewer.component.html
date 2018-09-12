@@ -6,15 +6,15 @@
     </div>
   </div>
   <div class="row">
-    <md-accordion class="col-md-12" *ngFor="let alertLog of alertLogList">
-      <md-expansion-panel [expanded]="alertLog.dataType==showType">
-        <md-expansion-panel-header>
-          <md-panel-title>{{alertLog.dataType}}({{alertLog.dataDesc}}),totalAlertTimes:{{alertLog.atimes}}</md-panel-title>
-          <md-panel-description>Not in Range[{{alertLog.dataRange.min}}~{{alertLog.dataRange.max}}] Top {{min(alertLog.atimes,topLimit)}} Alerts.</md-panel-description>
-        </md-expansion-panel-header>
+    <mat-accordion class="col-md-12" *ngFor="let alertLog of alertLogList">
+      <mat-expansion-panel [expanded]="alertLog.dataType==showType">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{alertLog.dataType}}({{alertLog.dataDesc}}),totalAlertTimes:{{alertLog.atimes}}</mat-panel-title>
+          <mat-panel-description>Not in Range[{{alertLog.dataRange.min}}~{{alertLog.dataRange.max}}] Top {{min(alertLog.atimes,topLimit)}} Alerts.</mat-panel-description>
+        </mat-expansion-panel-header>
         <ng2-smart-table [settings]="settings" [source]="alertLog.alertInfos" (deleteConfirm)="onDeleteConfirm($event)">
         </ng2-smart-table>
-      </md-expansion-panel>
-    </md-accordion>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>

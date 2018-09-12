@@ -1,45 +1,45 @@
 <form #locForm="ngForm" (ngSubmit)="onSubmit()">
   <div fxLayout="column" fxLayoutAlign="space-between stretch" fxLayoutGap="0px" id="dlg-frame">
-    <div md-dialog-title fxLayout="row" fxLayoutAlign="space-between" class="dlgheader">
+    <div mat-dialog-title fxLayout="row" fxLayoutAlign="space-between" class="dlgheader">
       <span>{{dlgTitle}}</span>
-      <button md-dialog-close md-icon-button tabindex="-1">
-        <md-icon class="mdci">close</md-icon>
+      <button mat-dialog-close mat-icon-button tabindex="-1">
+        <mat-icon class="mdci">close</mat-icon>
       </button>
     </div>
-    <div md-dialog-content class="dlgbody">
+    <div mat-dialog-content class="dlgbody">
       <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="10px">
-        <md-input-container class="full-width">
-          <input mdInput placeholder="Name" name="name" [(ngModel)]="location.name" tabindex="1" required/>
-        </md-input-container>
-        <md-input-container class="full-width">
-          <input mdInput placeholder="ContactInfo" name="contactInfo" [(ngModel)]="location.contactInfo" tabindex="2"/>
-        </md-input-container>
-        <md-input-container class="full-width">
-          <input mdInput placeholder="EMails" name="emails" [(ngModel)]="location.emails" tabindex="3"/>
-        </md-input-container>
+        <mat-form-field class="full-width">
+          <input matInput placeholder="Name" name="name" [(ngModel)]="location.name" tabindex="1" required/>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input matInput placeholder="ContactInfo" name="contactInfo" [(ngModel)]="location.contactInfo" tabindex="2"/>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input matInput placeholder="EMails" name="emails" [(ngModel)]="location.emails" tabindex="3"/>
+        </mat-form-field>
       </div>
       <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-        <md-input-container class="shortipt">
-          <input mdInput placeholder="Address" id="address" name="address" [(ngModel)]="location.address" tabindex="4"/>
-        </md-input-container>
-        <md-radio-group class="radioipt" name="searchType" [(ngModel)]="searchType">
-          <md-radio-button value="establishment" (click)="switchSearchType('establishment')">Establishments</md-radio-button>
-          <md-radio-button value="address" (click)="switchSearchType('address')">Addresses</md-radio-button>
-        </md-radio-group>
+        <mat-form-field class="shortipt">
+          <input matInput placeholder="Address" id="address" name="address" [(ngModel)]="location.address" tabindex="4"/>
+        </mat-form-field>
+        <mat-radio-group class="radioipt" name="searchType" [(ngModel)]="searchType">
+          <mat-radio-button value="establishment" (click)="switchSearchType('establishment')">Establishments</mat-radio-button>
+          <mat-radio-button value="address" (click)="switchSearchType('address')">Addresses</mat-radio-button>
+        </mat-radio-group>
       </div>
       <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="10px">
-        <md-input-container>
-          <input mdInput placeholder="DataSrc" name="datasrc" [(ngModel)]="location.datasrc" tabindex="5" required/>
-        </md-input-container>
-        <md-input-container>
-          <input mdInput placeholder="SnapCount" name="snapcount" [(ngModel)]="location.snapcount" tabindex="6" required>
-        </md-input-container>
-        <md-input-container>
-          <input mdInput placeholder="SynPeriod" name="synperiod" [(ngModel)]="location.synperiod" tabindex="7" required/>
-        </md-input-container>
-        <md-input-container>
-          <input mdInput placeholder="MonitPeriod" name="monitperiod" [(ngModel)]="location.monitperiod" tabindex="8" required/>
-        </md-input-container>
+        <mat-form-field>
+          <input matInput placeholder="DataSrc" name="datasrc" [(ngModel)]="location.datasrc" tabindex="5" required/>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="SnapCount" name="snapcount" [(ngModel)]="location.snapcount" tabindex="6" required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="SynPeriod" name="synperiod" [(ngModel)]="location.synperiod" tabindex="7" required/>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="MonitPeriod" name="monitperiod" [(ngModel)]="location.monitperiod" tabindex="8" required/>
+        </mat-form-field>
       </div>
       <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="2px">
         <div>Data Alert Config:</div>
@@ -51,9 +51,9 @@
         </div>
       </div>
     </div>
-    <div md-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="20px" class="dlgfooter">
-      <button type="submit" md-raised-button color="primary" tabindex="10" [disabled]="!locForm.valid">Save</button>
-      <button md-button md-dialog-close tabindex="11">Cancel</button>
+    <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="20px" class="dlgfooter">
+      <button type="submit" mat-raised-button color="primary" tabindex="10" [disabled]="!locForm.valid">Save</button>
+      <button mat-button mat-dialog-close tabindex="11">Cancel</button>
     </div>
   </div>
 </form>

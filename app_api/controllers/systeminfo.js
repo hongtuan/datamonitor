@@ -33,3 +33,17 @@ module.exports.getSystemInfo = function(req, res) {
   systemInfo.push({name:'loadavg',value: os.loadavg()});//系统最近5、10、15分钟的平均负载
   res.status(200).json(systemInfo);
 };
+
+module.exports.getLongTaskInfo = function(req, res) {
+  const taskName = req.params.taskName;
+  console.log('taskName=',taskName);
+  const longTaskInfo = req.app.locals.longTaskInfo;
+  const taskRes = longTaskInfo[taskName];
+  console.log(taskName,taskRes);
+  const result = { finished: false, data: taskRes?taskRes:{fc: 0, tc: 100} };
+  if(taskRes && taskRes['finished']) {
+    result.finished = true;
+  }
+  console.log(result);
+  res.status(200).json(result);
+};

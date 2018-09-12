@@ -4,8 +4,8 @@ import { FormsModule }    from '@angular/forms';
 import { NgaModule }      from '../../theme/nga.module';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MaterialModule, MdNativeDateModule } from '@angular/material';
-
+//import { MatNativeDateModule } from '@angular/material';
+import { MaterialRefModule } from '../../theme/material.ref.module';
 import { alertlogviewerService }  from '../../services/alertlogviewer.service';
 import { alertlogviewerComponent } from './alertlogviewer.component';
 import { routing } from './alertlogviewer.routing';
@@ -17,8 +17,9 @@ import { routing } from './alertlogviewer.routing';
     NgaModule,
     Ng2SmartTableModule,
     FlexLayoutModule,
-    MaterialModule,
-    MdNativeDateModule,
+    //MaterialModule,
+    //MatNativeDateModule,
+    MaterialRefModule,
     routing
   ],
   declarations: [

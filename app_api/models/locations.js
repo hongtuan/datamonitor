@@ -35,6 +35,10 @@ var nodeDataSchema = new mongoose.Schema({
   collectedOn: {
     type: Date,
     default: Date.now
+  },
+  updatedOn: {
+    type: Date,
+    default: Date.now
   }
 });
 

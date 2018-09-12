@@ -1,16 +1,18 @@
-import { Component, OnInit, ViewChild  } from '@angular/core';
-import { Router,ActivatedRoute }   from '@angular/router';
-import { MdDialog } from '@angular/material';
+import { Component } from '@angular/core';
+import { Router }   from '@angular/router';
+import { MatDialog } from '@angular/material';
 
 import { User }             from '../../domain/user.mdl';
 import { UserService }      from '../../services/user.service';
 import { UserDialogForm }   from './components/user.dialog.form';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AssignLocationComponent } from './components/assign.location';
 
-var DlgConfig = {
+const DlgConfig = {
   disableClose:true,
   hasBackdrop:true,
   width:'600px',
-  height:'480px'
+  height:'300px'
 };
 
 @Component({
@@ -31,9 +33,11 @@ export class UserComponent {
   users:User[];
   private errMsg: string;
 
-  constructor(private router: Router,
+  constructor(
+    private modalService: NgbModal,
+    private router: Router,
     private userService:UserService,
-    public dialog: MdDialog) {
+    public dialog: MatDialog) {
 
   }
 
@@ -89,12 +93,27 @@ export class UserComponent {
   }
 
   openEditDlg(formData:any):void {
-    let dialogRef = this.dialog.open(UserDialogForm,
-      $.extend({}, DlgConfig,{data:formData}));
+    let dialogRef = this.dialog.open(UserDialogForm,//null);
+      _.assign({}, DlgConfig,{data:formData}));
     /*
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     });//*/
   }
+  assignLocation(user:any) {
+    if(user.role === 'root'){
+      layer.msg('root user do not need assign locations.');
+      return;
+    }
+    const modalRef = this.modalService.open(
+      AssignLocationComponent,
+      { centered: true,backdrop:'static' });
+    modalRef.componentInstance.setSavedLocationList(user.loclist);
+    modalRef.componentInstance.setUserId(user._id);
+    //fill back locid
+    modalRef.result.then(loclist=>{
+      //console.log('loclist=',loclist);
+      user.loclist = loclist;
+    });
+  }
 }
-

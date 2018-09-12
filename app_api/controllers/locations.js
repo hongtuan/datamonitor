@@ -185,6 +185,7 @@ module.exports.updateAlertpolices = function(req, res) {
 };
 
 
+
 module.exports.saveOneBoundary = function(req, res) {
   //console.log('api controllers===req.params.lid='+req.params.lid);
   var lid = req.params.lid;
@@ -231,13 +232,13 @@ module.exports.updatePointInfo = function(req, res) {
   });
 };//*/
 
-//2016.11.05 add new method,just load nodes data,need not query in from db.
+/*/2016.11.05 add new method,just load nodes data,need not query in from db.
 module.exports.loadNodesData = function(req, res) {
   //console.log('api:loadNodesData req.params.lid='+req.params.lid);
   util.getNodesData(req.body.dataurl,function(sdA){
     res.status(200).json(sdA);
   });
-};
+};//*/
 
 module.exports.updateBoundaryName = function(req, res) {
   //console.log('api:loadNodesData req.params.lid='+req.params.lid);

@@ -3,11 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
+//import { TranslateService } from '@ngx-translate/core';
+import { CommonHttpService } from './services/common.http.service';
 
-//import { Ng2Bs3ModalModule }      from 'ng2-bs3-modal/ng2-bs3-modal';
 
 /*
  * Platform and Environment providers/directives/pipes
@@ -37,7 +38,8 @@ const APP_PROVIDERS = [
   LocationService,
   UserService,
   AuthService,
-  AuthGuard
+  AuthGuard,
+  CommonHttpService
 ];
 
 export type StoreType = {
@@ -58,19 +60,21 @@ export type StoreType = {
     BrowserModule,
     BrowserAnimationsModule,
     HttpModule,
+    HttpClientModule,
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
     NgaModule.forRoot(),
     NgbModule.forRoot(),
-    //Ng2Bs3ModalModule,
     PagesModule,
     LoginModule,
     routing
   ],
+  /*
   providers: [ // expose our Services and Providers into Angular's dependency injection
-    APP_PROVIDERS
-  ]
+    ...APP_PROVIDERS
+  ]//*/
+  providers: APP_PROVIDERS
 })
 
 export class AppModule {

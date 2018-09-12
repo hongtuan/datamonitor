@@ -1,8 +1,9 @@
 // util.js
-var superagent = require('superagent');
-var moment = require('moment');
-var fs = require('fs');
-var du = require('../app_client/myjs/data_utils.js');
+const moment = require('moment');
+const superagent = require('superagent');
+
+const fs = require('fs');
+const dp = require('../app_api/helper/data.parser.helper');
 
 module.exports = {
   extend : function( target, source, flag){
@@ -80,35 +81,82 @@ module.exports.sendJsonResponse = function(res, status, content) {
   res.json(content);
 };
 
-module.exports.getNodesData = function(url,cb){
-  //console.info('reading data from['+url+']...');
-  superagent.get(url).end(function(err, urlContent){
-    var dataList = [];
+function readRawDataFromUrl(url, cb){
+  // console.info('reading data from['+url+']...');
+  superagent.get(url).end(function(err, urlContent) {
+    let rawData = [];
+    if (err) {
+      console.error(err.status,err.message);
+      if (cb) cb(err, rawData);
+      return;
+    }
+    // try to parse raw data here
+    if (typeof urlContent == 'object') {
+      rawData = urlContent.body;
+      /*
+      try {
+        rawData = JSON.parse(urlContent.text);
+      } catch (e) {
+        console.error(e);
+        if (cb) cb(err, rawData);
+        return;
+      }//*/
+      if (cb) cb(null, rawData);
+      return;
+    }else{
+      if (cb) cb({message:`data format error,ur=${url}`}, rawData);
+    }
+  });
+}
+
+
+module.exports.readRawDataFromUrl = function (url, cb){
+  readRawDataFromUrl(url, cb);
+};
+
+function loadNewData(url, cb, rcb, ccb){
+  readRawDataFromUrl(url,(err, rawData)=>{
+    let dataList = [];
     if(err) {
-      console.error(err);
       if (cb) cb(err,dataList);
       return;
     }
-    //parse raw data first
-    var rawDataList = [];
-    if(typeof urlContent == 'object'){
-      try{
-        rawDataList = JSON.parse(urlContent.text);
-      }catch(e){
-        console.error(e);
-        if (cb) cb(err,dataList);
-        return;
-      }
-    }
+
     //then parse to node data.
-    if(Array.isArray(rawDataList)){
-      dataList = du.parserNodes(rawDataList);
+    if(Array.isArray(rawData)){
+      dataList = dp.getNewData(rawData,ccb);
     }
     //return via cb.
     if(cb) cb(null,dataList);
+    if(rcb) rcb(rawData);
   });
+}
+
+module.exports.loadNewData = function(url, cb, rcb, ccb){
+  loadNewData(url, cb, rcb, ccb);
 };
 
+function loadPastData(url, timeGap, cb, rcb, ccb){
+  readRawDataFromUrl(url,(err, rawData)=>{
+    let dataList = [];
+    if(err) {
+      if (cb) cb(err,dataList);
+      return;
+    }
+
+    //then parse to node data.
+    if(Array.isArray(rawData)){
+      dataList = dp.getPastData(rawData, timeGap, ccb);
+    }
+    //return via cb.
+    if(cb) cb(null,dataList);
+    if(rcb) rcb(rawData);
+  });
+}
+
+module.exports.loadPastData = function(url, timeGap, cb, rcb, ccb){
+  loadPastData(url, timeGap, cb, rcb, ccb);
+};
 
 module.exports.downloadFile = function(res,fc,fnPre) {
   var tmp = require('tmp');
@@ -197,6 +245,7 @@ module.exports.loadTextContent = function(pathname,encode) {
   }
 };
 
+/*
 module.exports.getUrlContent = function(url,cb){
   //console.info('reading data from['+url+']...');
   superagent.get(url).end(function(err, urlContent) {
@@ -208,5 +257,5 @@ module.exports.getUrlContent = function(url,cb){
     }
     if (cb) cb(null, urlContent);
   });
-};
+};//*/
 

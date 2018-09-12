@@ -2,12 +2,12 @@ const moment = require('moment');
 const util = require('../../utils/util.js');
 const dmt = require('../../utils/data.monitor.task.js');
 const mailSender = require('../../utils/mailsender.js');
-const du = require('../../app_client/myjs/data_utils.js');
+const dataParser = require('../../app_api/helper/data.parser.helper');
 
 const locDao = require('../dao/locationdao.js');
 const ndDao = require('../dao/nodedatadao.js');
 const llDao = require('../../app_api/dao/locationlogdao.js');
-
+const sysLogger = require('log4js').getLogger('system');
 //create emptyData for Interpolation
 function getEmptyData(dap){
   const emptyData = {isSham:true};
@@ -50,7 +50,7 @@ function cvtNodeData(nd,ptag){
   return {
     nid:nd.nid,
     ptag:ptag,//nidNodeMap[nd.nid].ptag,
-    dtime:du.iso2Locale(nd.timestampISO),
+    dtime:dataParser.iso2Locale(nd.timestampISO),
     data:dataInfo.join(',')
   };
 }
@@ -147,23 +147,23 @@ function doInterpolation(data,emptyData,dataTimeRange){
 
 function executeSyncTask(lid,dataUrl, cb){
   //read data from data server
-  util.getNodesData(dataUrl,function(err,nodesData){
+  util.loadNewData(dataUrl,function(err,nodesData){
     // console.log('step1 getNodesData ok.', lid, nodesData.length);
     // then write data to db:
-    ndDao.saveNodesData(lid,nodesData,function(errs,saveRes){
-      if(errs.length>0){
-        console.log(errs.join('\n'));
+    ndDao.saveNodesData(lid,nodesData,function(err,saveRes){
+      if(err){
+        sysLogger.error(err);
       }
       // console.log('step2 saveNodesData ok.', lid, saveRes.finish);
       //call fill lastestNodeData here:
       ndDao.fillLastestNodeDataByRaw(lid,nodesData,function(err,updateRes){
         if(err){
-          console.error("fillLastestNodeDataByRaw failed:"+err);
+          sysLogger.error("fillLastestNodeDataByRaw failed:"+err);
           return;
         }
         // console.log('step3 fillLastestNodeDataByRaw ok.', lid);
-        const logContent = du.simplifyStrKVJSONObj(saveRes)+','+
-          du.simplifyStrKVJSONObj(updateRes);
+        const logContent = dataParser.cvtJsonObj2StrKeyValue(saveRes)+','+
+          dataParser.cvtJsonObj2StrKeyValue(updateRes);
         // console.log('logContent='+logContent);
         llDao.recordLocLog(lid,llDao.logType.dataSync,logContent,function(err,taskLog){
           if(err) console.log(err);
@@ -180,30 +180,30 @@ function executeSyncTask(lid,dataUrl, cb){
               ucs.push(udc === '0' ? 0 : 1);
             }
             var ucStr = ucs.join('');
-            console.log(`lastestDataSynLogTime ${lastestLogDate},ucStr=${ucStr}.`);
+            sysLogger.info(`lastestDataSynLogTime ${lastestLogDate},ucStr=${ucStr}.`);
             switch(ucStr){
               //case '000':
               case '001':
               case '011':
-                console.log(`Location ${location.name} at ${lastestLogDate} around found lost data!`);
+                sysLogger.info(`Location ${location.name} at ${lastestLogDate} around found lost data!`);
                 mailSender.sendMail({
                   recipient: '"goodfriend" <3239048@qq.com>;"pgray" <pgray@nighthawkimagingservices.com>;"hongtuan" <hongtuang3@gmail.com>',
                   title: `Location:${location.name}'s data lost!`,
                   contentInText: `Location:${location.name} at ${lastestLogDate} around found data lost!(${ucStr})`,
                   contentInHtml: `<h2>Location:${location.name} at ${lastestLogDate} around found data lost!(${ucStr})</h2>`
                 },function(){
-                  console.log('data lost mail send over.');
+                  sysLogger.info('data lost mail send over.');
                 });
                 break;
               case '100':
-                console.log(`Location ${location.name} at ${lastestLogDate} around had new data come up!`);
+                sysLogger.info(`Location ${location.name} at ${lastestLogDate} around had new data come up!`);
                 mailSender.sendMail({
                   recipient: '"goodfriend" <3239048@qq.com>;"pgray" <pgray@nighthawkimagingservices.com>;"hongtuan" <hongtuang3@gmail.com>',
                   title: `Location:${location.name}'s new data come up!`,
                   contentInText: `Location:${location.name} at ${lastestLogDate} around new data come up!(${ucStr})`,
                   contentInHtml: `<h2>Location:${location.name} at ${lastestLogDate} around new data come up!(${ucStr})</h2>`
                 },function(){
-                  console.log('data come up mail send over.');
+                  sysLogger.info('data come up mail send over.');
                 });
                 break;
             }
@@ -240,17 +240,17 @@ function getTimeRange(req){
   var ctzo = req.query.ctzo;
   if(ctzo != undefined) {
     var stzo = req.app.locals.serverTimezoneOffset;
-    console.log('do tz cvt at:',moment().format('YYYY-MM-DD h:mm:ss a'),'ctzo:',ctzo,'stzo:',stzo);
-    console.log('before cvt:from=',from,'to=',to);
+    sysLogger.info('do tz cvt at:',moment().format('YYYY-MM-DD h:mm:ss a'),'ctzo:',ctzo,'stzo:',stzo);
+    sysLogger.info('before cvt:from=',from,'to=',to);
     if(ctzo != stzo) {
-      console.log('ctzo != stzo,need cvt.');
+      sysLogger.info('ctzo != stzo,need cvt.');
       //var tzos = getTZOStr(stzo - ctzo);
       var tzos = getTZOStr(ctzo - stzo);
       from = from.replace('Z', tzos);
       to = to.replace('Z', tzos);
-      console.log('after cvt:from=',from,'to=',to);
+      sysLogger.info('after cvt:from=',from,'to=',to);
     }else{
-      console.log('ctzo == stzo,do not need cvt.');
+      sysLogger.info('ctzo == stzo,do not need cvt.');
     }
   }
   return {from:moment(from),to:moment(to)};
@@ -327,6 +327,7 @@ function calcAvgData(dataList,timeRange,dataAlertPolicy){
   return avgDataList;
 }
 
+/*
 module.exports.readNodesRawData = function(req, res) {
   //console.log('save nodedata here.');
   var url = req.body.url||'http://xsentry.co/api/v1/sentry/C47F51001099/snapshots?top=3';
@@ -334,31 +335,31 @@ module.exports.readNodesRawData = function(req, res) {
   util.getNodesData(url,function(dataList){
     res.status(200).json(dataList);
   });
-};
+};//*/
 
 module.exports.getNodeData = function(req, res) {
   var lid = req.params.lid;
   locDao.getDataAlertPolicy(lid,function(err,dataAlertPolicy){
     if(err){
-      console.log(err);
+      sysLogger.error(err);
       res.status(406).json(err);
       return;
     }
     var nid = req.params.nid;
     var timeRange = getTimeRange(req);
-    console.log('timeRange',JSON.stringify(timeRange,null,2));
+    sysLogger.info('timeRange',JSON.stringify(timeRange,null,2));
     var from = timeRange.from;
     var to = timeRange.to;
     var fmt = 'YYYY-MM-DD hh:mm a';
-    console.log('getNodeData:from',from,moment(from).toISOString(),moment(from).format(fmt));
-    console.log('getNodeData:to',from,moment(to).toISOString(),moment(to).format(fmt));
+    sysLogger.info('getNodeData:from',from,moment(from).toISOString(),moment(from).format(fmt));
+    sysLogger.info('getNodeData:to',from,moment(to).toISOString(),moment(to).format(fmt));
     var timeRange = null;
     if(from && to){
       timeRange = {from:from,to:to};
     }
     ndDao.getNodeData(lid,nid,timeRange,function(err,dataList){
       if(err){
-        console.log(err);
+        sysLogger.error(err);
         res.status(406).json(err);
       }
       //console.log('getNodeData:dataList',dataList.length,JSON.stringify(dataList,null,2));
@@ -373,10 +374,11 @@ module.exports.getNodeData = function(req, res) {
 module.exports.executeInspectNodeTask = function(req, res) {
   var lid = req.params.lid;
   var location = req.body;
-  var dataUrl = du.buildDataUrl(location.datasrc,Math.ceil(0.1*location.snapcount));
-  util.getNodesData(dataUrl,function(err,nodesData){
+  var dataUrl = util.buildDataUrl(location.datasrc,Math.ceil(0.1*location.snapcount));
+
+  util.loadNewData(dataUrl,function(err,nodesData){
     if(err){
-      console.log(err);
+      sysLogger.error(err);
       res.status(500).json(err);
       return;
     }
@@ -422,7 +424,7 @@ module.exports.executeInspectNodeTask = function(req, res) {
         }
         llDao.recordLocLog(lid,llDao.logType.inspectNode,
           logContent.join('\n'),function(err,lastestLog){
-          if(err) console.log(err);
+          if(err) sysLogger.error(err);
           //console.log('lastestLog='+lastestLog);
           res.status(200).json({
             snc:swipNodes.length,
@@ -445,6 +447,7 @@ module.exports.executeInspectNodeTask = function(req, res) {
       }
     });
   });
+
 };
 
 module.exports.executeSyncTask = function(lid,dataUrl, cb) {
@@ -456,7 +459,7 @@ module.exports.synDataTaskCtrl = function(req, res) {
   var sts = req.params.sts;//switch to status:on,off
   var taskId = req.app.locals.dataSyncTask[lid];
   var location = req.body;
-  var dataUrl = du.buildDataUrl(location.datasrc,location.snapcount);
+  var dataUrl = util.buildDataUrl(location.datasrc,location.snapcount);
   if(sts == 'on'){
     locDao.updateSynStatus(lid,true);
     //execute immediately one time.
@@ -473,41 +476,22 @@ module.exports.synDataTaskCtrl = function(req, res) {
     req.app.locals.dataSyncTask[lid] = null;
   }else{
     //just do output.
-    console.log('sts='+sts);
+    sysLogger.info('sts='+sts);
   }
   res.status(200).json(req.app.locals.dataSyncTask[lid]?'running':'stop');
 };
 
-//for route call:
-module.exports.saveNodesData = function(req, res) {
-  var nodesData = req.body.nodeData;
-  var lid = req.body.lid;
-  ndDao.saveNodesData(lid,nodesData,function(errs,saveRes){
-    if(errs.length>0){
-      console.log(errs.join('\n'));
-    }
-    var saveResStr = du.simplifyStrKVJSONObj(saveRes);
-    ndDao.updateLastestNodeData(lid,function(err,updateRes){
-      if(err){
-        console.log(err);
-      }
-      if(updateRes)
-        saveResStr += ','+du.simplifyStrKVJSONObj(updateRes);
-      res.status(200).json({info:saveResStr});
-    });
-  });
-};
 
 module.exports.getNodesData = function(req, res) {
   var lid = req.params.lid;
   var timeRange = getTimeRange(req);
-  console.log('timeRange',JSON.stringify(timeRange,null,2));
+  sysLogger.info('timeRange',JSON.stringify(timeRange,null,2));
   var from = timeRange.from;
   var to = timeRange.to;
 
   locDao.getNodesInfoInLocation(lid,function(err,nodesInfo){
     if(err){
-      console.log(err);
+      sysLogger.error(err);
       res.status(404).json(err);
       return;
     }
@@ -516,7 +500,7 @@ module.exports.getNodesData = function(req, res) {
 
     ndDao.getNodesData(lid,timeRange,function(err,pidDataMap){
       if(err){
-        console.log(err);
+        sysLogger.error(err);
         res.status(404).json(err);
         return;
       }
@@ -540,19 +524,19 @@ module.exports.getNodeAvgData = function(req, res) {
   var lid = req.params.lid;
   locDao.getDataAlertPolicy(lid,function(err,dataAlertPolicy){
     if(err){
-      console.log(err);
+      sysLogger.error(err);
       res.status(406).json(err);
       return;
     }
     var nid = req.params.nid;
     var timeRange = getTimeRange(req);
-    console.log('timeRange',JSON.stringify(timeRange,null,2));
+    sysLogger.info('timeRange',JSON.stringify(timeRange,null,2));
     var from = timeRange.from;
     var to = timeRange.to;
 
     var fmt = 'YYYY-MM-DD hh:mm a';
-    console.log('getNodeAvgData:from',from,moment(from).toISOString(),moment(from).format(fmt));
-    console.log('getNodeAvgData:to',to,moment(to).toISOString(),moment(to).format(fmt));
+    sysLogger.info('getNodeAvgData:from',from,moment(from).toISOString(),moment(from).format(fmt));
+    sysLogger.info('getNodeAvgData:to',to,moment(to).toISOString(),moment(to).format(fmt));
     var timeRange = null;
     if(from && to){
       timeRange = {from:from,to:to};
@@ -560,7 +544,7 @@ module.exports.getNodeAvgData = function(req, res) {
 
     ndDao.getNodeData(lid,nid,timeRange,function(err,dataList){
       if(err){
-        console.log(err);
+        sysLogger.error(err);
         res.status(406).json(err);
       }
       //console.log('getNodeAvgData:dataList',dataList.length,JSON.stringify(dataList,null,2));
@@ -575,13 +559,13 @@ module.exports.getNodeAvgData = function(req, res) {
 module.exports.getNodesDataAvg = function(req, res) {
   var lid = req.params.lid;
   var timeRange = getTimeRange(req);
-  console.log('timeRange',JSON.stringify(timeRange,null,2));
+  sysLogger.info('timeRange',JSON.stringify(timeRange,null,2));
   var from = timeRange.from;
   var to = timeRange.to;
 
   locDao.getNodesInfoInLocation(lid,function(err,nodesInfo){
     if(err){
-      console.log(err);
+      sysLogger.error(err);
       res.status(404).json(err);
       return;
     }
@@ -590,7 +574,7 @@ module.exports.getNodesDataAvg = function(req, res) {
 
     ndDao.getNodesData(lid,timeRange,function(err,pidDataMap){
       if(err){
-        console.log(err);
+        sysLogger.info(err);
         res.status(404).json(err);
         return;
       }
@@ -613,20 +597,63 @@ module.exports.getNodesDataAvg = function(req, res) {
   });
 };
 
+
 module.exports.getSynDataLog = function(req, res) {
-  var lid = req.params.lid;
-  var lc = req.params.lc;
+  const lid = req.params.lid;
+  const lc = req.params.lc;
   if (lid) {
     //res.render('syn_data_log_graph', {lid:lid});
     llDao.getLocLogList(lid,llDao.logType.dataSync,lc||300,function(err,dataSyncLogList){
-      var logData = [];
+      const logData = [];
       for(let slog of dataSyncLogList){
-        var logContent = slog.logContent;
-        var udc = logContent.substr(logContent.lastIndexOf(':')+1);
+        const logContent = slog.logContent;
+        const udc = logContent.substr(logContent.lastIndexOf(':')+1);
         logData.push({dataTime:slog.createdOn,updateCount:+udc});
       }
       //console.log(logData);
       res.status(200).json({logData:logData});
     });
   }
+};
+
+module.exports.savePastNodeData = function(req, res) {
+  const lid = req.params.lid;
+  const cData = req.body.doc;
+  //console.log('cData=',cData);
+  //ndDao.saveManyNodes(lid,cData,
+  // 以lid作为任务名称
+  const taskName = lid;
+  // 从app中获取长时间任务信息.
+  const longTaskInfo = req.app.locals.longTaskInfo;
+  longTaskInfo[taskName] = { fc: 0, tc: 100 };
+
+  ndDao.savePastNodeData(lid,cData,
+    (err, saveResult)=>{
+      if(err) {
+        console.error(err);
+        res.status(500).json({message: 'server error.'});
+        return;
+      }
+      const tmpObj= {
+        ut:saveResult.useTime+'s',
+        total:saveResult.totalDataCount,
+        new:saveResult.totalAppendCount,
+        old:saveResult.totalOldCount,
+        replace:saveResult.totalRemoveCount,
+        uldn:saveResult.totalAppendCount
+      };
+      const logContent = dataParser.cvtJsonObj2StrKeyValue(tmpObj);
+      //total:35,new:0,old:35,finish:35,uldn:0
+      //nodeCount:35,removeCount:249,savedCount:249,useTime:54,fillCount:249
+      llDao.recordLocLog(lid,llDao.logType.dataSync,logContent,(err, result)=>{
+        if(err) console.error(err);
+        res.status(200).json(tmpObj);
+      });
+      longTaskInfo[taskName] = {finished: true,fc:100,tc:100};
+    },
+    (processInfo)=> {
+      sysLogger.info('processing info:',`${processInfo.finished}/${processInfo.totalNode}...`);
+      longTaskInfo[taskName] = {fc:processInfo.finished,tc:processInfo.totalNode};
+    }
+  );
 };

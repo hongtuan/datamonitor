@@ -1,24 +1,24 @@
 <div class="auth-main">
   <div class="auth-block">
-    <h1 translate>{{'login.title'}}</h1>
+    <h1>{{'login.title'}}</h1>
     <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
       <div class="form-group row" [ngClass]="{'has-error': (!email.valid && email.touched), 'has-success': (email.valid && email.touched)}">
-        <label for="inputEmail3" class="col-sm-2 control-label" translate>{{'login.email'}}</label>
+        <label for="inputEmail3" class="col-sm-2 control-label">{{'login.email'}}</label>
 
         <div class="col-sm-10">
-          <input [formControl]="email" type="email" class="form-control" id="inputEmail3" placeholder="{{'login.email' | translate}}">
+          <input [formControl]="email" type="email" class="form-control" id="inputEmail3" placeholder="{{'login.email'}}">
         </div>
       </div>
       <div class="form-group row" [ngClass]="{'has-error': (!password.valid && password.touched), 'has-success': (password.valid && password.touched)}">
-        <label for="inputPassword3" class="col-sm-2 control-label" translate>{{'login.password'}}</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">{{'login.password'}}</label>
 
         <div class="col-sm-10">
-          <input [formControl]="password" type="password" class="form-control" id="inputPassword3" placeholder="{{'login.password' | translate}}">
+          <input [formControl]="password" type="password" class="form-control" id="inputPassword3" placeholder="{{'login.password'}}">
         </div>
       </div>
       <div class="form-group row">
         <div class="offset-sm-2 col-sm-10">
-          <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth" translate>{{'login.sign_in'}}</button>
+          <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth">{{'login.sign_in'}}</button>
         </div>
       </div>
     </form>

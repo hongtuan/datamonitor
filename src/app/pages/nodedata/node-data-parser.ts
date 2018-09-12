@@ -1,13 +1,12 @@
 //our root app component
-import {  Component,Attribute,OnInit }     from '@angular/core'
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import { Component, OnInit }     from '@angular/core'
+import { ActivatedRoute, Router} from '@angular/router';
 import { NodeDataService }          from '../../services/node-data.service';
-import * as moment from "moment";
-import _date = moment.unitOfTime._date;
-
-//var layer;// = require('../lib/layer/layer.js');
-//var layer4ng = require('../myjs/layer4ng.js');
-//var du = require('../myjs/data_utils.js');
+import { CommonHttpService } from '../../services/common.http.service';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbProgressbarExt} from './ngb.progressbar.ext';
+// import * as moment from "moment";
+import * as _ from "lodash";
 
 @Component({
   selector: 'node-data-parser',
@@ -23,12 +22,16 @@ export class NodeDataParserComponent implements OnInit {
   dataUrl:string = '';
   datasrc:string = '';
   snapcount:number = 3;
+  timeGap:number = 1;
   name:string = '';
   lid:string;
-  //nidNodeMap:any;
   locationData:any;
-  //nidPtagMap:any;
-  constructor(private activatedRoute: ActivatedRoute,private router: Router,private nodeDataService:NodeDataService) {
+  constructor(
+    private modalService: NgbModal,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private httpClient: CommonHttpService,
+    private nodeDataService:NodeDataService) {
     //console.log('NodeDataParserComponent:constructor called.');
   }
   ngOnInit(): void {
@@ -42,6 +45,7 @@ export class NodeDataParserComponent implements OnInit {
     this.nodeDataService.getLocationData(this.lid).subscribe(
       locationData => {
         this.locationData = locationData;
+        this.getRawData();
         //console.log('',JSON.stringify(this.locationData,null,2));
       },
       errMsg => {
@@ -49,42 +53,109 @@ export class NodeDataParserComponent implements OnInit {
         console.error(this.errMsg);
       }
     );
-    setTimeout(()=>{this.getRawData()},200);
-    //this.getRawData();
-    //console.log('NodeDataParserComponent:ngOnInit called.');
   }
-  rawData:string = '';
-  rawDataStr:string = '';
-  rawDataDesc:string = '';
 
-  parserData:string = '';
-  parserDataDesc:string = '';
+  analysisResult:any = {
+    rawData:{obj:null,str:'',desc:''},
+    pastNodeData:{obj:null,str:'',desc:'',cObj:null},
+    newNodeData:{obj:null,str:'',desc:'',cObj:null},
+    // dataTimeInfo:{latestDataTime:null,latestDataNid:'',oldestDataTime:null,oldestDataNid:''},
+    noDataNode:{obj:null,str:'',desc:''}
+  };
 
-  analysisResult:string = '';
-
-  latestDataTime:any = null;
-  latestDataNid:string = '';
-
-  oldestDataTime:any = null;
-  oldestDataNid:string = '';
-
+  nidTimeMap:any = {};
   nidList:string[] = [];
-  simplifiedNodesData:string = '';
-  noDataInfo:string = '';
+  /**
+   * find which nid has not assigned.
+   * find which tag has no data.
+   */
+  analysisResultDesc:string = '';
+
   errMsg: string;
 
-  getRawData() :void{
-    let url = du.buildDataUrl(this.datasrc,this.snapcount);
+  getRawData():void {
+    let url = dataParser.buildDataUrl(this.datasrc,this.snapcount);
     //layer.load();
-    var lwi = layer.load();
+    let lwi = layer.load();
+    //*
     this.nodeDataService.getRawData(url).subscribe(
       rawData => {
-        //console.log('users='+JSON.stringify(users));
-        //console.log(`${rawData.length} raw datas got.`);
-        this.rawDataDesc = `${rawData.length} raw datas got.`;
-        this.rawDataStr = JSON.stringify(rawData,null,2);
-        this.rawData = JSON.stringify(rawData);
-        this.parserRawData();
+
+        this.analysisResult.rawData.obj = rawData;
+        let totalCount = 0;
+        this.analysisResult.rawData.str = '';
+        _.each(rawData,(item)=>{
+          this.analysisResult.rawData.str+=`[${item.sentryId}]@${dataParser.iso2Locale(item.timestamp)},has ${item.nodes.length} items\n`;
+          totalCount += item.nodes.length;
+        });
+        this.analysisResult.rawData.desc = ` ${rawData.length} snapshots,has ${totalCount} nodes.`;
+
+        let pastDataList = dataParser.getPastData(
+          rawData,
+          this.timeGap,
+          (classifiedData)=>{
+            this.analysisResult.pastNodeData.cObj = classifiedData;
+          }
+        );
+        this.analysisResult.pastNodeData.obj = pastDataList;
+        this.analysisResult.pastNodeData.desc = ` ${pastDataList.length} nodes.`;
+        this.updatePastDataOrder('time');
+
+
+        let newDataList = dataParser.getNewData(
+          rawData,
+          (classifiedData)=>{
+            this.analysisResult.newNodeData.cObj = classifiedData;
+            this.nidList = _.keys(classifiedData);
+            _.each(classifiedData, (dl, nid)=>{
+              this.nidTimeMap[nid] = dl[dl.length-1]['timestampISO'];
+            });
+          }
+        );
+        this.analysisResult.newNodeData.obj = newDataList;
+        this.analysisResult.newNodeData.desc = ` ${newDataList.length} nodes.`;
+        const od = newDataList[0],ld = newDataList[newDataList.length -1];
+        this.analysisResult.newNodeData.str = `[${od.nid}]@(${this.getNodeTag(od.nid)}) sent the oldest data on ${dataParser.iso2Locale(od.timestampISO)}\n`;
+        this.analysisResult.newNodeData.str += `[${ld.nid}]@(${this.getNodeTag(ld.nid)}) sent the latest data on ${dataParser.iso2Locale(ld.timestampISO)}\n\n`;
+
+        _.each(newDataList, (item)=>{
+          this.analysisResult.newNodeData.str += `[${item.nid}]@(${this.getNodeTag(item.nid)}) latestData on ${dataParser.iso2Locale(item.timestampISO)}\n`;
+        });
+
+        //find Unassigned Mac here:
+        const unassignedNodes = [];
+        for(let nid of this.nidList){
+          let node = this.locationData.NNM[nid];
+          if(node === undefined)
+            unassignedNodes.push({nid:nid,dataTime:this.nidTimeMap[nid]});
+          //this.analysisResult += `UnassignedMac[${nid}]@${du.iso2Locale(this.nidTimeMap[nid])}`;
+        }
+        if(unassignedNodes.length>0){
+          //du.sortArrayByAttr(unassignedNodes,'dataTime','desc');
+          let tmpStr = '';
+          unassignedNodes.forEach((un)=>{
+            tmpStr += `Mac[${un.nid}]@${dataParser.iso2Locale(un.dataTime)}\n`
+          });
+          this.analysisResultDesc += `\nThere are ${unassignedNodes.length} Unassigned Mac:\n`;
+          this.analysisResultDesc += tmpStr;
+        }else{
+          this.analysisResultDesc += 'all mac has been assigned.';
+        }
+
+        //find no data node here:
+        let noDataNodeList = [];
+        _.each(this.locationData.NNM, (tag, nid)=>{
+          if(!this.nidList.includes(nid)){
+            noDataNodeList.push(`[${nid}]@(${tag.ptag})`);
+          }
+        });
+        if(noDataNodeList.length > 0){
+          this.analysisResultDesc += `\nThere are ${noDataNodeList.length} nodes has no data.\n`;
+          this.analysisResultDesc += noDataNodeList.join('\n');
+        }else{
+          this.analysisResultDesc += 'all node has data in these snapshots.';
+        }
+
         layer.close(lwi);
       },
       errMsg => this.errMsg = errMsg
@@ -92,169 +163,117 @@ export class NodeDataParserComponent implements OnInit {
   }
 
   getNodeTag(nid):string{
-    /*
-    for(var bname in this.locationData.BNTM){
-      var nidTagMap = this.locationData.BNTM[bname];
-      var tag = nidTagMap[nid];
-      return `${tag?tag:'Unassigned'}[${nid}]`;
-    }//*/
-    var node = this.locationData.NNM[nid];
-    return `${node?node.ptag:'Mac'}[${nid}]`;
+    const node = this.locationData.NNM[nid];
+    return node?node.ptag:'Unassigned';
   }
 
 
-  nidTimeMap:any;
-  parserRawData():void {
-    //console.log('this.RawData='+this.rawData);
-    if(this.rawData == ''){
-      this.parserData = 'please getRawData first.';
-      return;
-    }
-    //console.log('tp='+typeof this.rawData);
-    //console.log('this.rawData=\n'+this.rawData);
-    //if(typeof this.rawData =='string')
-    //  console.log('l='+this.rawData.length());
-    var dataArray = JSON.parse(this.rawData);
-    var nodesData = du.parserNodes(dataArray);
-    if(Array.isArray(nodesData)){
-      this.nidTimeMap = {};
-      this.nidList = [];
-      nodesData.forEach((nd)=>{
-        this.nidTimeMap[nd.nid] = nd.timestampISO;
-        let _dataTime = moment(nd.timestampISO);
-        if(this.latestDataTime == null) {
-          this.latestDataTime = _dataTime;
-          this.latestDataNid = nd.nid;
-        }
-        if(_dataTime.isAfter(this.latestDataTime)){
-          this.latestDataTime = _dataTime;
-          this.latestDataNid = nd.nid;
-        }
-        if(this.oldestDataTime == null) {
-          this.oldestDataTime = _dataTime;
-          this.oldestDataNid = nd.nid;
-        }
-        if(_dataTime.isBefore(this.oldestDataTime)){
-          this.oldestDataTime = _dataTime;
-          this.oldestDataNid = nd.nid;
-        }
-        //record the nids
-        if(this.nidList.indexOf(nd.nid) == -1){
-          this.nidList.push(nd.nid);
-        }
-      });
-
-      //console.log(`${nidList.length} nid found.`);
-      //console.log(nidList.join('\r\n'));
-      var rawDataCount = dataArray.length;
-      //var str = ''+this.rawData.toString();
-      var totalDataLength = this.rawData.length;
-      var avgDataLength = Math.ceil(totalDataLength/rawDataCount);
-
-      this.analysisResult = `${rawDataCount} raw records,totalLength:${totalDataLength},avgLength:${avgDataLength}\n`;
-      this.analysisResult += `${this.getNodeTag(this.latestDataNid)} sent the latestData@${this.latestDataTime.format('MM/DD/YYYY,h:mm A')}\n`;
-      this.analysisResult += `${this.getNodeTag(this.oldestDataNid)} sent the oldestData@${this.oldestDataTime.format('MM/DD/YYYY,h:mm A')}\n`;
-      this.analysisResult += `${this.nidList.length} Macs found.\n`;
-
-      this.noDataInfo = '';
-      var totalNoDataCount = 0;
-      var _noDataInfo = [];
-      //var isManyArea = this.nidPtagMap.bc>1;
-      var isManyArea = this.locationData.BDL.length>1;
-      var boundaryNidTagMap = this.locationData.BNTM;
-      for(var bname in boundaryNidTagMap){
-        //if(bname == 'bc') continue;
-        //tmStr += 'area['
-        var nidTagMap = boundaryNidTagMap[bname];
-        var noDataNodes = [];
-        var dataNodes = [];
-        for(var nid in nidTagMap){
-          var tagInBoundary = nidTagMap[nid];
-          if(!this.nidList.includes(nid)){
-            noDataNodes.push(`${tagInBoundary}[${nid}]`);
-          }
-          var ndt = this.nidTimeMap[nid];
-          if(ndt){
-            dataNodes.push({
-              node:`${tagInBoundary}[${nid}]`,
-              dataTime:ndt
-            });
-          }
-        }
-
-        //sort here
-        du.sortArrayByAttr(dataNodes,'dataTime','desc');
-        var nodeInfos = '';
-        dataNodes.forEach(function(nd){
-          nodeInfos += `${nd.node},@${du.iso2Locale(nd.dataTime)}\n`;
-        });
-
-        this.analysisResult += `\n${dataNodes.length} Nodes in ${bname} data detail:\n`;
-        this.analysisResult += nodeInfos;
-
-
-        if(noDataNodes.length>0){
-          _noDataInfo.push(`Area[${bname}],has ${noDataNodes.length} no data nodes:`);
-          _noDataInfo.push(noDataNodes.join('\n'));
-        }
-        totalNoDataCount+=noDataNodes.length;
-        //boundCount++;
-      }
-      if(isManyArea)
-        this.noDataInfo += `totalNoDataCount:${totalNoDataCount}\n`;
-      this.noDataInfo += _noDataInfo.join('\n');
-      //find Unassigned Mac here:
-      var unassignedNodes = [];
-      for(var nid in this.nidTimeMap){
-        var node = this.locationData.NNM[nid];
-        if(node==undefined)
-          unassignedNodes.push({nid:nid,dataTime:this.nidTimeMap[nid]});
-          //this.analysisResult += `UnassignedMac[${nid}]@${du.iso2Locale(this.nidTimeMap[nid])}`;
-      }
-      if(unassignedNodes.length>0){
-        du.sortArrayByAttr(unassignedNodes,'dataTime','desc');
-        var unassignedNodesInfo = '';
-        unassignedNodes.forEach(function(un){
-          unassignedNodesInfo += `Mac[${un.nid}]@${du.iso2Locale(un.dataTime)}\n`
-        });
-        this.analysisResult += `\nThere are ${unassignedNodes.length} Unassigned Mac:\n`;
-        this.analysisResult += unassignedNodesInfo;
-      }
-
-      //test simplifyNodeData
-      var simplifiedND = du.simplifyNodesData(nodesData);
-      this.simplifiedNodesData = JSON.stringify(simplifiedND,null,2);
-      this.simplifiedNodesData += `\n${simplifiedND.length} rows simplifiedNodeData.`
-    }
-
-    this.parserDataDesc = `${nodesData.length} raw records data parserd.`;
-    this.parserData = JSON.stringify(nodesData,null,2);
-    //console.log('parserRawData over.');
+  getBack():void {
+    this.router.navigate(['/pages/location']);
   }
 
-  saveNodesData(dataType:string):void{
-    console.log('saveNodesData here.dataType='+dataType);
-    if(this.parserData == ''){
-      layer.msg('need parse data first.');
-      return;
+  pastDataOrderBy = 'nid';
+
+  updatePastDataOrder(orderBy): void{
+    if(this.pastDataOrderBy!=orderBy){
+      //*
+      let lwi = layer.load();
+      this.pastDataOrderBy=orderBy;
+      switch (this.pastDataOrderBy) {
+        case 'time':
+          const od = this.analysisResult.pastNodeData.obj[0];
+          const ld = this.analysisResult.pastNodeData.obj[this.analysisResult.pastNodeData.obj.length -1];
+          this.analysisResult.pastNodeData.str = `[${od.nid}]@(${this.getNodeTag(od.nid)}) sent the oldest data on ${dataParser.iso2Locale(od.timestampISO)}\n`;
+          this.analysisResult.pastNodeData.str += `[${ld.nid}]@(${this.getNodeTag(ld.nid)}) sent the latest data on ${dataParser.iso2Locale(ld.timestampISO)}\n\n`;
+          _.each(this.analysisResult.pastNodeData.obj, (item)=>{
+            this.analysisResult.pastNodeData.str += `[${item.nid}]@(${this.getNodeTag(item.nid)}) sent data on ${dataParser.iso2Locale(item.timestampISO)}\n`;
+          });
+          break;
+        case  'nid':
+          this.analysisResult.pastNodeData.str = '';
+          _.each(this.analysisResult.pastNodeData.cObj, (item, nid)=>{
+            let sortedItem:any = _.sortBy(item,['timestampISO']);
+            this.analysisResult.pastNodeData.str += `[${nid}]@(${this.getNodeTag(nid)}) has ${item.length} datas,dataTime in range:[${dataParser.iso2Locale(sortedItem[0].timestampISO)} ~ ${dataParser.iso2Locale(sortedItem[sortedItem.length - 1].timestampISO)}]\n`;
+            if(item.length>1){
+              _.each(sortedItem,(si)=>{
+                this.analysisResult.pastNodeData.str += `[${nid}]@(${this.getNodeTag(nid)}) sent data on ${dataParser.iso2Locale(si.timestampISO)}\n`;
+              });
+            }
+          });
+          break;
+      }
+      layer.close(lwi);//*/
     }
-    var nodeData = JSON.parse(dataType=='1'?
-      this.parserData:this.simplifiedNodesData);
-    //call nodeDataService here:
-    var dataPkg = {nodeData:nodeData,lid:this.lid};
-    this.nodeDataService.saveNodeData(dataPkg).subscribe(
-      saveRes => {
-        console.log(saveRes);
-        //layer.msg(JSON.stringify(saveRes,null,2));
-        layer.msg(saveRes.info);
+  }
+
+  savePastNodeData():void {
+
+    //confirm save.
+    //*
+    layerHelper.confirm('Do you want to save the past data to DB?','SaveConfirm',()=>{
+      //let lwi = layer.load();
+      const modalRef = this.modalService.open(
+        NgbProgressbarExt,
+        { centered: true,backdrop:'static' });
+      modalRef.componentInstance.taskName = this.lid;
+      this.httpClient.callPost(
+        `/api/nd/${this.lid}/save`,
+        this.analysisResult.pastNodeData.cObj,
+        (result)=>{
+          console.log(result);
+          //layer.close(lwi);
+          let saveResult = '';
+          if(result.new>0){
+            saveResult += `find unsaved past data,just saved ${result.new} items.\n`;
+          }else {
+            saveResult += 'no unsaved past data find,increase the snapshotsCount value and click Refresh button,then save again.\n ';
+          }
+          saveResult += JSON.stringify(result,null,2);
+          layerHelper.showInfo(saveResult);
+        },
+        (error)=>{
+          console.error(error);
+          //layer.close(lwi);
+        }
+      );
+    });//*/
+  }
+
+  comparePastData():void {
+    //ndMap:{from:,to:,pdc:12};
+    const ndMap = {};
+    let lwi = layer.load();
+    _.each(this.analysisResult.pastNodeData.cObj, (ndList, nid)=>{
+      const sortedList:any[] = _.sortBy(ndList,['timestampISO']);
+      ndMap[nid] = {
+        from: sortedList[0].timestampISO,
+        to:sortedList[sortedList.length - 1].timestampISO,
+        pdc:sortedList.length
+      };
+    });
+    this.httpClient.callPost(
+      `/api/nd/${this.lid}/comp`,
+      ndMap,
+      (result)=>{
+        //console.log(result);
+        layer.close(lwi);
+        //layer.msg(JSON.stringify(result,null,2));
+        //layerHelper.showInfo(JSON.stringify(result,null,2));
+        this.analysisResult.pastNodeData.str = '';
+        let tmpStr = JSON.stringify(result,null,2);
+        if(result.tndc != 0) {
+          this.analysisResult.pastNodeData.str += `Find ${result.tndc} new data item,we may need save them.\n`;
+        }else{
+          this.analysisResult.pastNodeData.str += 'No new data item find,we do not need save.\n';
+        }
+        this.analysisResult.pastNodeData.str += tmpStr;
       },
-      errMsg => {
-        this.errMsg = errMsg;
-        console.log('error!'+errMsg);
+      (error)=>{
+        console.error(error);
+        //layerHelper.showInfo(JSON.stringify(error,null,2));
+        this.analysisResult.pastNodeData.str = JSON.stringify(error,null,2);
+        layer.close(lwi);
       }
     );
-  }
-  getBack():void{
-    this.router.navigate(['/pages/location']);
   }
 }
