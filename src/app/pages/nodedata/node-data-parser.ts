@@ -3,10 +3,14 @@ import { Component, OnInit }     from '@angular/core'
 import { ActivatedRoute, Router} from '@angular/router';
 import { NodeDataService }          from '../../services/node-data.service';
 import { CommonHttpService } from '../../services/common.http.service';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {NgbProgressbarExt} from './ngb.progressbar.ext';
+import { HttpClient, HttpRequest, HttpEvent, HttpEventType, HttpErrorResponse}  from '@angular/common/http';
+
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbProgressbarExt } from './ngb.progressbar.ext';
 // import * as moment from "moment";
-import * as _ from "lodash";
+// import * as _ from "lodash";
+// import { throwError } from "rxjs";
+// import { map, tap, last,catchError } from "rxjs/operators";
 
 @Component({
   selector: 'node-data-parser',
@@ -30,6 +34,7 @@ export class NodeDataParserComponent implements OnInit {
     private modalService: NgbModal,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private _httpClient: HttpClient,
     private httpClient: CommonHttpService,
     private nodeDataService:NodeDataService) {
     //console.log('NodeDataParserComponent:constructor called.');
@@ -40,7 +45,7 @@ export class NodeDataParserComponent implements OnInit {
     this.datasrc = params['src'];
     this.snapcount = params['sc'];
     this.name = params['name'];
-    console.log('name',JSON.stringify(this.name,null,2));
+    // console.log('name',JSON.stringify(this.name,null,2));
 
     this.nodeDataService.getLocationData(this.lid).subscribe(
       locationData => {
@@ -206,74 +211,96 @@ export class NodeDataParserComponent implements OnInit {
     }
   }
 
-  savePastNodeData():void {
+  /*
+  private getEventMessage(event: HttpEvent<any>) {
+    switch (event.type) {
+      case HttpEventType.Sent:
+        //return `Uploading file "${file.name}" of size ${file.size}.`;
+        return `Uploading ...`;
 
+      case HttpEventType.UploadProgress:
+        // Compute and show the % done:
+        const percentDone = Math.round(100 * event.loaded / event.total);
+        //return `File "${file.name}" is ${percentDone}% uploaded.`;
+        return `${percentDone}% uploaded.`;
+
+      case HttpEventType.Response:
+        //return `File "${file.name}" was completely uploaded!`;
+        return `info was completely uploaded!`;
+
+      default:
+        //return `File "${file.name}" surprising upload event: ${event.type}.`;
+        return `surprising upload event: ${event.type}.`;
+    }
+  }
+
+  showProgress(msg):void{
+    console.log(msg);
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error.message);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      console.error(
+        `Backend returned code ${error.status}, ` +
+        `body was: ${error.error}`);
+    }
+    // return an observable with a user-facing error message
+    return throwError(
+      'Something bad happened; please try again later.');
+  };//*/
+
+  savePastNodeData():void {
     //confirm save.
     //*
     layerHelper.confirm('Do you want to save the past data to DB?','SaveConfirm',()=>{
-      //let lwi = layer.load();
+      // get a modalRef here.
       const modalRef = this.modalService.open(
-        NgbProgressbarExt,
-        { centered: true,backdrop:'static' });
-      modalRef.componentInstance.taskName = this.lid;
-      this.httpClient.callPost(
+        NgbProgressbarExt, { centered: true,backdrop:'static' });
+      // get progressBar here.
+      const progressBar = modalRef.componentInstance;
+      // set longTask name.
+      progressBar.setTaskName(this.lid);
+      progressBar.showProgressDesc = true;
+      // call long task here.
+      this.httpClient.callLongTask(
         `/api/nd/${this.lid}/save`,
         this.analysisResult.pastNodeData.cObj,
-        (result)=>{
-          console.log(result);
-          //layer.close(lwi);
-          let saveResult = '';
-          if(result.new>0){
-            saveResult += `find unsaved past data,just saved ${result.new} items.\n`;
-          }else {
-            saveResult += 'no unsaved past data find,increase the snapshotsCount value and click Refresh button,then save again.\n ';
+        {
+          uploadStart: () => {
+            progressBar.updateProgressInfo(20,'upload...');
+            progressBar.setProgressDesc('sending data to server now...');
+          },
+          updateTaskInfo: (ufValue)=>{
+            // console.log('ufValue=',ufValue);
+            progressBar.updateProgressInfo(ufValue,ufValue+'% uploaded.');
+            progressBar.setProgressDesc('sending data to server over.');
+            if (ufValue == 100) {
+              progressBar.startRefreshProgress();
+            }
+          },
+          finishTask: (result) => {
+            const _result = result.body;
+            //console.log(_result);
+            //layer.close(lwi);
+            let saveResult = '';
+            if(_result['new']>0){
+              saveResult += `find unsaved past data,just saved ${_result['new']} items.\n`;
+            }else {
+              saveResult += 'no unsaved past data find,increase the snapshotsCount value and click Refresh button,then save again.\n ';
+            }
+            saveResult += JSON.stringify(_result,null,2);
+            layerHelper.showInfo(saveResult);
+          },
+          handleError: (error)=>{
+            console.log('handleError:',error);
           }
-          saveResult += JSON.stringify(result,null,2);
-          layerHelper.showInfo(saveResult);
-        },
-        (error)=>{
-          console.error(error);
-          //layer.close(lwi);
         }
       );
-    });//*/
-  }
-
-  comparePastData():void {
-    //ndMap:{from:,to:,pdc:12};
-    const ndMap = {};
-    let lwi = layer.load();
-    _.each(this.analysisResult.pastNodeData.cObj, (ndList, nid)=>{
-      const sortedList:any[] = _.sortBy(ndList,['timestampISO']);
-      ndMap[nid] = {
-        from: sortedList[0].timestampISO,
-        to:sortedList[sortedList.length - 1].timestampISO,
-        pdc:sortedList.length
-      };
     });
-    this.httpClient.callPost(
-      `/api/nd/${this.lid}/comp`,
-      ndMap,
-      (result)=>{
-        //console.log(result);
-        layer.close(lwi);
-        //layer.msg(JSON.stringify(result,null,2));
-        //layerHelper.showInfo(JSON.stringify(result,null,2));
-        this.analysisResult.pastNodeData.str = '';
-        let tmpStr = JSON.stringify(result,null,2);
-        if(result.tndc != 0) {
-          this.analysisResult.pastNodeData.str += `Find ${result.tndc} new data item,we may need save them.\n`;
-        }else{
-          this.analysisResult.pastNodeData.str += 'No new data item find,we do not need save.\n';
-        }
-        this.analysisResult.pastNodeData.str += tmpStr;
-      },
-      (error)=>{
-        console.error(error);
-        //layerHelper.showInfo(JSON.stringify(error,null,2));
-        this.analysisResult.pastNodeData.str = JSON.stringify(error,null,2);
-        layer.close(lwi);
-      }
-    );
   }
 }
