@@ -10,45 +10,29 @@
     </div>
   </div>
   <div class="row">
-    <mat-accordion class="col-md-12">
-      <mat-expansion-panel [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title>NewNodeData:{{analysisResult.newNodeData.desc}}</mat-panel-title>
-          <mat-panel-description>Display the latest data on each node.</mat-panel-description>
-        </mat-expansion-panel-header>
-        <textarea class="full-width" rows="15">{{analysisResult.newNodeData.str}}</textarea>
-      </mat-expansion-panel>
-    </mat-accordion>
-    <mat-accordion class="col-md-12">
-      <mat-expansion-panel [expanded]="false">
-        <mat-expansion-panel-header>
-          <mat-panel-title>PastNodeData:{{analysisResult.pastNodeData.desc}}</mat-panel-title>
-          <mat-panel-description>Display the past data of all node.</mat-panel-description>
-        </mat-expansion-panel-header>
-        orderBy:
-        <input type="radio" name="pastOrderBy" value="time" checked (click)="updatePastDataOrder('time')">Time
-        <input type="radio" name="pastOrderBy" value="nid" (click)="updatePastDataOrder('nid')">Mac
-        <input class="btn btn-primary" type="button" value="Save" (click)="savePastNodeData()">
-        <textarea class="full-width" rows="25">{{analysisResult.pastNodeData.str}}</textarea>
-      </mat-expansion-panel>
-    </mat-accordion>
-    <mat-accordion class="col-md-12">
-      <mat-expansion-panel [expanded]="false">
-        <mat-expansion-panel-header>
-          <mat-panel-title>AnalysisResult</mat-panel-title>
-          <mat-panel-description>Display the AnalysisResult here.</mat-panel-description>
-        </mat-expansion-panel-header>
-        <textarea class="full-width" rows="15">{{analysisResultDesc}}</textarea>
-      </mat-expansion-panel>
-    </mat-accordion>
-    <mat-accordion class="col-md-12">
-      <mat-expansion-panel [expanded]="false">
-        <mat-expansion-panel-header>
-          <mat-panel-title>Raw Data:{{analysisResult.rawData.desc}}</mat-panel-title>
-          <mat-panel-description>Display the RAW data here.</mat-panel-description>
-        </mat-expansion-panel-header>
-        <textarea class="full-width" rows="15">{{analysisResult.rawData.str}}</textarea>
-      </mat-expansion-panel>
-    </mat-accordion>
+    <div class="col-md-12">
+      <mat-tab-group>
+        <mat-tab label="NewNodeData:{{analysisResult.newNodeData.desc}}">
+          <div>Display the latest data on each node.</div>
+          <textarea class="full-width" rows="22">{{analysisResult.newNodeData.str}}</textarea>
+        </mat-tab>
+        <mat-tab label="PastNodeData:{{analysisResult.pastNodeData.desc}}">
+          <div>Display the past data of all node.
+          orderBy:
+          <input type="radio" name="pastOrderBy" value="time" checked (click)="updatePastDataOrder('time')">Time
+          <input type="radio" name="pastOrderBy" value="nid" (click)="updatePastDataOrder('nid')">Mac
+          <input class="btn btn-primary" type="button" value="Save" (click)="savePastNodeData()"></div>
+          <textarea class="full-width" rows="21">{{analysisResult.pastNodeData.str}}</textarea>
+        </mat-tab>
+        <mat-tab label="AnalysisResult">
+          <div>Display the AnalysisResult here.</div>
+          <textarea class="full-width" rows="22">{{analysisResultDesc}}</textarea>
+        </mat-tab>
+        <mat-tab label="Raw Data:{{analysisResult.rawData.desc}}">
+          <div>Display the Raw data here.</div>
+          <textarea class="full-width" rows="22">{{showRawData()}}</textarea>
+        </mat-tab>
+      </mat-tab-group>
+  </div>
   </div>
 </div>

@@ -5,6 +5,8 @@ import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MaterialRefModule } from '../../theme/material.ref.module';
 import { AngularDualListBoxModule } from 'angular-dual-listbox';
+import { PrimeNgRefModule } from '../../core/primeng.ref.module';
+
 import { UserDialogForm } from './components/user.dialog.form';
 import { AssignLocationComponent } from './components/assign.location';
 
@@ -19,6 +21,7 @@ import { routing } from './user.routing';
     FlexLayoutModule,
     MaterialRefModule,
     AngularDualListBoxModule,
+    PrimeNgRefModule,
     routing
   ],
   declarations: [

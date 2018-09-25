@@ -374,7 +374,7 @@ module.exports.getNodeData = function(req, res) {
 module.exports.executeInspectNodeTask = function(req, res) {
   var lid = req.params.lid;
   var location = req.body;
-  var dataUrl = util.buildDataUrl(location.datasrc,Math.ceil(0.1*location.snapcount));
+  var dataUrl = dataParser.buildDataUrl(location.datasrc,Math.ceil(0.1*location.snapcount));
 
   util.loadNewData(dataUrl,function(err,nodesData){
     if(err){
@@ -459,7 +459,7 @@ module.exports.synDataTaskCtrl = function(req, res) {
   var sts = req.params.sts;//switch to status:on,off
   var taskId = req.app.locals.dataSyncTask[lid];
   var location = req.body;
-  var dataUrl = util.buildDataUrl(location.datasrc,location.snapcount);
+  var dataUrl = dataParser.buildDataUrl(location.datasrc,location.snapcount);
   if(sts == 'on'){
     locDao.updateSynStatus(lid,true);
     //execute immediately one time.

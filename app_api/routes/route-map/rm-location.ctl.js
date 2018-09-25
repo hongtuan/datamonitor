@@ -15,7 +15,7 @@ module.exports.routeConfig = {
     {':lid/delb/:bid': {get: controller.deleteBoundary}},
     {':lid/ld': {get: controller.getLocationData}},
     {':lid/savebound': {post: controller.saveOneBoundary}},
-    {':lid/upi': {post: controller.updatePointInfo}},
+    {'upi': {post: controller.updatePointInfo}},
   ]
 };
 

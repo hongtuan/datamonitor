@@ -27,6 +27,9 @@
               "node_modules/ng2-slim-loading-bar/style.css",
               "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/assets/lib/smartmenu/css/smartMenu.css",
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/primeng/resources/themes/nova-light/theme.css",
+              "node_modules/primeng/resources/primeng.min.css",
               "src/app/theme/theme.scss",
               "src/styles.scss"
             ],

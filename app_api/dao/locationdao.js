@@ -1,6 +1,7 @@
-var mongoose = require('mongoose');
-var Location = mongoose.model('Location');
-var du = require('../../app_client/myjs/data_utils.js');
+const mongoose = require('mongoose');
+const Location = mongoose.model('Location');
+// var du = require('../../app_client/myjs/data_utils.js');
+const dataParser = require('../../app_api/helper/data.parser.helper');
 function trimJSONStr(jStr){
   return JSON.stringify(JSON.parse(jStr));
 }
@@ -267,7 +268,7 @@ function buildPoint(_point){
   //cvt notes:
   var notesEcho = [];
   _point.notes.forEach(function(note){
-    notesEcho.push(`${du.iso2Locale(note.ntime)} note:\n${note.nc}`);
+    notesEcho.push(`${dataParser.iso2Locale(note.ntime)} note:\n${note.nc}`);
   });
   point.notes = notesEcho.reverse().join('\n');
   return point;
@@ -301,16 +302,6 @@ module.exports.getPointInfo = function(lid,bid,pid, cb) {
           for(var j in boundary.points){
             var _point = boundary.points[j];
             if(_point._id == pid){
-              /*
-              point.nodeid = _point.nodeid;
-              point.ptag = _point.ptag;
-              //cvt notes:
-              var notesEcho = [];
-              _point.notes.forEach(function(note){
-                notesEcho.push(`${du.iso2Locale(note.ntime)} note:\n${note.nc}`);
-              });
-              point.notes = notesEcho.reverse().join('\n');//*/
-              //console.log('point found.');
               point = buildPoint(_point);
               break;
             }

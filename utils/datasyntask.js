@@ -1,11 +1,12 @@
 const locDao = require('../app_api/dao/locationdao.js');
-const du = require('../app_client/myjs/data_utils.js');
+// const du = require('../app_client/myjs/data_utils.js');
+const dataParser = require('../app_api/helper/data.parser.helper');
 const nd = require('../app_api/controllers/nodedata.js');
 
 function deploySynTask(location,app){
   const lid = location.id;
   let taskId = app.locals.dataSyncTask[lid];
-  const dataUrl = du.buildDataUrl(location.datasrc,location.snapcount);
+  const dataUrl = dataParser.buildDataUrl(location.datasrc,location.snapcount);
   console.log(lid,dataUrl,location.synperiod);
   //execute immediately one time.
   setTimeout(function(){

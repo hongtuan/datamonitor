@@ -5,20 +5,18 @@ import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'assign-location',
-  template: `
-    <div class="ctn">
-      <dual-list [source]="sourceList" [(destination)]="assignedList" 
-        [key]="key" [display]="display" [filter]="true"
-        [format]="format" height="200px"></dual-list>
-      <div class="btrow" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px">
-        <button class="btn btn-primary btn-block" (click)="save()">Save</button><button class="btn btn-primary btn-block" (click)="cancel()">Cancel</button>
-      </div>
+  template: `<div class="ctn">
+    <dual-list [source]="sourceList" [(destination)]="assignedList"
+               [key]="key" [display]="display" [filter]="true"
+               [format]="format" height="200px"></dual-list>
+    <div class="btrow" fxLayout="row" fxLayoutAlign="center start" fxLayoutGap="40px">
+      <button class="btn btn-primary" (click)="save()">Save</button>
+      <button class="btn btn-primary" (click)="cancel()">Cancel</button>
     </div>
-  `,
+  </div>`,
   styles: [
     `.ctn {width: auto; height: auto;margin: 20px 20px}`,
-    `.btrow {margin: 5px 10px}`,
-    `.btn-block {background: #286090;width:60px}`
+    `.btrow {margin: 5px 10px; }`
   ]
 })
 export class AssignLocationComponent implements OnInit, AfterViewInit {

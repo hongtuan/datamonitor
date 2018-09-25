@@ -211,49 +211,6 @@ export class NodeDataParserComponent implements OnInit {
     }
   }
 
-  /*
-  private getEventMessage(event: HttpEvent<any>) {
-    switch (event.type) {
-      case HttpEventType.Sent:
-        //return `Uploading file "${file.name}" of size ${file.size}.`;
-        return `Uploading ...`;
-
-      case HttpEventType.UploadProgress:
-        // Compute and show the % done:
-        const percentDone = Math.round(100 * event.loaded / event.total);
-        //return `File "${file.name}" is ${percentDone}% uploaded.`;
-        return `${percentDone}% uploaded.`;
-
-      case HttpEventType.Response:
-        //return `File "${file.name}" was completely uploaded!`;
-        return `info was completely uploaded!`;
-
-      default:
-        //return `File "${file.name}" surprising upload event: ${event.type}.`;
-        return `surprising upload event: ${event.type}.`;
-    }
-  }
-
-  showProgress(msg):void{
-    console.log(msg);
-  }
-
-  private handleError(error: HttpErrorResponse) {
-    if (error.error instanceof ErrorEvent) {
-      // A client-side or network error occurred. Handle it accordingly.
-      console.error('An error occurred:', error.error.message);
-    } else {
-      // The backend returned an unsuccessful response code.
-      // The response body may contain clues as to what went wrong,
-      console.error(
-        `Backend returned code ${error.status}, ` +
-        `body was: ${error.error}`);
-    }
-    // return an observable with a user-facing error message
-    return throwError(
-      'Something bad happened; please try again later.');
-  };//*/
-
   savePastNodeData():void {
     //confirm save.
     //*
@@ -302,5 +259,9 @@ export class NodeDataParserComponent implements OnInit {
         }
       );
     });
+  }
+
+  showRawData():string {
+    return `${this.analysisResult.rawData.str}the raw data detail are:\n${JSON.stringify(this.analysisResult.rawData.obj,null,2)}`;
   }
 }

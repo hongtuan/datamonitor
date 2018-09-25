@@ -19,8 +19,8 @@
           <td class="clkt" title="click to edit." (click)="openEditDlg(user)">{{user.email}}</td>
           <td>{{user.name}}</td>
           <td>{{user.role}}</td>
-          <td>{{user.createdOn | date:'yMdjm'}}</td>
-          <td>{{user.expiredOn | date:'yMdjm'}}</td>
+          <td>{{user.createdOn | date:'y-M-d h:mm:ss a'}}</td>
+          <td>{{user.expiredOn | date:'y-M-d h:mm:ss a'}}</td>
           <td>
             <button class="btn btn-primary" (click)="deleteUser(user._id)">Delete</button>
             <button class="btn btn-primary" (click)="assignLocation(user)">AssignLocation</button>

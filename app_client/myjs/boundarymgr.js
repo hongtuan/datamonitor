@@ -180,7 +180,7 @@ function initMap() {
     },1000);//*/
     //updateNodeTag();
   });
-  console.log('initMap called.');
+  // console.log('initMap called.');
 
   //$("#menutest").smartMenu(boundsMenu,{name:'testMenu',type:'left'});
   //console.log('over.');
